@@ -17,5 +17,11 @@ This mod is based on Draconis and created by Scottii.
 
 ## Release log
 
+### Release v 1.0.4
+- Reduce downloadable size
+- add mod.conf
+
 ### Release v 1.0.0
 - Initial release
+
+
