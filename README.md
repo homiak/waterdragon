@@ -21,7 +21,7 @@ This mod is based on Draconis and created by Scottii.
 ### Release v 1.0.0
 - Initial release
 
-### Release v 1.0.5
+### Release v 1.1.0
 - Add throwable Wing Horn
 - Fix bugs
 - Fix view points
