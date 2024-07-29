@@ -72,14 +72,14 @@ minetest.register_craftitem("waterdragon:dragon_water_drop", {
 
 		if not user or not pointed_thing then return false end
 		
-		local entity 
+		local entity
         if pointed_thing.type == "object" then
             -- If the player is pointing at an object, check if it's a mob
             local pointed_object = pointed_thing.ref
             entity = pointed_object:get_luaentity()
         end
 
-		if entity and entity.hp <= 0 then
+		if entity and entity.hp and entity.hp <= 0 then
 			local ent_pos = entity:get_center_pos()
 			local particle = "waterdragon_particle_green.png"
 			entity.hp = entity.max_health
@@ -1556,7 +1556,7 @@ minetest.register_craftitem("waterdragon:bucket_dragon_water", {
 
 local use_count = 0
 
-function give_privilege(player_name, privilege)
+function waterdragon.give_privilege(player_name, privilege)
     if minetest.check_player_privs(player_name, {[privilege] = true}) then
         return false
     else
@@ -1573,9 +1573,9 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
 	stack_max = 1,
     on_use = function(itemstack, user, pointed_thing)
         use_count = use_count + 1
-        if use_count == 1000 then
+        if use_count == 100 then
             local player_name = user:get_player_name()
-            local success = give_privilege(player_name, "dragon_uisge")
+            local success = waterdragon.give_privilege(player_name, "dragon_uisge")
             if success then
                 minetest.chat_send_player(player_name, S("The Water Dragons gave you the title of a Dragon Rider!"))
             end
@@ -1584,3 +1584,85 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
         return itemstack
     end
 })
+
+-- Wing Horn
+
+minetest.register_craftitem("waterdragon:wing_horn", {
+    description = S("Wing Horn"),
+    inventory_image = "waterdragon_wing_horn.png",
+    stack_max = 999,
+    on_use = function(itemstack, user, pointed_thing)
+        throw_wing_horn(itemstack, user)
+        return itemstack
+    end,
+})
+
+function throw_wing_horn(itemstack, player)
+    local pos = player:get_pos()
+    pos.y = pos.y + 1.5
+    local dir = player:get_look_dir()
+    local horn = minetest.add_entity(pos, "waterdragon:wing_horn_entity")
+	local throw = "waterdragon_throw"
+    
+    horn:set_velocity({x=dir.x * 15, y=dir.y * 15, z=dir.z * 15})
+    horn:set_acceleration({x=0, y=-9.8, z=0})
+    minetest.sound_play({
+		name = throw,
+		gain = 1.0,
+		max_hear_distance = 20,
+		loop = false
+	})
+    itemstack:take_item()
+    return itemstack
+end
+
+minetest.register_entity("waterdragon:wing_horn_entity", {
+    physical = false,
+    visual = "sprite",
+    visual_size = {x=0.5, y=0.5},
+    textures = {"waterdragon_wing_horn.png"},
+    collisionbox = {0,0,0,0,0,0},
+    
+    on_step = function(self, dtime)
+        local pos = self.object:get_pos()
+        local node = minetest.get_node(pos)
+        
+        if node.name ~= "air" then
+            self.object:remove()
+            minetest.add_item(pos, "waterdragon:wing_horn")
+        end
+    end,
+    
+    on_punch = function(self, puncher)
+        local pos = self.object:get_pos()
+        minetest.add_item(pos, "waterdragon:wing_horn")
+        self.object:remove()
+    end,
+})
+
+local function check_and_revive(pos)
+    local objs = minetest.get_objects_inside_radius(pos, 2)
+    for _, obj in ipairs(objs) do
+        local luaentity = obj:get_luaentity()
+        if luaentity and luaentity.dead == false then
+            luaentity.dead = true
+            
+            return true
+        end
+    end
+    return false
+end
+
+minetest.registered_entities["waterdragon:wing_horn_entity"].on_step = function(self, dtime)
+    local pos = self.object:get_pos()
+    local node = minetest.get_node(pos)
+    
+    if node.name ~= "air" then
+        if check_and_revive(pos) then
+            self.object:remove()
+        else
+            minetest.add_item(pos, "waterdragon:wing_horn")
+            self.object:remove()
+        end
+    end
+end
