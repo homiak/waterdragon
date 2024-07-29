@@ -1592,12 +1592,12 @@ minetest.register_craftitem("waterdragon:wing_horn", {
     inventory_image = "waterdragon_wing_horn.png",
     stack_max = 999,
     on_use = function(itemstack, user, pointed_thing)
-        throw_wing_horn(itemstack, user)
+        Throw_wing_horn(itemstack, user)
         return itemstack
     end,
 })
 
-function throw_wing_horn(itemstack, player)
+function Throw_wing_horn(itemstack, player)
     local pos = player:get_pos()
     pos.y = pos.y + 1.5
     local dir = player:get_look_dir()
