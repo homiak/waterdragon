@@ -3,6 +3,7 @@
 --------------
 
 waterdragon = {
+	scottish_dragons = {},
 	force_storage_save = false
 }
 
@@ -105,6 +106,7 @@ dofile(path.."/api/mount.lua")
 dofile(path.."/api/behaviors.lua")
 dofile(path.."/mobs/rare_water_dragon.lua")
 dofile(path.."/mobs/pure_water_dragon.lua")
+dofile(path.."/mobs/scottish_dragon.lua")
 dofile(path.."/nodes.lua")
 dofile(path.."/craftitems.lua")
 dofile(path.."/api/book.lua")
