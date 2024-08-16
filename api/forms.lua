@@ -134,9 +134,9 @@ local function get_customize_formspec(self)
 	return table.concat(form, "")
 end
 
------------------
--- scottish_dragon Form --
------------------
+--------------------------
+-- Scottish Dragon Form --
+--------------------------
 
 local function get_scottish_dragon_formspec(self)
 	-- Stats

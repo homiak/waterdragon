@@ -845,7 +845,7 @@ creatura.register_utility("waterdragon:fly_to_land", function(self)
 	self:set_utility(func)
 end)
 
--- scottish_dragon Breaking
+-- Scottish Dragon Breaking
 
 creatura.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
 	local center = self.object:get_pos()
@@ -1298,7 +1298,7 @@ waterdragon.scottish_dragon_behavior = {
 		get_score = function(self)
 			local pos = self.object:get_pos()
 			if not pos then return end
-			local stance = (self.owner and self.stance) or "aggressive"
+			local stance = (self.owner and self.stance) or "neutral"
 			if stance == "passive" then return 0 end
 			local target = self._target
 			if not target then
@@ -1308,10 +1308,8 @@ waterdragon.scottish_dragon_behavior = {
 					self._target = nil
 					return 0
 				end
-			elseif stance == "neutral" then
-				stance = "aggressive"
 			end
-			if stance ~= "aggressive" then
+			if stance ~= "neutral" then
 				self._target = nil
 				return 0
 			end

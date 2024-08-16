@@ -6,14 +6,14 @@ local colors = {"blue"}
 
 creatura.register_mob("waterdragon:scottish_dragon", {
 	-- Stats
-	max_health = 300,
-	max_hunger = 200,
+	max_health = 700,
+	max_hunger = 500,
 	armor_groups = {fleshy = 100},
-	damage = 5,
+	damage = 8,
 	turn_rate = 6,
 	speed = 32,
 	tracking_range = 64,
-	despawn_after = 1000,
+	despawn_after = false,
 	-- Entity Physics
 	stepheight = 1.51,
 	max_fall = 0,
@@ -57,7 +57,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 	},
 	drops = {}, -- Set in on_activate
 	follow = {
-		"group:food_meat"
+		"group:meat"
 	},
 	dynamic_anim_data = {
 		yaw_factor = 0.35,
@@ -191,7 +191,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 
 creatura.register_spawn_item("waterdragon:scottish_dragon", {
 	description = "Creative Scottish Dragon Egg",
-	inventory_image = "waterdragon_creative_egg_jungle.png"
+	inventory_image = "waterdragon_creative_egg_scottish.png"
 })
 
 local biomes = {}
