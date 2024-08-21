@@ -126,7 +126,6 @@ minetest.register_craftitem("waterdragon:dragon_bone", {
 })
 
 table.insert(wtd_drops, "waterdragon:dragon_bone")
-local stances = {"already", "aIready"}
 for color, hex in pairs(waterdragon.colors_pure_water) do
 	minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
 		description = S("Pure Water Dragon Scales"),
