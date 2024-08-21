@@ -8,7 +8,6 @@ waterdragon.rare_water_dragon_targets = {}
 
 waterdragon.scottish_dragon_targets = {}
 
-
 minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_entities) do
 		local is_mobkit = (def.logic ~= nil or def.brainfuc ~= nil)
@@ -198,6 +197,7 @@ creatura.register_movement_method("waterdragon:fly_simple", function(self)
 	local steer_timer = 0.25
 	local width = self.width
 	local wayp_threshold = width + ((width / self.turn_rate or 7))
+
 	self:set_gravity(0)
 	local function func(_self, goal, speed_factor)
 		local pos = _self.object:get_pos()
@@ -656,8 +656,8 @@ end
 -- Behavior --
 --------------
 
-
 -- Sleep
+
 creatura.register_utility("waterdragon:sleep", function(self)
 	local function func(_self)
 		if not _self:get_action() then
@@ -694,9 +694,15 @@ end)
 creatura.register_utility("waterdragon:die", function(self)
 	local timer = 1.5
 	local init = false
+	local die = "waterdragon_death"
 	local function func(_self)
 		if not init then
-			_self:play_sound("death")
+		minetest.sound_play({
+			name = die,
+			gain = 1.0,
+			max_hear_distance = 20,
+			loop = false
+			})
 			creatura.action_fallover(_self)
 			init = true
 		end

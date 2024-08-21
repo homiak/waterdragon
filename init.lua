@@ -134,24 +134,6 @@ end)
 
 dofile(path.."/mapgen.lua")
 
--- Aliases --
-
-minetest.register_alias("waterdragon:dracolily_pure_water", "air")
-minetest.register_alias("waterdragon:dracolily_rare_water", "air")
-
-minetest.register_alias("waterdragon:blood_pure_water_dragon", "")
-minetest.register_alias("waterdragon:blood_rare_water_dragon", "")
-
-minetest.register_alias("waterdragon:manuscript", "")
-
-for color in pairs(waterdragon.colors_rare_water) do
-    minetest.register_alias("waterdragon:egg_rare_water_dragon", "waterdragon:egg_rare_water")
-end
-
-for color in pairs(waterdragon.colors_pure_water) do
-    minetest.register_alias("waterdragon:egg_pure_water_dragon", "waterdragon:egg_pure_water")
-end
-
 minetest.register_entity("waterdragon:rare_water_eyes", {
     on_activate = function(self)
         self.object:remove()

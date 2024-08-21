@@ -96,3 +96,4 @@ The nearest Water Dragon has been called and has flied to you!=
 Sets owner of pointed Water Dragon=
 Adds player to attack blacklist of Water Dragons=
 Removes player from attack blacklist of the Water Dragons=
+You already can interact with the Water Dragons=

@@ -126,13 +126,23 @@ minetest.register_craftitem("waterdragon:dragon_bone", {
 })
 
 table.insert(wtd_drops, "waterdragon:dragon_bone")
-
+local stances = {"already", "aIready"}
 for color, hex in pairs(waterdragon.colors_pure_water) do
 	minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
 		description = S("Pure Water Dragon Scales"),
 		inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
-		groups = { dragon_scales = 1 }
+		on_use = function(itemstack, user)
+			local name = user:get_player_name()
+			taming_ability_enabled = not taming_ability_enabled
+			local status = taming_ability_enabled and " already" or " airedy"
+			minetest.chat_send_player(name, S("You can" .. status .. " interact with the Water Dragons"))
+			return itemstack
+		end,
 	})
+	function is_taming_ability_enabled()
+		return taming_ability_enabled
+	end
+		groups = { dragon_scales = 1 }
 	table.insert(wtd_drops, "waterdragon:scales_pure_water_dragon")
 end
 
@@ -631,9 +641,6 @@ minetest.register_craftitem("waterdragon:dragon_horn", {
 	on_secondary_use = dragon_horn_use
 })
 
-minetest.register_alias("waterdragon:dragon_horn", "waterdragon:dragon_horn")
-minetest.register_alias("waterdragon:dragon_flute", "waterdragon:dragon_horn")
-
 --------------
 -- Crucible --
 --------------
@@ -831,11 +838,6 @@ for color in pairs(waterdragon.colors_rare_water) do
 	})
 end
 
-minetest.register_alias("waterdragon:pick_dragonbone", "waterdragon:pick_dragonhide_pure_water_black")
-minetest.register_alias("waterdragon:shovel_dragonbone", "waterdragon:shovel_dragonhide_pure_water_black")
-minetest.register_alias("waterdragon:axe_dragonbone", "waterdragon:axe_dragonhide_pure_water_black")
-minetest.register_alias("waterdragon:sword_dragonbone", "waterdragon:sword_dragonhide_pure_water_black")
-
 -- Draconic Steel --
 
 local function draconic_step(itemstack, player, pointed_thing)
@@ -1016,7 +1018,6 @@ end
 --------------
 
 minetest.register_alias_force("waterdragon:bestiary", "waterdragon:book_waterdragon")
-minetest.register_alias_force("waterdragon:lectern", "waterdragon:log_wet") -- I do a little trolling
 
 -- Get Craft Items --
 
@@ -1041,9 +1042,9 @@ end)
 minetest.register_craft({
 	output = "waterdragon:dragonstone_block_rare_water",
 	recipe = {
-		{ "",                      "waterdragon:wet_stone", "" },
+		{ "", "waterdragon:wet_stone", "" },
 		{ "waterdragon:wet_stone", "waterdragon:wet_stone", "waterdragon:wet_stone" },
-		{ "",                      "waterdragon:wet_stone", "" },
+		{ "", "waterdragon:wet_stone", "" },
 	}
 })
 
@@ -1515,35 +1516,58 @@ minetest.register_craftitem("waterdragon:bucket_dragon_water", {
 		and entity.memorize then
 			local ent_pos = entity:get_center_pos()
 			local particle = "waterdragon_particle_green.png"
+			local particle2 = "waterdragon_particle_blue.png"
 			if not entity.owner then
 				entity.owner = player:get_player_name()
 				entity:memorize("owner", entity.owner)
 				minetest.chat_send_player(player:get_player_name(), S("The animal has been tamed!"))
+				minetest.add_particlespawner({
+					amount = 16,
+					time = 0.25,
+					minpos = {
+						x = ent_pos.x - entity.width,
+						y = ent_pos.y - entity.width,
+						z = ent_pos.z - entity.width
+					},
+					maxpos = {
+						x = ent_pos.x + entity.width,
+						y = ent_pos.y + entity.width,
+						z = ent_pos.z + entity.width
+					},
+					minacc = {x = 0, y = 0.25, z = 0},
+					maxacc = {x = 0, y = -0.25, z = 0},
+					minexptime = 0.75,
+					maxexptime = 1,
+					minsize = 4,
+					maxsize = 4,
+					texture = particle,
+					glow = 16
+				})
 			else
 				minetest.chat_send_player(player:get_player_name(), S("The animal is already tamed"))
+				minetest.add_particlespawner({
+					amount = 16,
+					time = 0.25,
+					minpos = {
+						x = ent_pos.x - entity.width,
+						y = ent_pos.y - entity.width,
+						z = ent_pos.z - entity.width
+					},
+					maxpos = {
+						x = ent_pos.x + entity.width,
+						y = ent_pos.y + entity.width,
+						z = ent_pos.z + entity.width
+					},
+					minacc = {x = 0, y = 0.25, z = 0},
+					maxacc = {x = 0, y = -0.25, z = 0},
+					minexptime = 0.75,
+					maxexptime = 1,
+					minsize = 4,
+					maxsize = 4,
+					texture = particle2,
+					glow = 16
+				})
 			end
-			minetest.add_particlespawner({
-				amount = 16,
-				time = 0.25,
-				minpos = {
-					x = ent_pos.x - entity.width,
-					y = ent_pos.y - entity.width,
-					z = ent_pos.z - entity.width
-				},
-				maxpos = {
-					x = ent_pos.x + entity.width,
-					y = ent_pos.y + entity.width,
-					z = ent_pos.z + entity.width
-				},
-				minacc = {x = 0, y = 0.25, z = 0},
-				maxacc = {x = 0, y = -0.25, z = 0},
-				minexptime = 0.75,
-				maxexptime = 1,
-				minsize = 4,
-				maxsize = 4,
-				texture = particle,
-				glow = 16
-			})
 		-- Consume the item from the player's inventory
 		itemstack:take_item()
 		return itemstack
@@ -1590,8 +1614,7 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
 minetest.register_craftitem("waterdragon:wing_horn", {
     description = S("Wing Horn"),
     inventory_image = "waterdragon_wing_horn.png",
-    stack_max = 999,
-    on_use = function(itemstack, user, pointed_thing)
+    on_use = function(itemstack, user)
         Throw_wing_horn(itemstack, user)
         return itemstack
     end,
@@ -1623,7 +1646,7 @@ minetest.register_entity("waterdragon:wing_horn_entity", {
     textures = {"waterdragon_wing_horn.png"},
     collisionbox = {0,0,0,0,0,0},
     
-    on_step = function(self, dtime)
+    on_step = function(self)
         local pos = self.object:get_pos()
         local node = minetest.get_node(pos)
         
@@ -1633,7 +1656,7 @@ minetest.register_entity("waterdragon:wing_horn_entity", {
         end
     end,
     
-    on_punch = function(self, puncher)
+    on_punch = function(self)
         local pos = self.object:get_pos()
         minetest.add_item(pos, "waterdragon:wing_horn")
         self.object:remove()
@@ -1641,19 +1664,18 @@ minetest.register_entity("waterdragon:wing_horn_entity", {
 })
 
 local function check_and_revive(pos)
-    local objs = minetest.get_objects_inside_radius(pos, 2)
+    local objs = minetest.get_objects_inside_radius(pos, 1)
     for _, obj in ipairs(objs) do
         local luaentity = obj:get_luaentity()
-        if luaentity and luaentity.dead == false then
-            luaentity.dead = true
-            
-            return true
-        end
+        if luaentity then
+		obj:set_hp(0)
+		end
+		return true
     end
-    return false
+	return false
 end
 
-minetest.registered_entities["waterdragon:wing_horn_entity"].on_step = function(self, dtime)
+minetest.registered_entities["waterdragon:wing_horn_entity"].on_step = function(self)
     local pos = self.object:get_pos()
     local node = minetest.get_node(pos)
     
