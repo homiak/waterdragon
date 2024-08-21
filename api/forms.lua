@@ -250,6 +250,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 	end
 	if formname == "waterdragon:scottish_dragon_forms" then
+		minetest.log("action", "!! name "  .. dump(fields) .. " formname " .. formname)
+
 		if fields.btn_wtd_stance then
 			if not ent.object then return end
 			if ent.stance == "neutral" then
@@ -260,6 +262,34 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				ent.stance = ent:memorize("stance", "neutral")
 			end
 			ent:show_formspec(player)
+		end
+		if fields.btn_wtd_order then
+			if not ent.object then return end
+			if ent.order == "wander" then
+				ent.order = ent:memorize("order", "follow")
+			elseif ent.order == "follow" then
+				ent.order = ent:memorize("order", "stay")
+			elseif ent.order == "stay" then
+				ent.order = ent:memorize("order", "wander")
+			else
+				ent.order = ent:memorize("order", "stay")
+			end
+			ent:show_formspec(player)
+		end
+		if fields.btn_wtd_fly then
+			if not ent.object then return end
+			if ent.fly_allowed then
+				ent.fly_allowed = ent:memorize("fly_allowed", false)
+			else
+				ent.fly_allowed = ent:memorize("fly_allowed", true)
+			end
+			ent:show_formspec(player)
+		end
+		if fields.btn_wtd_name then
+			minetest.show_formspec(name, "waterdragon:set_name", get_rename_formspec(ent))
+		end
+		if fields.quit or fields.key_enter then
+			form_objref[name] = nil
 		end
 	end
 	if formname == "waterdragon:customize" then
