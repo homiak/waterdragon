@@ -131,7 +131,29 @@ local book_pages = {
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-	
+	{ -- Water Dragons Page 3
+		{ -- Scottish Dragon Text
+			element_type = "label",
+			font_size = 24,
+			offset = {x = 0, y = 1.5},
+			file = "waterdragon_book_dragon5.txt"
+		},
+		{ -- Water Dragon Image
+			element_type = "image",
+			font_size = 24,
+			offset = {x = 8.5, y = 2},
+			size = {x = 7.5, y = 6.5},
+			text = "waterdragon_wtd.png"
+		},
+		{ -- Last Page
+			element_type = "image_button",
+			font_size = 24,
+			offset = {x = 1, y = 9},
+			size = {x = 1, y = 1},
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+		},
+	},
+
 	-- Chapter 2
 	{ -- Steel Page 1
 		{ -- Main Page
@@ -206,7 +228,7 @@ local book_pages = {
 			offset = {x = 11.5, y = 5.5},
 			text = "Pure Water Forge:"
 		},
-		{ -- pure_water Forge Instructions
+		{ -- Pure Water Forge Instructions
 			element_type = "image",
 			offset = {x = 10.5, y = 6.5},
 			size = {x = 4.5, y = 2.5},
