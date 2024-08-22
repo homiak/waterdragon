@@ -13,8 +13,8 @@ minetest.register_on_mods_loaded(function()
 		local is_mobkit = (def.logic ~= nil or def.brainfuc ~= nil)
 		local is_creatura = def._creatura_mob
 		if is_mobkit
-		or is_creatura
-		or def._cmi_is_mob then
+			or is_creatura
+			or def._cmi_is_mob then
 			if name ~= "waterdragon:pure_water_dragon" then
 				table.insert(waterdragon.pure_water_dragon_targets, name)
 			end
@@ -53,7 +53,7 @@ local function diff(a, b) -- Get difference between 2 angles
 end
 
 local function vec_raise(v, n)
-	return {x = v.x, y = v.y + n, z = v.z}
+	return { x = v.x, y = v.y + n, z = v.z }
 end
 
 local vec_normal = vector.normalize
@@ -72,9 +72,9 @@ local dir2yaw = minetest.dir_to_yaw
 local is_night = false
 
 local function check_time()
-    local time = (minetest.get_timeofday() or 0) * 24000
-    is_night = time > 19500 or time < 4500
-    minetest.after(10, check_time)
+	local time = (minetest.get_timeofday() or 0) * 24000
+	is_night = time > 19500 or time < 4500
+	minetest.after(10, check_time)
 end
 
 check_time()
@@ -88,8 +88,10 @@ local function is_target_flying(target)
 	local node = minetest.get_node(pos)
 	if not node then return false end
 	if minetest.get_item_group(node.name, "igniter") > 0
-	or creatura.get_node_def(node.name).drawtype == "liquid"
-	or creatura.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then return false end
+		or creatura.get_node_def(node.name).drawtype == "liquid"
+		or creatura.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then
+		return false
+	end
 	local flying = true
 	for i = 1, 8 do
 		local fly_pos = {
@@ -110,9 +112,9 @@ local function shared_owner(obj1, obj2)
 	obj1 = creatura.is_valid(obj1)
 	obj2 = creatura.is_valid(obj2)
 	if obj1
-	and obj2
-	and obj1:get_luaentity()
-	and obj2:get_luaentity() then
+		and obj2
+		and obj1:get_luaentity()
+		and obj2:get_luaentity() then
 		obj1 = obj1:get_luaentity()
 		obj2 = obj2:get_luaentity()
 		return obj1.owner and obj2.owner and obj1.owner == obj2.owner
@@ -127,7 +129,7 @@ local function get_target_group(target, radius)
 	for _, object in ipairs(objects) do
 		local ent = object and object:get_luaentity()
 		if ent
-		and not ent._ignore then
+			and not ent._ignore then
 			table.insert(group, object)
 		end
 	end
@@ -224,6 +226,11 @@ end)
 -- Actions --
 
 function waterdragon.action_flight_pure_water(self, target, timeout)
+	if not self.fly_allowed then
+		-- Use a walking attack instead
+		return
+	end
+
 	local timer = timeout or 12
 	local goal
 	local function func(_self)
@@ -249,7 +256,7 @@ function waterdragon.action_flight_pure_water(self, target, timeout)
 	self:set_action(func)
 end
 
-function waterdragon.action_flight_attack(self, target, timeout)
+function waterdragon.action_flight_attack(self, target, timeout)	
 	local anim = self.animations["fly_punch"]
 	local anim_len = (anim.range.y - anim.range.x) / anim.speed
 	local anim_time = 0
@@ -257,6 +264,7 @@ function waterdragon.action_flight_attack(self, target, timeout)
 	local cooldown = 0
 	local goal
 	local function func(_self)
+		
 		local pos = _self.stand_pos
 		if timer <= 0 then return true end
 		local target_alive, _, tgt_pos = _self:get_target(target)
@@ -281,12 +289,12 @@ function waterdragon.action_flight_attack(self, target, timeout)
 		end
 
 		if goal
-		and _self:move_to(goal, "waterdragon:fly_simple", 0.25) then
+			and _self:move_to(goal, "waterdragon:fly_simple", 0.25) then
 			goal = nil
 		end
 
 		if not goal
-		and _self:move_to(tgt_pos, "waterdragon:fly_simple", 0.5) then
+			and _self:move_to(tgt_pos, "waterdragon:fly_simple", 0.5) then
 			if dist < _self.width + 4 then
 				_self:punch_target(target)
 				cooldown = timeout / 3
@@ -313,12 +321,12 @@ function waterdragon.action_pursue(self, target, timeout, method, speed_factor, 
 		timer = timer - _self.dtime
 		if timer <= 0 then return true end
 		if not goal
-		or (line_of_sight
-		and vec_dist(goal, tgt_pos) > 3) then
+			or (line_of_sight
+				and vec_dist(goal, tgt_pos) > 3) then
 			goal = tgt_pos
 		end
 		if timer <= 0
-		or _self:move_to(goal, method or "creatura:obstacle_avoidance", speed_factor or 0.5) then
+			or _self:move_to(goal, method or "creatura:obstacle_avoidance", speed_factor or 0.5) then
 			_self:halt()
 			return true
 		end
@@ -332,7 +340,7 @@ function waterdragon.action_fly(self, pos2, timeout, method, speed_factor, anim)
 	local function func(_self)
 		timer = timer - _self.dtime
 		if timer <= 0
-		or _self:move_to(pos2, method or "waterdragon:fly_simple", speed_factor) then
+			or _self:move_to(pos2, method or "waterdragon:fly_simple", speed_factor) then
 			return true
 		end
 		_self:animate(anim or "fly")
@@ -387,7 +395,7 @@ function waterdragon.action_idle_pure_water(self, target, time)
 		_self:breath_attack(tgt_pos)
 		timer = timer - _self.dtime
 		if timer <= 0
-		or math.abs(end_angle - start_angle) < 0.1 then
+			or math.abs(end_angle - start_angle) < 0.1 then
 			return true
 		end
 	end
@@ -427,7 +435,7 @@ function waterdragon.action_hover_pure_water(self, target, time)
 		_self:breath_attack(tgt_pos)
 		timer = timer - _self.dtime
 		if timer <= 0
-		or math.abs(end_angle - start_angle) < 0.1 then
+			or math.abs(end_angle - start_angle) < 0.1 then
 			return true
 		end
 	end
@@ -470,7 +478,7 @@ function waterdragon.action_takeoff(self, tgt_height)
 		end
 		local height_diff = pos.y - height
 		if height_diff < tgt_height
-		and timer < anim_time * 0.5 then
+			and timer < anim_time * 0.5 then
 			_self:set_forward_velocity(0)
 			_self:set_vertical_velocity(anim_time * tgt_height)
 			_self:set_gravity(0)
@@ -518,7 +526,7 @@ function waterdragon.action_slam(self)
 		_self:animate("slam")
 		timeout = timeout - _self.dtime
 		if timeout < anim_time * 0.5
-		and not damage_init then
+			and not damage_init then
 			_self.alert_timer = 15
 			local terrain_dir
 			local aoe_center = vec_add(pos, vec_multi(yaw2dir(yaw), _self.width))
@@ -529,8 +537,8 @@ function waterdragon.action_slam(self)
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
 					if (creatura.is_alive(ent)
-					and not ent._ignore)
-					or is_player then
+							and not ent._ignore)
+						or is_player then
 						local dir = vec_dir(pos, tgt_pos)
 						terrain_dir = terrain_dir or dir
 						local vel = {
@@ -554,7 +562,10 @@ function waterdragon.action_slam(self)
 			})
 			damage_init = true
 		end
-		if timeout <= 0 then self:animate("stand") return true end
+		if timeout <= 0 then
+			self:animate("stand")
+			return true
+		end
 	end
 	self:set_action(func)
 end
@@ -580,7 +591,7 @@ function waterdragon.action_repel(self)
 		_self:animate("repel")
 		timeout = timeout - _self.dtime
 		if timeout < anim_time * 0.7
-		and not damage_init then
+			and not damage_init then
 			_self.alert_timer = 15
 			local aoe_center = vec_add(pos, vec_multi(yaw2dir(yaw), _self.width))
 			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 8 * scale)
@@ -590,8 +601,8 @@ function waterdragon.action_repel(self)
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
 					if (creatura.is_alive(ent)
-					and not ent._ignore)
-					or is_player then
+							and not ent._ignore)
+						or is_player then
 						local dir = vec_dir(pos, tgt_pos)
 						local vel = {
 							x = dir.x * _self.damage * 1.5,
@@ -604,7 +615,10 @@ function waterdragon.action_repel(self)
 			end
 			damage_init = true
 		end
-		if timeout <= 0 then self:animate("stand") return true end
+		if timeout <= 0 then
+			self:animate("stand")
+			return true
+		end
 	end
 	self:set_action(func)
 end
@@ -623,7 +637,7 @@ function waterdragon.action_punch(self)
 		_self:animate("bite")
 		timeout = timeout - _self.dtime
 		if timeout < anim_time * 0.5
-		and not damage_init then
+			and not damage_init then
 			_self.alert_timer = 15
 			local aoe_center = vec_add(pos, vec_multi(yaw2dir(yaw), _self.width))
 			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 2)
@@ -633,8 +647,8 @@ function waterdragon.action_punch(self)
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
 					if (creatura.is_alive(ent)
-					and not ent._ignore)
-					or is_player then
+							and not ent._ignore)
+						or is_player then
 						_self:punch_target(object, _self.damage)
 					end
 				end
@@ -647,7 +661,10 @@ function waterdragon.action_punch(self)
 			})
 			damage_init = true
 		end
-		if timeout <= 0 then self:animate("stand") return true end
+		if timeout <= 0 then
+			self:animate("stand")
+			return true
+		end
 	end
 	self:set_action(func)
 end
@@ -697,11 +714,11 @@ creatura.register_utility("waterdragon:die", function(self)
 	local die = "waterdragon_death"
 	local function func(_self)
 		if not init then
-		minetest.sound_play({
-			name = die,
-			gain = 1.0,
-			max_hear_distance = 20,
-			loop = false
+			minetest.sound_play({
+				name = die,
+				gain = 1.0,
+				max_hear_distance = 20,
+				loop = false
 			})
 			creatura.action_fallover(_self)
 			init = true
@@ -713,12 +730,12 @@ creatura.register_utility("waterdragon:die", function(self)
 			minetest.add_particlespawner({
 				amount = 8,
 				time = 0.25,
-				minpos = {x = pos.x - 0.1, y = pos.y, z = pos.z - 0.1},
-				maxpos = {x = pos.x + 0.1, y = pos.y + 0.1, z = pos.z + 0.1},
-				minacc = {x = 0, y = 2, z = 0},
-				maxacc = {x = 0, y = 3, z = 0},
-				minvel = {x = random(-1, 1), y = -0.25, z = random(-1, 1)},
-				maxvel = {x = random(-2, 2), y = -0.25, z = random(-2, 2)},
+				minpos = { x = pos.x - 0.1, y = pos.y, z = pos.z - 0.1 },
+				maxpos = { x = pos.x + 0.1, y = pos.y + 0.1, z = pos.z + 0.1 },
+				minacc = { x = 0, y = 2, z = 0 },
+				maxacc = { x = 0, y = 3, z = 0 },
+				minvel = { x = random(-1, 1), y = -0.25, z = random(-1, 1) },
+				maxvel = { x = random(-2, 2), y = -0.25, z = random(-2, 2) },
 				minexptime = 0.75,
 				maxexptime = 1,
 				minsize = 4,
@@ -755,7 +772,7 @@ creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 			height_timer = 4
 		end
 		if _self.nest_pos
-		and vec_dist(pos, _self.nest_pos) > 128 then
+			and vec_dist(pos, _self.nest_pos) > 128 then
 			center = _self.nest_pos
 		end
 		if not _self:get_action() then
@@ -770,7 +787,7 @@ end)
 creatura.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 	local center = self.nest_position or self.object:get_pos()
 	if not center then return end
-	local center_fly = {x = center.x, y = center.y + 12, z = center.z}
+	local center_fly = { x = center.x, y = center.y + 12, z = center.z }
 	local dist2floor = creatura.sensor_floor(self, 10, true)
 	center.y = center.y - dist2floor
 	local is_landed = true
@@ -803,7 +820,7 @@ creatura.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 					dist2floor = creatura.sensor_floor(_self, 10, true)
 					pos2.y = pos2.y - dist2floor
 					creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
-					--_self:animate("fly")
+					_self:animate("fly")
 				end
 				return
 			end
@@ -831,7 +848,7 @@ end)
 creatura.register_utility("waterdragon:fly_to_land", function(self)
 	local landed = false
 	local function func(_self)
-	minetest.log("action", "inside fly to land")
+		minetest.log("action", "inside fly to land")
 		if not _self:get_action() then
 			if landed then return true end
 			if _self.touching_ground then
@@ -861,7 +878,7 @@ creatura.register_utility("waterdragon:scottish_dragon_breaking", function(self,
 	local height_tick = 0
 	local function func(_self)
 		if not player
-		or not player:get_pos() then
+			or not player:get_pos() then
 			return true
 		end
 		local pos = _self.object:get_pos()
@@ -899,10 +916,10 @@ creatura.register_utility("waterdragon:scottish_dragon_breaking", function(self,
 					time = 0.1,
 					minpos = part_pos,
 					maxpos = part_pos,
-					minvel = {x=-1, y=1, z=-1},
-					maxvel = {x=1, y=2, z=1},
-					minacc = {x=0, y=-5, z=0},
-					maxacc = {x=0, y=-9, z=0},
+					minvel = { x = -1, y = 1, z = -1 },
+					maxvel = { x = 1, y = 2, z = 1 },
+					minacc = { x = 0, y = -5, z = 0 },
+					maxacc = { x = 0, y = -9, z = 0 },
 					minexptime = 1,
 					maxexptime = 1,
 					minsize = 4,
@@ -957,8 +974,16 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 	local fov_timer = 0
 	local switch_timer = 20
 	local function func(_self)
+		if not self.fly_allowed then
+			-- Use a walking attack instead
+			return
+		end
+		
 		local target_alive, _, tgt_pos = _self:get_target(target)
-		if not target_alive then _self._target = nil return true end
+		if not target_alive then
+			_self._target = nil
+			return true
+		end
 		local pos = _self.object:get_pos()
 		local yaw = _self.object:get_yaw()
 		if not pos then return end
@@ -968,12 +993,11 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 		end
 		switch_timer = switch_timer - _self.dtime
 		if not self:get_action() then
-
 			-- Decide to attack from ground or air
 			if not init then
 				local dist2floor = creatura.sensor_floor(_self, 7, true)
 				if dist2floor > 6
-				or is_target_flying(target) then -- Fly if too far from ground
+					or is_target_flying(target) then -- Fly if too far from ground
 					is_landed = false
 				end
 				init = true
@@ -990,7 +1014,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 				if not self.touching_ground then
 					local pos2 = tgt_pos
 					if is_target_flying(target) then
-						pos2 = {x = pos.x, y = pos.y - 7, z = pos.z}
+						pos2 = { x = pos.x, y = pos.y - 7, z = pos.z }
 					end
 					creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
 				else
@@ -1002,7 +1026,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 
 			-- Takeoff if walking while in flying state
 			if takeoff_init
-			and self.touching_ground then
+				and self.touching_ground then
 				waterdragon.action_takeoff(self)
 				takeoff_init = false
 				return
@@ -1014,7 +1038,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 			if dist <= attack_range then -- Close-range Attacks
 				if is_landed then
 					if fov_timer < 1
-					and target:is_player() then
+						and target:is_player() then
 						waterdragon.action_repel(_self, target)
 					else
 						waterdragon.action_slam(_self, target)
@@ -1083,7 +1107,7 @@ creatura.register_utility("waterdragon:stay", function(self)
 	local function func(_self)
 		local order = _self.order
 		if not order
-		or order ~= "stay" then
+			or order ~= "stay" then
 			return true
 		end
 		if not _self:get_action() then
@@ -1097,7 +1121,7 @@ creatura.register_utility("waterdragon:follow_player", function(self, player)
 	local function func(_self)
 		local order = _self.order
 		if not order
-		or order ~= "follow" then
+			or order ~= "follow" then
 			return true
 		end
 		if not player then
@@ -1107,7 +1131,10 @@ creatura.register_utility("waterdragon:follow_player", function(self, player)
 		local pos = _self.object:get_pos()
 		if not pos then return end
 		local tgt_pos = player:get_pos()
-		if not tgt_pos then _self.order = "stay" return true end
+		if not tgt_pos then
+			_self.order = "stay"
+			return true
+		end
 		local dist = vec_dist(pos, tgt_pos)
 		local dist_to_ground = creatura.sensor_floor(_self, 8, true)
 		if not _self:get_action() then
@@ -1119,9 +1146,7 @@ creatura.register_utility("waterdragon:follow_player", function(self, player)
 				end
 			else
 				local height_diff = tgt_pos.y - pos.y
-				if (height_diff > 8
-				or dist_to_ground > 2)
-				or not self.flight_allowed then
+				if ((height_diff > 8 or dist_to_ground > 2) and self.fly_allowed) then
 					creatura.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
 				else
 					creatura.action_move(_self, tgt_pos, 3, "creatura:context_based_steering", 0.5, "walk")
@@ -1138,7 +1163,7 @@ waterdragon.dragon_behavior = {
 	{ -- Wander
 		utility = "waterdragon:fly_and_roost",
 		get_score = function(self)
-			return 0.1, {self}
+			return 0.1, { self }
 		end
 	},
 	{ -- Attack
@@ -1157,8 +1182,8 @@ waterdragon.dragon_behavior = {
 				if not target or not target:get_pos() then return 0 end
 				local is_far = self.nest_pos and vec_dist(target:get_pos(), self.nest_pos) > 192
 				if is_far
-				or self._ignore_obj[target]
-				or shared_owner(self, target) then
+					or self._ignore_obj[target]
+					or shared_owner(self, target) then
 					self._target = nil
 					return 0
 				end
@@ -1166,23 +1191,23 @@ waterdragon.dragon_behavior = {
 			local scale = self.growth_scale
 			local dist2floor = creatura.sensor_floor(self, 3, true)
 			if not self.owner
-			and dist2floor < 3
-			and target:get_pos()
-			and vec_dist(pos, target:get_pos()) > 48 * scale
-			and self.alert_timer <= 0 then
+				and dist2floor < 3
+				and target:get_pos()
+				and vec_dist(pos, target:get_pos()) > 48 * scale
+				and self.alert_timer <= 0 then
 				-- Wild Dragons sleep until approached
 				self._target = nil
 				return 0
 			end
 			local name = target:is_player() and target:get_player_name()
 			if name then
-				local inv = minetest.get_inventory({type = "player", name = name})
+				local inv = minetest.get_inventory({ type = "player", name = name })
 				if waterdragon.contains_book(inv) then
 					waterdragon.add_page(inv, "waterdragons")
 				end
 			end
 			self._target = target
-			return 0.9, {self, target}
+			return 0.9, { self, target }
 		end
 	},
 	{ -- Sleep
@@ -1190,14 +1215,14 @@ waterdragon.dragon_behavior = {
 		get_score = function(self)
 			if self.owner then
 				if is_night then
-					return 0.2, {self}
+					return 0.2, { self }
 				end
 				return 0
 			end
 			if self.alert_timer > 0 then return 0 end
 			if self.touching_ground
-			and not self._target then
-				return 0.7, {self}
+				and not self._target then
+				return 0.7, { self }
 			end
 			return 0
 		end
@@ -1208,7 +1233,7 @@ waterdragon.dragon_behavior = {
 			if not self.owner then return 0 end
 			local order = self.order
 			if order == "stay" then
-				return 1, {self}
+				return 1, { self }
 			end
 			return 0
 		end
@@ -1224,11 +1249,11 @@ waterdragon.dragon_behavior = {
 				local stance = self.stance
 				local score = 1
 				if stance == "aggressive"
-				or stance == "neutral"
-				and self.owner_target then
+					or stance == "neutral"
+					and self.owner_target then
 					score = 0.8
 				end
-				return score, {self, owner}
+				return score, { self, owner }
 			end
 			return 0
 		end
@@ -1237,9 +1262,11 @@ waterdragon.dragon_behavior = {
 		utility = "waterdragon:mount",
 		get_score = function(self)
 			if not self.owner
-			or not self.rider
-			or not self.rider:get_look_horizontal() then return 0 end
-			return 1, {self}
+				or not self.rider
+				or not self.rider:get_look_horizontal() then
+				return 0
+			end
+			return 1, { self }
 		end
 	}
 }
@@ -1249,23 +1276,23 @@ waterdragon.scottish_dragon_behavior = {
 		utility = "waterdragon:wander",
 		step_delay = 0.3,
 		get_score = function(self)
-			return 0.1, {self}
+			return 0.1, { self }
 		end
 	},
 	{ -- Wander (Flight)
 		utility = "waterdragon:aerial_wander",
 		get_score = function(self)
-			if self.owner and not self.flight_allowed then return 0 end
+			if self.owner and not self.fly_allowed then return 0 end
 			if self.in_liquid then
 				if self._target then
 					self._ignore_obj[self._target] = true
 				end
 				self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina + 200)
 				self.is_landed = self:memorize("is_landed", false)
-				return 0.4, {self, 0.3}
+				return 0.4, { self, 0.3 }
 			end
 			if not self.is_landed then
-				return 0.2, {self, 0.3}
+				return 0.2, { self, 0.3 }
 			end
 			return 0
 		end,
@@ -1276,7 +1303,7 @@ waterdragon.scottish_dragon_behavior = {
 			if not self.owner then return 0 end
 			local order = self.order
 			if order == "stay" then
-				return 1, {self}
+				return 1, { self }
 			end
 			return 0
 		end
@@ -1290,11 +1317,11 @@ waterdragon.scottish_dragon_behavior = {
 			if order == "follow" then
 				local stance = self.stance
 				if stance == "aggressive"
-				or (stance == "neutral"
-				and self.owner_target) then
-					return 0.8, {self, owner}
+					or (stance == "neutral"
+						and self.owner_target) then
+					return 0.8, { self, owner }
 				end
-				return 1, {self, owner}
+				return 1, { self, owner }
 			end
 			return 0
 		end
@@ -1321,18 +1348,18 @@ waterdragon.scottish_dragon_behavior = {
 			end
 			local name = target:is_player() and target:get_player_name()
 			if name then
-				local inv = minetest.get_inventory({type = "player", name = target:get_player_name()})
+				local inv = minetest.get_inventory({ type = "player", name = target:get_player_name() })
 			end
 			self._target = target
-			return 0.9, {self, target}
+			return 0.9, { self, target }
 		end
 	},
 	{ -- Taming
 		utility = "waterdragon:scottish_dragon_breaking",
 		get_score = function(self)
 			if self.rider
-			and not self.owner then
-				return 0.9, {self, self.rider}
+				and not self.owner then
+				return 0.9, { self, self.rider }
 			end
 			return 0
 		end
@@ -1341,8 +1368,8 @@ waterdragon.scottish_dragon_behavior = {
 		utility = "waterdragon:scottish_dragon_mount",
 		get_score = function(self)
 			if self.rider
-			and self.owner then
-				return 1, {self}
+				and self.owner then
+				return 1, { self }
 			end
 			return 0
 		end
@@ -1358,11 +1385,11 @@ waterdragon.scottish_dragon_behavior = {
 				local is_landed = self.is_landed or self.flight_stamina < 15
 				local is_grounded = (self.owner and not self.fly_allowed) or self.order == "stay"
 				if is_landed
-				or is_grounded then
+					or is_grounded then
 					if self.flight_stamina < 15 then
-						return 1, {self}
+						return 1, { self }
 					else
-						return 0.3, {self}
+						return 0.3, { self }
 					end
 				end
 			end

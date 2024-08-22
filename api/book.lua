@@ -38,7 +38,7 @@ local book_pages = {
 		},
 	},
 	-- Chapter 1
-	{ -- Dragons Page 1
+	{ -- Water Dragons Page 1
 		{ -- Main Page
 			element_type = "label",
 			font_size = 24,
@@ -67,7 +67,7 @@ local book_pages = {
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-	{ -- Dragons Page 2
+	{ -- Water Dragons Page 2
 		{ -- Water Dragon Image
 		element_type = "image",
 		font_size = 24,
@@ -96,7 +96,7 @@ local book_pages = {
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-	{ -- Dragons Page 3
+	{ -- Water Dragons Page 3
 		{ -- Hatching Text
 			element_type = "label",
 			font_size = 24,

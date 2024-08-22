@@ -898,7 +898,7 @@ end
 --------------------
 
 
-waterdragon.dragon_api = {
+waterdragon.wtd_api = {
 	action_flight_to_land = function(self)
 	minetest.log("action", "fly to land action")
         if not self:get_action() then
@@ -1328,7 +1328,7 @@ waterdragon.dragon_api = {
 }
 
 
-waterdragon.scottish_dragon_api = {
+waterdragon.scottish_wtd_api = {
 	animate = function(self, anim)
 		if self.animations and self.animations[anim] then
 			if self._anim == anim then return end
@@ -1394,7 +1394,7 @@ waterdragon.scottish_dragon_api = {
 		return minetest.sound_play(spec, parameters)
 	end,
 	-- Dynamic Animation Methods
-	tilt_to = waterdragon.dragon_api.tilt_to,
+	tilt_to = waterdragon.wtd_api.tilt_to,
 	set_weighted_velocity = function(self, speed, goal)
 		self._tyaw = dir2yaw(goal)
 		speed = speed or self._movement_data.speed
@@ -1430,8 +1430,8 @@ waterdragon.scottish_dragon_api = {
 		local offset = {x = 0, y = anim_data.pos.y, z = anim_data.pos.z}
 		self.object:set_bone_position("Jaw.CTRL", offset, {x = clamp(tgt_angle, -45, 0), y = 0, z = 0})
 	end,
-	move_tail = waterdragon.dragon_api.move_tail,
-	move_head = waterdragon.dragon_api.move_head,
+	move_tail = waterdragon.wtd_api.move_tail,
+	move_head = waterdragon.wtd_api.move_head,
 	feed = function(self, player)
 		local name = player:get_player_name()
 		if not self.owner
@@ -1512,11 +1512,11 @@ waterdragon.scottish_dragon_api = {
 dofile(minetest.get_modpath("waterdragon") .. "/api/forms.lua")
 
 minetest.register_on_mods_loaded(function()
-	for k, v in pairs(waterdragon.dragon_api) do
+	for k, v in pairs(waterdragon.wtd_api) do
 		minetest.registered_entities["waterdragon:pure_water_dragon"][k] = v
 		minetest.registered_entities["waterdragon:rare_water_dragon"][k] = v
 	end
-	for k, v in pairs(waterdragon.scottish_dragon_api) do
+	for k, v in pairs(waterdragon.scottish_wtd_api) do
 		minetest.registered_entities["waterdragon:scottish_dragon"][k] = v
 	end
 end)
@@ -1671,7 +1671,7 @@ end)
 -- On Activate --
 -----------------
 
--- Dragon
+-- Water Dragon
 
 function waterdragon.dragon_activate(self)
 	local dragon_type = "rare_water"
@@ -1694,7 +1694,7 @@ function waterdragon.dragon_activate(self)
 	end
 	self.growth_scale = self:recall("growth_scale") or 1
 	self.growth_timer = self:recall("growth_timer") or 700
-	self.age = self:recall("age") or 130
+	self.age = self:recall("age") or 110
 	local age = self.age
 	if age <= 25 then
 		self.growth_stage = 1
@@ -1789,7 +1789,7 @@ function waterdragon.scottish_dragon_activate(self)
 	self.owner = self:recall("owner") or false
 	self.stance = self:recall("stance") or "neutral"
 	self.order = self:recall("order") or "wander"
-	self.flight_allowed = self:recall("flight_allowed") or false
+	self.fly_allowed = self:recall("fly_allowed") or false
 	self.hunger = self:recall("hunger") or self.max_hunger
 	activate_nametag(self)
 	-- Movement Data

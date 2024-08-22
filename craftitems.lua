@@ -1251,7 +1251,7 @@ end
 -- Tools --
 -----------
 
--- Dragon Bone Tools --
+-- Water Dragon Bone Tools --
 
 for color in pairs(waterdragon.colors_pure_water) do
 	craft_pick({
