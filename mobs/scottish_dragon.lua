@@ -1,6 +1,7 @@
 ---------------------
 -- Scottish Dragon --
 ---------------------
+local S = waterdragon.S
 
 local scottish_spawn_rate = tonumber(minetest.settings:get("scottish_dragon_spawn_rate")) or 300
 
