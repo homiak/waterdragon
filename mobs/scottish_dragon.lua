@@ -2,6 +2,8 @@
 -- Scottish Dragon --
 ---------------------
 
+local scottish_spawn_rate = tonumber(minetest.settings:get("scottish_dragon_spawn_rate")) or 300
+
 local colors = {"blue"}
 
 creatura.register_mob("waterdragon:scottish_dragon", {
@@ -190,7 +192,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 })
 
 creatura.register_spawn_item("waterdragon:scottish_dragon", {
-	description = "Creative Scottish Dragon Egg",
+	description = S("Creative Scottish Dragon Egg"),
 	inventory_image = "waterdragon_creative_egg_scottish.png"
 })
 
@@ -206,10 +208,8 @@ minetest.register_on_mods_loaded(function()
 	end
 end)
 
-local spawn_rate = tonumber(minetest.settings:get("scottish_dragon_jungle_spawn_rate")) or 60000
-
 creatura.register_mob_spawn("waterdragon:scottish_dragon", {
-	chance = spawn_rate,
+	chance = scottish_spawn_rate,
 	min_group = 1,
 	max_group = 2,
 	biomes = biomes,

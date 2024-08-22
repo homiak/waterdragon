@@ -49,7 +49,7 @@ Sprint key now changes vertical movement method=Кнопка "Бежать" те
 The animal has been revived!=Животное ожило!
 The animal has been tamed!=Животное был приручено!
 The animal is already tamed=Животное уже приручено
-You must be pointing at a Water Dragon=Вы должны смотреть на Водяного Дракона
+You must be pointing at a untamed mob=Вы должны смотреть на неприрученное животное
 the Water Dragon is now owned by=Хозяином Водяного Дракона стал
 is already on the Water Dragon attack blacklist=уже есть на черном листе атаки Водяных Драконов
 has been added to the Water Dragon attack blacklist=был добавлен в черный лист атаки Водяных Драконов
@@ -97,5 +97,6 @@ Teleport your nearest Water Dragon to you within the specified radius=Телеп
 The nearest Water Dragon has been called and has flied to you!=Ближний Водяной Дракон был позван и прилетел к вам!
 Sets owner of pointed Water Dragon=Меняет владельца Водяного Дракона на которого Вы смотрите
 Adds player to attack blacklist of Water Dragons=Добавляет игрока к черному листу атаки Водяных Драконов
-Removes player from attack blacklist of the Water Dragons=Убирает игрока с чернового листа атаки Водяных Драконов
-You already can interact with the Water Dragons=Вы уже можете взаимодействовать с Водяными Драконами
+Removes player from attack blacklist of the Water Dragons=Убирает игрока с черного листа атаки Водяных Драконов
+Creative Scottish Dragon Egg=Креативное Яйцо Шотландского Дракона
+

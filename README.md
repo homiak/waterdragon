@@ -1,6 +1,6 @@
 # Dragon Uisge means in Scottish Gaelic a Water Dragon.
 
-**Water Dragons**  The mod introduces two types of Water Dragons - the Pure Water Dragon and the Rare Water Dragon. These Dragons inhabit their Water Nests, each with unique abilities and characteristics.
+**Water Dragons**  The mod introduces three types of Water Dragons - the Pure Water Dragon, the Rare Water Dragon and the Scottish Dragon. These Dragons inhabit their Water Nests, each with unique abilities and characteristics.
 
 **Draconic Blocks**  The mod features various decorative and functional blocks, including Draconic Bricks, slabs, stairs, and more.
 **Water-Forged Draconic Armour**  Gather the Water-Forged Draconic Steel material and craft powerful armor to protect you during battles.
@@ -27,3 +27,11 @@ This mod is based on Draconis and created by Scottii.
 - Fix view points
 - A new chatcommand
 - Translation
+
+### Release v 2.1.0
+- Adds the Scottish Dragon
+- Fix bugs
+- Fix translation
+- Fix Wing Horn
+- A new setting
+

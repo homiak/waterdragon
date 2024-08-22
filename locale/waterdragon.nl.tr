@@ -49,7 +49,7 @@ Sprint key now changes vertical movement method=Sprintknop verandert nu vertical
 The animal has been revived!=is weer tot leven gewekt!
 The animal has been tamed!=Het dier is getemd!
 The animal is already tamed=Het dier is al getemd
-You must be pointing at a Water Dragon=Je moet op een Waterdraak richten
+You must be pointing at a untamed mob=Je moet op een niet-getemde dier richten
 the Water Dragon is now owned by=de Waterdraak is nu eigendom van 
 is already on the Water Dragon attack blacklist=staat al op de Waterdraak aanvalslijst
 has been added to the Water Dragon attack blacklist=is toegevoegd aan de Waterdraak aanvalslijst
@@ -97,3 +97,5 @@ Sets owner of pointed Water Dragon=Stelt de eigenaar van de Waterdraak in waar j
 Adds player to attack blacklist of Water Dragons=Voegt speler toe aan aanvalszwarte lijst van Water Dragons
 Removes player from attack blacklist of the Water Dragons=Verwijdert speler van de aanvalszwarte lijst van de Waterdraken
 You already can interact with the Water Dragons=Je kunt al met de Waterdraken interacteren
+Creative Scottish Dragon Egg=Creatief Schots Draken Ei=
+

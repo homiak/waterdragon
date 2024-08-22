@@ -49,7 +49,7 @@ Sprint key now changes vertical movement method=
 The animal has been revived!=
 The animal has been tamed!=
 The animal is already tamed=
-You must be pointing at a Water Dragon=
+You must be pointing at a untamed mob=
 the Water Dragon is now owned by=
 is already on the Water Dragon attack blacklist=
 has been added to the Water Dragon attack blacklist=
@@ -96,4 +96,5 @@ The nearest Water Dragon has been called and has flied to you!=
 Sets owner of pointed Water Dragon=
 Adds player to attack blacklist of Water Dragons=
 Removes player from attack blacklist of the Water Dragons=
-You already can interact with the Water Dragons=
+Creative Scottish Dragon Egg=
+

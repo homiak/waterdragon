@@ -2,9 +2,7 @@
 -- Mapgen --
 ------------
 
---------------
--- Settings --
---------------
+-- Settings
 
 local water_nest_spawning = minetest.settings:get("water_nest_spawning") or true
 

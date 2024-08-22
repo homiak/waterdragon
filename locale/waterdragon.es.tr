@@ -49,7 +49,7 @@ Sprint key now changes vertical movement method=La tecla de Sprint ahora cambia 
 The animal has been revived!=El animal ha sido revivido!
 The animal has been tamed!=El animal ha sido domesticado!
 The animal is already tamed=El animal ya esta domesticado
-You must be pointing at a Water Dragon=Debes apuntar a un Dragón de Agua
+You must be pointing at a dead mob=Debes estar apuntando a una turba indómita.
 the Water Dragon is now owned by=El Dragón de Agua ahora es propiedad de  
 is already on the Water Dragon attack blacklist=ya está en la lista negra de ataque del Dragón de Agua
 has been added to the Water Dragon attack blacklist=ha sido añadido a la lista negra de ataque del Dragón de Agua
@@ -97,3 +97,5 @@ Sets owner of pointed Water Dragon=Establece propietario del Dragón de Agua pun
 Adds player to attack blacklist of Water Dragons=Añade al jugador a la lista negra de ataques de los Dragones de Agua.
 Removes player from attack blacklist of the Water Dragons=Elimina al jugador de la lista negra de ataque de los Dragones de Agua.
 You already can interact with the Water Dragons=Ya puedes interactuar con los Dragones de Agua
+Creative Scottish Dragon Egg=Huevo de Dragón Escocés creativo
+

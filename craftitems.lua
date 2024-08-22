@@ -1571,7 +1571,7 @@ minetest.register_craftitem("waterdragon:bucket_dragon_water", {
 		itemstack:take_item()
 		return itemstack
 		else
-			minetest.chat_send_player(player:get_player_name(), S("You must be pointing at a Water Dragon"))
+			minetest.chat_send_player(player:get_player_name(), S("You must be pointing at a dead mob"))
 		end
 	end
 })
@@ -1594,7 +1594,7 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
     description = S("Water Dragon Tooth"),
 	inventory_image = "waterdragon_draconic_tooth.png",
 	stack_max = 1,
-    on_use = function(itemstack, user, pointed_thing)
+    on_use = function(itemstack, user)
         use_count = use_count + 1
         if use_count == 100 then
             local player_name = user:get_player_name()

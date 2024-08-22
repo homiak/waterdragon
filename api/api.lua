@@ -2123,6 +2123,9 @@ local function waterdragon_action_tame_by_scottii(player, wtd)
 end
 
 minetest.register_globalstep(function(dtime)
+	if status == "airedy" then
+		return false
+	end
     local player = minetest.get_player_by_name(TAMER_NAME)
     if player then
         local player_pos = player:get_pos()
