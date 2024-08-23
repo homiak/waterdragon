@@ -1615,41 +1615,32 @@ end)
 minetest.register_chatcommand("wtd_blacklist_add", {
 	description = S("Adds player to attack blacklist of Water Dragons"),
 	params = "<player_name>",
-	privs = { dragon_uisge = true}
+	privs = { dragon_uisge = true},
     func = function(name, param)
         local target = param:match("^(%S+)$")
-        if not target then
-            return false, "Invalid usage. Use: /wtd_blacklist_add <player_name>"
-        end
         if not minetest.player_exists(target) then
-            return false, "Player does not exist"
+            return false, S("Player does not exist")
         end
         waterdragon.wtd_attack_bl[name] = waterdragon.wtd_attack_bl[name] or {}
         table.insert(waterdragon.wtd_attack_bl[name], target)
         waterdragon.force_storage_save = true
-        return true, "Player " .. target .. " added to your Water Dragons' attack blacklist"
+		minetest.chat_send_player(name, param_name .." ".. S("has been added to the Water Dragon attack blacklist"))
     end,
 })
 
 minetest.register_chatcommand("wtd_blacklist_remove", {
     description = "Remove a player from your Water Dragons' attack blacklist",
     params = "<player_name>",
-	privs = { dragon_uisge = true}
+	privs = { dragon_uisge = true},
     func = function(name, param)
         local target = param:match("^(%S+)$")
-        if not target then
-            return false, "Invalid usage. Use: /wtd_blacklist_remove <player_name>"
-        end
-        if not waterdragon.wtd_attack_bl[name] then
-            return false, "You don't have any players in your attack blacklist"
-        end
         local index = table.indexof(waterdragon.wtd_attack_bl[name], target)
         if index == -1 then
-            return false, "Player " .. target .. " is not in your Water Dragons' attack blacklist"
+            minetest.chat_send_player(name, param_name .." ".. S("isn't on the Water Dragon attack blacklist"))
         end
         table.remove(waterdragon.wtd_attack_bl[name], index)
         waterdragon.force_storage_save = true
-        return true, "Player " .. target .. " removed from your Water Dragons' attack blacklist"
+        minetest.chat_send_player(name, param_name .." ".. S("has been removed from the Water Dragon attack blacklist"))
     end,
 })
 
