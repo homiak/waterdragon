@@ -51,10 +51,8 @@ The animal has been tamed!=Животное был приручено!
 The animal is already tamed=Животное уже приручено
 You must be pointing at a untamed mob=Вы должны смотреть на неприрученное животное
 the Water Dragon is now owned by=Хозяином Водяного Дракона стал
-is already on the Water Dragon attack blacklist=уже есть на черном листе атаки Водяных Драконов
-has been added to the Water Dragon attack blacklist=был добавлен в черный лист атаки Водяных Драконов
-isn't on the Water Dragon attack blacklist=нету на черном листе атаки Водяных Драконов
-has been removed from the Water Dragon attack blacklist=был убран с черного листа атаки Водяных Драконов
+has been added to the Water Dragon attack blacklist=Игрок был добавлен в черный лист атаки Водяных Драконов
+has been removed from the Water Dragon attack blacklist=Игрок был убран с черного листа атаки Водяных Драконов
 Your Water Dragon will age while stored=Ваш Водяной Дракон будет стареть пока он в роге
 Your Water Dragon will not age while stored=Ваш Водяной Дракон не будет стареть пока он в роге
 Rare Water Draconic Scale Boots=Ботинки из Чешуи Дракона Редкой Воды
@@ -100,5 +98,5 @@ Adds player to attack blacklist of Water Dragons=Добавляет игрока
 Removes player from attack blacklist of the Water Dragons=Убирает игрока с черного листа атаки Водяных Драконов
 Creative Scottish Dragon Egg=Креативное Яйцо Шотландского Дракона
 The Water Dragon is not allowed to fly=Водяному Дракону не разрешено летать
-
+Player does not exist=Игрок не существует
 

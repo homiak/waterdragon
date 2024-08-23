@@ -51,10 +51,8 @@ The animal has been tamed!=Het dier is getemd!
 The animal is already tamed=Het dier is al getemd
 You must be pointing at a untamed mob=Je moet op een niet-getemde dier richten
 the Water Dragon is now owned by=de Waterdraak is nu eigendom van 
-is already on the Water Dragon attack blacklist=staat al op de Waterdraak aanvalslijst
-has been added to the Water Dragon attack blacklist=is toegevoegd aan de Waterdraak aanvalslijst
-isn't on the Water Dragon attack blacklist=staat niet op de Waterdraak aanvalslijst
-has been removed from the Water Dragon attack blacklist=is verwijderd van de Waterdraak aanvalslijst
+The player has been added to the Water Dragon attack blacklist=De speler is toegevoegd aan de Waterdraken aanvalslijst
+The player has been removed from the Water Dragon attack blacklist=De speler is verwijderd van de Waterdraken aanvalslijst
 Your Water Dragon will age while stored=Je Waterdraak zal verouderen tijdens opslag
 Your Water Dragon will not age while stored=Je Waterdraak zal niet verouderen tijdens opslag
 Rare Water Draconic Scale Boots=Zeldzaam Water Draconische Schubben Laarzen
@@ -99,5 +97,5 @@ Removes player from attack blacklist of the Water Dragons=Verwijdert speler van 
 You already can interact with the Water Dragons=Je kunt al met de Waterdraken interacteren
 Creative Scottish Dragon Egg=Creatief Schots Draken Ei=
 The Water Dragon is not allowed to fly=De Waterdraak mag niet vliegen
-
+Player does not exist=Deze speler bestaat niet
 
