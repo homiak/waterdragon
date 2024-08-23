@@ -6,7 +6,7 @@
 
 local water_nest_spawning = minetest.settings:get("water_nest_spawning") or true
 
-local water_cavern_spawning = minetest.settings:get("water_cavern_spawning") or false
+local water_cavern_spawning = minetest.settings:get("water_cavern_spawning") or true
 
 local water_nest_spawn_rate = tonumber(minetest.settings:get("water_nest_spawn_rate")) or 128
 

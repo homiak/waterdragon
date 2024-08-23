@@ -70,10 +70,9 @@ local function get_dragon_formspec(self)
 	-- Settings
 	local fly_allowed = "Flight Allowed"
 	local fly_image = "waterdragon_forms_flight_allowed.png"
-	local fly_disallowed = "Flight Not Allowed"
 	if not self.fly_allowed then
 		fly_image = "waterdragon_forms_flight_disallowed.png"
-		self.is_landed = true
+		is_landed = true
 		waterdragon.action_land(self)
 	end
 	local form = {
@@ -230,7 +229,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			else
 				ent.fly_allowed = ent:memorize("fly_allowed", true)
 			end
-			minetest.log("action", "!!! " .. dump(ent))
 			ent:show_formspec(player)
 		end
 		if fields.btn_wtd_name then
@@ -254,7 +252,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 	end
 	if formname == "waterdragon:scottish_dragon_forms" then
-		minetest.log("action", "!! name " .. dump(fields) .. " formname " .. formname)
 
 		if fields.btn_wtd_stance then
 			if not ent.object then return end

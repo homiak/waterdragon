@@ -852,7 +852,6 @@ end)
 creatura.register_utility("waterdragon:fly_to_land", function(self)
 	local landed = false
 	local function func(_self)
-		minetest.log("action", "inside fly to land")
 		if not _self:get_action() then
 			if landed then return true end
 			if _self.touching_ground then

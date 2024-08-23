@@ -900,13 +900,10 @@ end
 
 waterdragon.wtd_api = {
 	action_flight_to_land = function(self)
-	minetest.log("action", "fly to land action")
         if not self:get_action() then
             creatura.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
-			minetest.log("action", "fly to landaction")
         end
         if self.touching_ground then
-			minetest.log("action", "touching ground")
             waterdragon.action_land(self)
             return true
         end
