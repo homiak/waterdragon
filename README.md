@@ -29,9 +29,10 @@ This mod is based on Draconis and created by Scottii.
 - Translation
 
 ### Release v 2.1.0
-- Adds the Scottish Dragon
+- Adds the Scottish Water Dragon
 - Fix bugs
 - Fix translation
 - Fix Wing Horn
 - A new setting
+- A new chatcommand
 

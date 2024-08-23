@@ -97,4 +97,8 @@ Removes player from attack blacklist of the Water Dragons=
 Creative Scottish Dragon Egg=
 The Water Dragon is not allowed to fly=
 Player does not exist=
+Scottish Dragon Crate=
+Scottish Dragon stored=
+No owned Scottish Dragons found nearby=
+Scottish Dragon released=
 
