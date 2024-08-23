@@ -47,18 +47,19 @@ end
 local function get_horn_desc(self)
 	local info = S("Dragon Horn\n") .. minetest.colorize("#bdd9ff", correct_name(self.name))
 	if self.nametag == "" then
-		info = info .. "\n" .. infotext("a Nameless Dragon")
+		info = info .. "\n" .. infotext("a Nameless Water Dragon")
 	else
-		info = info .. "\n" .. infotext(self.nametag or "a Nameless Dragon")
+		info = info .. "\n" .. infotext(self.nametag or "a Nameless Water Dragon")
 	end
 	if self.age then
-		info = info .. "\n" .. infotext(self.age)
+		info = info .. "\n" .. infotext(self.age) .. " Year(s) old"
 	end
-	if self.color then
-		info = info .. "\n" .. infotext(self.color, true)
+	if self.hp then
+		info = info .. "\n" .. infotext(self.hp) .. " from " .. self.max_health .. " health points"
 	end
 	return info
 end
+
 
 -----------
 -- Drops --
@@ -492,7 +493,7 @@ local function capture(player, ent)
 		meta:set_string("mob", ent.name)
 		meta:set_string("wtd_id", ent.wtd_id)
 		meta:set_string("staticdata", ent:get_staticdata())
-		meta:set_string("nametag", ent.nametag or "a Nameless Dragon")
+		meta:set_string("nametag", ent.nametag or "a Nameless Water Dragon")
 		meta:set_string("description", get_horn_desc(ent))
 		if stored_aging > 0 then
 			meta:set_int("timestamp", os.time())
@@ -508,6 +509,34 @@ local function capture(player, ent)
 	end
 end
 
+
+local function capture_scottish_dragon(player, ent)
+	if not player:is_player()
+		or not player:get_inventory() then
+		return false
+	end
+	local stack = player:get_wielded_item()
+	local meta = stack:get_meta()
+	if not meta:get_string("staticdata")
+		or meta:get_string("staticdata") == "" then
+		if not ent.scottish_id then return end
+		waterdragon.set_color_string(ent)
+		meta:set_string("mob", ent.name)
+		meta:set_string("scottish_id", ent.scottish_id)
+		meta:set_string("staticdata", ent:get_staticdata())
+		meta:set_string("nametag", ent.nametag or "a Nameless Scottish Dragon")
+		meta:set_string("description", get_bridle_desc(ent))
+		player:set_wielded_item(stack)
+		waterdragon.scottish_dragons[ent.scottish_id].stored_in_item = true
+		ent.object:remove()
+		waterdragon.force_storage_save = true
+		return stack
+	else
+		minetest.chat_send_player(player:get_player_name(), S("This Bridle already contains a Scottish Dragon"))
+		return false
+	end
+end
+
 local function get_wtd_by_id(wtd_id)
 	for _, ent in pairs(minetest.luaentities) do
 		if ent.wtd_id
@@ -517,7 +546,68 @@ local function get_wtd_by_id(wtd_id)
 	end
 end
 
+local function get_scottish_by_id(scottish_id)
+	for _, ent in pairs(minetest.luaentities) do
+		if ent.scottish_id
+			and ent.scottish_id == scottish_id then
+			return ent
+		end
+	end
+end
+
 -- Items --
+
+local function bridle_use(itemstack, player, pointed_thing)
+	local meta = itemstack:get_meta()
+	local staticdata = meta:get_string("staticdata")
+	if staticdata ~= "" then return end -- Skip func if Bridle contains a Scottish Dragon
+	local mob = meta:get_string("mob")
+	local id = meta:get_string("scottish_id")
+	if player:get_player_control().sneak then
+		player:set_wielded_item(itemstack)
+		return itemstack
+	end
+	if id ~= "" then -- If the Bridle has a linked Scottish Dragon
+		if not waterdragon.scottish_dragons[id] then -- Clear data if linked Scottish Dragon is dead
+			meta:set_string("mob", nil)
+			meta:set_string("scottish_id", nil)
+			meta:set_string("staticdata", nil)
+			meta:set_string("description", S("Bridle"))
+			player:set_wielded_item(itemstack)
+			return itemstack
+		end
+		local ent = pointed_thing.ref and pointed_thing.ref:get_luaentity()
+		if ent
+			and ent.name:match("^waterdragon:scottish_dragon")
+			and ent.scottish_id
+			and ent.scottish_id == id
+			and not ent.rider then -- Store Scottish Dragon if linked to Horn
+			return capture_scottish_dragon(player, ent)
+		end
+		-- Teleport linked Scottish Dragon if not pointed
+		local last_pos = waterdragon.scottish_dragons[id].last_pos
+		ent = get_scottish_by_id(id)
+		if waterdragon.scottish_dragons[id].stored_in_item then return itemstack end
+		if not ent then
+			table.insert(waterdragon.scottish_dragons[id].removal_queue, last_pos)
+			minetest.add_entity(player:get_pos(), mob, waterdragon.scottish_dragons[id].staticdata)
+		else
+			ent.object:set_pos(player:get_pos())
+		end
+		minetest.chat_send_player(player:get_player_name(), S("You have called your Water Dragon"))
+	else -- Link Scottish Dragon to Horn
+		local ent = pointed_thing.ref and pointed_thing.ref:get_luaentity()
+		if ent
+			and ent.name:match("^waterdragon:scottish_dragon")
+			and ent.scottish_id
+			and ent.owner
+			and ent.owner == player:get_player_name()
+			and not ent.rider then
+			return capture_scottish_dragon(player, ent)
+		end
+	end
+	return itemstack
+end
 
 local function dragon_horn_use(itemstack, player, pointed_thing)
 	local meta = itemstack:get_meta()
@@ -579,6 +669,59 @@ local function dragon_horn_use(itemstack, player, pointed_thing)
 	return itemstack
 end
 
+local function bridle_place(itemstack, player, pointed_thing)
+	local meta = itemstack:get_meta()
+	local pos = pointed_thing.above
+	local under = pointed_thing.type == "node" and pointed_thing.under
+	local node_def = creatura.get_node_def(under)
+	if node_def.on_rightclick then
+		return node_def.on_rightclick(under, minetest.get_node(under), player, itemstack)
+	end
+	if pos
+		and not minetest.is_protected(pos, player:get_player_name()) then
+		pos.y = pos.y + 1
+		local mob = meta:get_string("mob")
+		local staticdata = meta:get_string("staticdata")
+		local nametag = meta:get_string("nametag") or "a Nameless Water Dragon"
+		local id = meta:get_string("scottish_id")
+		if not waterdragon.scottish_dragons[id] then -- Clear data if linked Water Dragon is dead
+			meta:set_string("mob", nil)
+			meta:set_string("scottish_id", nil)
+			meta:set_string("staticdata", nil)
+			meta:set_string("description", S("Bridle"))
+			player:set_wielded_item(itemstack)
+			return itemstack
+		end
+		if staticdata == ""
+			and id ~= ""
+			and waterdragon.scottish_dragons[id]
+			and waterdragon.scottish_dragons[id].stored_in_item then
+			staticdata = waterdragon.scottish_dragons[id].staticdata
+		end
+		if staticdata ~= "" then
+			local ent = minetest.add_entity(pos, mob, staticdata)
+			if id ~= ""
+				and waterdragon.scottish_dragons[id] then
+				waterdragon.scottish_dragons[id].stored_in_item = false
+			end
+			waterdragon.force_storage_save = true
+			local desc = S("Bridle\n") .. minetest.colorize("#bdd9ff", correct_name(mob))
+			if nametag ~= "" then
+				desc = desc .. "\n" .. infotext(nametag)
+			end
+			meta:set_string("staticdata", nil)
+			meta:set_string("description", desc)
+			if meta:get_int("timestamp") > 0 then
+				local time = meta:get_int("timestamp")
+				local diff = os.time() - time
+				ent:get_luaentity().time_in_bridle = diff
+				meta:set_int("timestamp", os.time())
+			end
+			return itemstack
+		end
+	end
+end
+
 local function dragon_horn_place(itemstack, player, pointed_thing)
 	local meta = itemstack:get_meta()
 	local pos = pointed_thing.above
@@ -592,7 +735,7 @@ local function dragon_horn_place(itemstack, player, pointed_thing)
 		pos.y = pos.y + 3
 		local mob = meta:get_string("mob")
 		local staticdata = meta:get_string("staticdata")
-		local nametag = meta:get_string("nametag") or "a Nameless Dragon"
+		local nametag = meta:get_string("nametag") or "a Nameless Water Dragon"
 		local id = meta:get_string("wtd_id")
 		if not waterdragon.waterdragons[id] then -- Clear data if linked Water Dragon is dead
 			meta:set_string("mob", nil)
@@ -638,6 +781,14 @@ minetest.register_craftitem("waterdragon:dragon_horn", {
 	stack_max = 1,
 	on_place = dragon_horn_place,
 	on_secondary_use = dragon_horn_use
+})
+
+minetest.register_craftitem("waterdragon:bridle", {
+	description = S("Bridle"),
+	inventory_image = "waterdragon_bridle.png",
+	stack_max = 1,
+	on_place = bridle_place,
+	on_secondary_use = bridle_use
 })
 
 --------------

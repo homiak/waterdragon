@@ -27,6 +27,8 @@ waterdragon.aux_key_setting = storage.aux_key_setting
 waterdragon.wtd_attack_bl = storage.wtd_attack_bl
 waterdragon.book_font_size = storage.book_font_size
 
+
+
 waterdragon.sounds = {
     wood = {},
     stone = {},

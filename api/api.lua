@@ -205,6 +205,20 @@ function waterdragon.generate_id()
 	return idst
 end
 
+function waterdragon.generate_scottish_id()
+	local idst = ""
+	for _ = 0, 5 do idst = idst .. (random(0, 9)) end
+	if waterdragon.scottish_dragons[idst] then
+		local fail_safe = 20
+		while waterdragon.scottish_dragons[idst]
+			and fail_safe > 0 do
+			for _ = 0, 5 do idst = idst .. (random(0, 9)) end
+			fail_safe = fail_safe - 1
+		end
+	end
+	return idst
+end
+
 -------------------
 -- Mob Functions --
 -------------------
@@ -1576,38 +1590,67 @@ minetest.register_chatcommand("set_wtd_owner", {
 	end
 })
 
+local function is_player_in_attack_blacklist(owner, player_name)
+    return waterdragon.wtd_attack_bl[owner] and table.indexof(waterdragon.wtd_attack_bl[owner], player_name) ~= -1
+end
+
+minetest.register_globalstep(function(dtime)
+    for _, obj in pairs(minetest.luaentities) do
+        if obj.name and string.match(obj.name, "^waterdragon:") and obj.owner then
+            for _, player in ipairs(minetest.get_connected_players()) do
+                local player_name = player:get_player_name()
+                if is_player_in_attack_blacklist(obj.owner, player_name) then
+                    obj._target = player
+                    if obj.stance then
+                        obj.stance = "aggressive"
+                    end
+                    break
+                end
+            end
+        end
+    end
+end)
+
+
 minetest.register_chatcommand("wtd_blacklist_add", {
 	description = S("Adds player to attack blacklist of Water Dragons"),
-	params = "<name>",
-	privs = { dragon_uisge = true },
-	func = function(name, params)
-		local player = minetest.get_player_by_name(name)
-		local param_name = params:match("%S+")
-		if not player or not param_name then return false end
-		if waterdragon.wtd_attack_bl[param_name] then
-			minetest.chat_send_player(name, param_name .." ".. S("is already on the Water Dragon attack blacklist"))
-			return false
-		end
-		waterdragon.wtd_attack_bl[param_name] = true
-		minetest.chat_send_player(name, param_name .." ".. S("has been added to the Water Dragon attack blacklist"))
-	end
+	params = "<player_name>",
+	privs = { dragon_uisge = true}
+    func = function(name, param)
+        local target = param:match("^(%S+)$")
+        if not target then
+            return false, "Invalid usage. Use: /wtd_blacklist_add <player_name>"
+        end
+        if not minetest.player_exists(target) then
+            return false, "Player does not exist"
+        end
+        waterdragon.wtd_attack_bl[name] = waterdragon.wtd_attack_bl[name] or {}
+        table.insert(waterdragon.wtd_attack_bl[name], target)
+        waterdragon.force_storage_save = true
+        return true, "Player " .. target .. " added to your Water Dragons' attack blacklist"
+    end,
 })
 
 minetest.register_chatcommand("wtd_blacklist_remove", {
-	description = S("Removes player from attack blacklist of the Water Dragons"),
-	params = "<name>",
-	privs = { dragon_uisge = true },
-	func = function(name, params)
-		local player = minetest.get_player_by_name(name)
-		local param_name = params:match("%S+")
-		if not player or not param_name then return false end
-		if not waterdragon.wtd_attack_bl[param_name] then
-			minetest.chat_send_player(name, param_name .." ".. S("isn't on the Water Dragon attack blacklist"))
-			return false
-		end
-		waterdragon.wtd_attack_bl[param_name] = nil
-		minetest.chat_send_player(name, param_name .." ".. S("has been removed from the Water Dragon attack blacklist"))
-	end
+    description = "Remove a player from your Water Dragons' attack blacklist",
+    params = "<player_name>",
+	privs = { dragon_uisge = true}
+    func = function(name, param)
+        local target = param:match("^(%S+)$")
+        if not target then
+            return false, "Invalid usage. Use: /wtd_blacklist_remove <player_name>"
+        end
+        if not waterdragon.wtd_attack_bl[name] then
+            return false, "You don't have any players in your attack blacklist"
+        end
+        local index = table.indexof(waterdragon.wtd_attack_bl[name], target)
+        if index == -1 then
+            return false, "Player " .. target .. " is not in your Water Dragons' attack blacklist"
+        end
+        table.remove(waterdragon.wtd_attack_bl[name], index)
+        waterdragon.force_storage_save = true
+        return true, "Player " .. target .. " removed from your Water Dragons' attack blacklist"
+    end,
 })
 
 ----------------------
@@ -1789,6 +1832,10 @@ function waterdragon.scottish_dragon_activate(self)
 	self.fly_allowed = self:recall("fly_allowed") or false
 	self.hunger = self:recall("hunger") or self.max_hunger
 	activate_nametag(self)
+	if self.scottish_id == 1 then
+		self.scottish_id = waterdragon.generate_scottish_id()
+		self:memorize("scottish_id", self.scottish_id)
+	end
 	-- Movement Data
 	self.is_landed = self:recall("is_landed") or false
 	-- World Data
