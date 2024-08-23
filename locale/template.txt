@@ -97,4 +97,5 @@ Sets owner of pointed Water Dragon=
 Adds player to attack blacklist of Water Dragons=
 Removes player from attack blacklist of the Water Dragons=
 Creative Scottish Dragon Egg=
+The Water Dragon is not allowed to fly=
 

@@ -219,7 +219,7 @@ function waterdragon.attach_passenger(self, player)
 	local scale = self.growth_scale
 	-- Attach Player
 	player:set_attach(self.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
-	-- Set Players Eye Offset
+	-- Set players eye offset
 	player:set_eye_offset({
 		x = 0,
 		y = 115 * scale, -- Passenger's eye offset
@@ -279,7 +279,7 @@ function waterdragon.detach_player(self, player)
 	player:hud_set_flags({ wielditem = false })
 	-- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
 	waterdragon.unset_fake_player(player)
-	-- Set Water Dragon Data
+	-- Set Water Dragon data
 	if player == self.rider then
 		self.rider = nil
 	else
@@ -542,6 +542,12 @@ creatura.register_utility("waterdragon:mount", function(self)
                     anim = "walk"
                 end
                 if control.jump then
+					if not self.fly_allowed then
+						minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
+						is_landed = true
+						waterdragon.action_land(self)
+						return
+					end
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
@@ -557,8 +563,19 @@ creatura.register_utility("waterdragon:mount", function(self)
                     minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
                 else
                     if control.up then
+						if not self.fly_allowed then
+							minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
+							is_landed = true
+							waterdragon.action_land(self)							return
+						end
                         anim = "fly"
                         if _self.pitch_fly then
+							if not self.fly_allowed then
+								minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
+								is_landed = true
+								waterdragon.action_land(self)
+								return
+							end
                             _self:set_vertical_velocity(12 * look_dir.y)
                         end
                         _self:set_forward_velocity(24)
@@ -569,6 +586,12 @@ creatura.register_utility("waterdragon:mount", function(self)
                     _self:tilt_to(look_yaw, 2)
                     if not _self.pitch_fly then
                         if control.jump then
+							if not self.fly_allowed then
+								minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
+								is_landed = true
+								waterdragon.action_land(self)
+								return
+							end
                             _self:set_vertical_velocity(12)
                         elseif control.down then
                             _self:set_vertical_velocity(-12)
@@ -704,6 +727,12 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
 					anim = "walk"
 				end
 				if control.jump then
+					if not self.fly_allowed then
+						minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
+						is_landed = true
+						waterdragon.action_land(self)
+						return
+					end
 					is_landed = false
 					waterdragon.action_takeoff(_self)
 				end

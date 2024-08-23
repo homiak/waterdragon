@@ -759,6 +759,10 @@ end)
 -- Wander Flight
 
 creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
+	if not self.fly_allowed then
+		-- If the Water Dragon is not allowed to fly
+		return
+	end
 	local center = self.object:get_pos()
 	if not center then return end
 	local height_timer = 0
