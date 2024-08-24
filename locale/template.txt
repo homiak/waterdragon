@@ -101,4 +101,5 @@ Scottish Dragon Crate=
 Scottish Dragon stored=
 No owned Scottish Dragons found nearby=
 Scottish Dragon released=
+You must point at a Scottish Dragon=
 

@@ -1145,6 +1145,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "waterdragon:scottish_dragon_crate",
+	recipe = {
+		{ "group:wood", "group:wood", "group:wood" },
+		{ "group:wood", "default:steel_ingot", "group:wood"},
+		{ "group:wood", "group:wood", "group:wood" }
+	}
+})
+
+minetest.register_craft({
 	output = "waterdragon:dragonstone_crucible",
 	recipe = {
 		{ "waterdragon:stone_wet", "", "waterdragon:stone_wet" },
@@ -1707,20 +1716,19 @@ local function update_item_description(itemstack, name, health)
     meta:set_string("description", desc)
 end
 
-
 minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
     description = S("Scottish Dragon Crate"),
     inventory_image = "waterdragon_scottish_dragon_crate.png",
     stack_max = 1,
 
-    on_use = function(itemstack, user)
+    on_use = function(itemstack, user, pointed_thing)
         local meta = itemstack:get_meta()
         local pos = user:get_pos()
         pos.y = pos.y + 1
 
         if meta:get_string("stored_dragon") == "" then
-            local objs = minetest.get_objects_inside_radius(pos, 15)
-            for _, obj in ipairs(objs) do
+            if pointed_thing.type == "object" then
+                local obj = pointed_thing.ref
                 local ent = obj:get_luaentity()
                 if ent and ent.name == "waterdragon:scottish_dragon" and ent.owner == user:get_player_name() then
                     local dragon_name = ent.nametag or "Unnamed Scottish Dragon"
@@ -1733,8 +1741,9 @@ minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
                     minetest.chat_send_player(user:get_player_name(), S("Scottish Dragon stored"))
                     return itemstack
                 end
+            else
+                minetest.chat_send_player(user:get_player_name(), S("You must point at a Scottish Dragon"))
             end
-            minetest.chat_send_player(user:get_player_name(), S("No owned Scottish Dragons found nearby"))
         else
             local dragon = minetest.add_entity(pos, "waterdragon:scottish_dragon")
             if dragon then
