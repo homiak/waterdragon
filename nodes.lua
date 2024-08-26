@@ -550,7 +550,7 @@ local function cool_crucible(pos, ingot)
 		local draconic_ingot = ItemStack(ingot)
 		local ingot_meta = draconic_ingot:get_meta()
 		local ingot_desc = minetest.registered_items[ingot].description
-		local dragon_name = "a Nameless Dragon"
+		local dragon_name = "a Nameless Water Dragon"
 		if waterdragon.waterdragons[wtd_id]
 		and waterdragon.waterdragons[wtd_id].name then
 			dragon_name = waterdragon.waterdragons[wtd_id].name

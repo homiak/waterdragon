@@ -1,6 +1,6 @@
---------------
--- waterdragon --
---------------
+-----------------
+-- Waterdragon --
+-----------------
 
 waterdragon = {
 	scottish_dragons = {},
