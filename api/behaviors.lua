@@ -331,6 +331,7 @@ function waterdragon.action_pursue(self, target, timeout, method, speed_factor, 
 			return true
 		end
 		_self:animate(anim or "walk")
+
 	end
 	self:set_action(func)
 end
@@ -1213,7 +1214,7 @@ waterdragon.dragon_behavior = {
 				and target:get_pos()
 				and vec_dist(pos, target:get_pos()) > 48 * scale
 				and self.alert_timer <= 0 then
-				-- Wild Dragons sleep until approached
+				-- Wild Water Dragons sleep until approached
 				self._target = nil
 				return 0
 			end

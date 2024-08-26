@@ -1631,7 +1631,7 @@ minetest.register_chatcommand("wtd_blacklist_add", {
         waterdragon.wtd_attack_bl[name] = waterdragon.wtd_attack_bl[name] or {}
         table.insert(waterdragon.wtd_attack_bl[name], target)
         waterdragon.force_storage_save = true
-        return true, S("The player has been added to the attack blacklist of the Water Dragons")
+        return true, S("The player has been added to the Water Dragon attack blacklist")
     end,
 })
 
