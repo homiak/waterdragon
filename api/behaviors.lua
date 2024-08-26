@@ -763,6 +763,21 @@ creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 		-- If the Water Dragon is not allowed to fly
 		return
 	end
+	play_wing_sound2 = function(self)
+		local offset = self.frame_offset or 0
+		if offset > 20
+			and not self.flap_sound_played2 then
+			minetest.sound_play("waterdragon_flap", {
+				object = self.object,
+				gain = 3.0,
+				max_hear_distance = 128,
+				loop = false,
+			})
+			self.flap_sound_played2 = true
+		elseif offset < 10 then
+			self.flap_sound_played2 = false
+		end
+	end
 	local center = self.object:get_pos()
 	if not center then return end
 	local height_timer = 0

@@ -1502,19 +1502,19 @@ waterdragon.scottish_wtd_api = {
 		end
 		return false
 	end,
-	play_wing_sound = function(self)
+	play_wing_sound2 = function(self)
 		local offset = self.frame_offset or 0
 		if offset > 20
-		and not self.flap_sound_played then
+		and not self.flap_sound_played2 then
 			minetest.sound_play("waterdragon_flap", {
 				object = self.object,
 				gain = 3.0,
 				max_hear_distance = 128,
 				loop = false,
 			})
-			self.flap_sound_played = true
+			self.flap_sound_played2 = true
 		elseif offset < 10 then
-			self.flap_sound_played = false
+			self.flap_sound_played2 = false
 		end
 	end
 }
@@ -1792,7 +1792,7 @@ function waterdragon.dragon_activate(self)
 	self.flight_stamina = self:recall("flight_stamina") or 300
 
 	-- Sound Data
-	self.flap_sound_timer = 1.5
+	self.flap_sound_timer = 5.0
 	self.flap_sound_played = false
 	self.time_from_last_sound = 0
 	-- World Data
@@ -1862,6 +1862,8 @@ function waterdragon.scottish_dragon_activate(self)
 	self.flight_stamina = self:recall("flight_stamina") or 1600
 	-- Sound Data
 	self.time_from_last_sound = 0
+	self.flap_sound_timer = 5.0
+	self.flap_sound_played = false
 	waterdragon.scottish_dragons[self.object] = {owner = self.owner}
 end
 
