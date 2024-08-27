@@ -766,11 +766,11 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     waterdragon.action_land(_self)
                 end
 
-                -- Добавляем атаку во время полета
+
                 if control.LMB and attack_cooldown <= 0 then
                     local start_pos = _self.object:get_pos()
-                    start_pos.y = start_pos.y + 1.5  -- Примерная высота головы дракона
-                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))  -- Дистанция атаки
+                    start_pos.y = start_pos.y + 1.5
+                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5.34))
                     
                     local ray = minetest.raycast(start_pos, end_pos, true, false)
                     for pointed_thing in ray do
@@ -779,16 +779,15 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                             if obj ~= player and obj ~= _self.object then
                                 _self:punch_target(obj)
                                 anim = "fly_punch"
-                                attack_cooldown = 1  -- Устанавливаем кулдаун атаки
-                                
-                                -- Воспроизведение звука с обработкой ошибок
+                                attack_cooldown = 1
+
                                 local pos = _self.object:get_pos()
                                 if pos then
                                     minetest.sound_play("waterdragon_scottish_dragon_bite", {
                                         pos = pos,
                                         max_hear_distance = 10,
                                         gain = 1.0,
-                                    }, true)  -- true для надежного воспроизведения
+                                    }, true)
                                 end
                                 
                                 break
