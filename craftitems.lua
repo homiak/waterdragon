@@ -654,7 +654,6 @@ minetest.register_craftitem("waterdragon:dragon_horn", {
 minetest.register_craftitem("waterdragon:dragonstone_crucible", {
 	description = S("Water Dragonstone Crucible"),
 	inventory_image = "waterdragon_dragonstone_crucible.png",
-	stack_max = 999
 })
 
 minetest.register_craftitem("waterdragon:dragonstone_crucible_full", {
@@ -1707,7 +1706,6 @@ end
 
 -- Scottish Dragon Crate --
 
-local S = minetest.get_translator("waterdragon")
 local storage = minetest.get_mod_storage()
 
 local function generate_scottish_id()
@@ -1758,142 +1756,3 @@ local function clear_crate_data(itemstack)
     update_crate_description(meta, nil)
 end
 
-minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
-    description = S("Scottish Dragon Crate"),
-    inventory_image = "waterdragon_scottish_dragon_crate.png",
-    stack_max = 1,
-
-    on_use = function(itemstack, user, pointed_thing)
-        local meta = itemstack:get_meta()
-        local pos = user:get_pos()
-        pos.y = pos.y + 1
-
-        local bound_id = meta:get_string("bound_id")
-        local is_stored = meta:get_string("stored_dragon") ~= ""
-
-        if bound_id == "" then
-            -- Bind Scottish Dragon logic
-            if pointed_thing.type == "object" then
-                local obj = pointed_thing.ref
-                local ent = obj:get_luaentity()
-                if ent and ent.name == "waterdragon:scottish_dragon" and ent.owner == user:get_player_name() then
-                    bound_id = ent.scottish_id or generate_scottish_id()
-                    ent.scottish_id = bound_id
-                    if ent.memorize then
-                        ent:memorize("scottish_id", bound_id)
-                    end
-                    meta:set_string("bound_id", bound_id)
-                    meta:set_string("stored_dragon", "stored")
-                    local dragon_data = {
-                        owner = ent.owner,
-                        pos = obj:get_pos(),
-                        hp = ent.hp,
-                        name = ent.nametag or ent.name_tag or "",
-                    }
-                    save_inactive_dragon(bound_id, dragon_data)
-                    update_crate_description(meta, dragon_data)
-                    obj:remove()
-                    minetest.chat_send_player(user:get_player_name(), S("Scottish Dragon bound and stored"))
-                else
-                    minetest.chat_send_player(user:get_player_name(), S("You must point at your own Scottish Dragon"))
-                end
-            else
-                minetest.chat_send_player(user:get_player_name(), S("You must point at a Scottish Dragon"))
-            end
-        else
-            if is_stored then
-                -- Release Scottish Dragon logic
-                local dragon_data = load_inactive_dragon(bound_id)
-                if dragon_data then
-                    local dragon = minetest.add_entity(pos, "waterdragon:scottish_dragon")
-                    if dragon then
-                        local ent = dragon:get_luaentity()
-                        if ent then
-                            ent.owner = dragon_data.owner
-                            ent.scottish_id = bound_id
-                            ent.hp = dragon_data.hp
-                            ent.nametag = dragon_data.name
-                            ent.name_tag = dragon_data.name
-                            if ent.memorize then
-                                ent:memorize("owner", ent.owner)
-                                ent:memorize("scottish_id", ent.scottish_id)
-                                ent:memorize("hp", ent.hp)
-                                ent:memorize("nametag", ent.nametag)
-                                ent:memorize("name_tag", ent.name_tag)
-                            end
-                            if ent.nametag ~= "" then
-                                dragon:set_properties({nametag = ent.nametag})
-                            end
-                        end
-                        meta:set_string("stored_dragon", "")
-                        update_crate_description(meta, nil)
-                        minetest.chat_send_player(user:get_player_name(), S("Scottish Dragon released"))
-                    else
-                        minetest.chat_send_player(user:get_player_name(), S("Error: Unable to release the Scottish Dragon"))
-                    end
-                else
-                    minetest.chat_send_player(user:get_player_name(), S("The Scottish Dragon is dead"))
-                    clear_crate_data(itemstack)
-                end
-            else
-                -- Try to teleport or store the Scottish Dragon
-                local ent = get_scottish_dragon_by_id(bound_id)
-                if ent then
-                    if pointed_thing.type == "object" and pointed_thing.ref == ent.object then
-                        -- Store dragon
-                        meta:set_string("stored_dragon", "stored")
-                        local dragon_data = {
-                            owner = ent.owner,
-                            pos = ent.object:get_pos(),
-                            hp = ent.hp,
-                            name = ent.nametag or ent.name_tag or "",
-                        }
-                        save_inactive_dragon(bound_id, dragon_data)
-                        update_crate_description(meta, dragon_data)
-                        ent.object:remove()
-                        minetest.chat_send_player(user:get_player_name(), S("Scottish Dragon stored"))
-                    else
-                        -- Teleport Scottish Dragon
-                        ent.object:set_pos(pos)
-                        minetest.chat_send_player(user:get_player_name(), S("Your Scottish Dragon has been teleported to you"))
-                    end
-                else
-                    -- Check if the dragon is dead
-                    local stored_data = load_inactive_dragon(bound_id)
-                    if stored_data then
-                        -- Dragon is not dead, just not loaded in the world
-                        local new_dragon = minetest.add_entity(pos, "waterdragon:scottish_dragon")
-                        if new_dragon then
-                            local new_ent = new_dragon:get_luaentity()
-                            if new_ent then
-                                new_ent.owner = stored_data.owner
-                                new_ent.scottish_id = bound_id
-                                new_ent.hp = stored_data.hp
-                                new_ent.nametag = stored_data.name
-                                new_ent.name_tag = stored_data.name
-                                if new_ent.memorize then
-                                    new_ent:memorize("owner", new_ent.owner)
-                                    new_ent:memorize("scottish_id", new_ent.scottish_id)
-                                    new_ent:memorize("hp", new_ent.hp)
-                                    new_ent:memorize("nametag", new_ent.nametag)
-                                    new_ent:memorize("name_tag", new_ent.name_tag)
-                                end
-                                if new_ent.nametag ~= "" then
-                                    new_dragon:set_properties({nametag = new_ent.nametag})
-                                end
-                            end
-                            minetest.chat_send_player(user:get_player_name(), S("Your Scottish Dragon has been teleported to you"))
-                        else
-                            minetest.chat_send_player(user:get_player_name(), S("Error: Unable to teleport the Scottish Dragon"))
-                        end
-                    else
-                        -- Scottish Dragon is dead
-                        minetest.chat_send_player(user:get_player_name(), S("The Scottish Dragon is dead"))
-                        clear_crate_data(itemstack)
-                    end
-                end
-            end
-        end
-        return itemstack
-    end,
-})

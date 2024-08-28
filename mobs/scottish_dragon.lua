@@ -12,7 +12,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 	max_health = 700,
 	max_hunger = 500,
 	armor_groups = {fleshy = 100},
-	damage = 8,
+	damage = 10,
 	turn_rate = 6,
 	speed = 32,
 	tracking_range = 64,
