@@ -786,7 +786,7 @@ minetest.register_node("waterdragon:draconic_forge_pure_water", {
 
 		meta:set_string("wtd_id", id)
 
-		forge_particle(pos, "fire_basic_flame.png")
+		forge_particle(pos, "waterdragon_water_particle.png")
 	end
 })
 
