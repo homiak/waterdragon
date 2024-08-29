@@ -2,7 +2,6 @@
 --- Armour ---
 -------------
 
--- Ver 1.0 --
 
 local S = waterdragon.S
 
@@ -150,4 +149,121 @@ armor:register_armor("waterdragon:boots_rare_water_draconic", {
         physics_speed=0.5, physics_gravity=0.05, physics_jump=0.15, armor_fire=1},
     armor_groups = {fleshy=75},
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=15},
+})
+
+-------------
+-- Shields --
+-------------
+
+-- Draconic Steel --
+
+-- Pure Water
+
+armor:register_armor("waterdragon:shield_pure_water_draconic_steel", {
+    description = S("Pure Water Draconic Steel Shield"),
+    inventory_image = "waterdragon_inv_shield_pure_water_draconic_steel.png",
+    groups = {armor_shield=1, armor_heal=30, armor_use=100,
+        physics_speed=0.1, physics_gravity=0.01, physics_jump=0.05, armor_fire=1},
+    armor_groups = {fleshy=100},
+    damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=30},
+    reciprocate_damage = true,
+    on_punched = function(hitter)
+        -- 20% chance to stun the attacker
+        if math.random(1, 5) == 1 then
+            if hitter and hitter:is_player() then
+                hitter:set_physics_override({speed = 0.5})
+                minetest.after(2, function()
+                    hitter:set_physics_override({speed = 1})
+                end)
+            elseif hitter and hitter:get_luaentity() then
+                hitter:get_luaentity().speed = hitter:get_luaentity().speed * 0.5
+                minetest.after(2, function()
+                    if hitter:get_luaentity() then
+                        hitter:get_luaentity().speed = hitter:get_luaentity().speed * 2
+                    end
+                end)
+            end
+        end
+    end,
+})
+
+-- Rare Water
+armor:register_armor("waterdragon:shield_rare_water_draconic_steel", {
+    description = S("Rare Water Draconic Steel Shield"),
+    inventory_image = "waterdragon_inv_shield_rare_water_draconic_steel.png",
+    groups = {armor_shield=1, armor_heal=40, armor_use=100,
+        physics_speed=0.15, physics_gravity=0.02, physics_jump=0.07, armor_fire=1},
+    armor_groups = {fleshy=120},
+    damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=30},
+    reciprocate_damage = true,
+    on_punched = function(player, hitter, time_from_last_punch, tool_capabilities)
+        -- 25% chance to reflect damage back to the attacker
+        if math.random(1, 4) == 1 then
+            if hitter and hitter:is_player() then
+                hitter:set_hp(hitter:get_hp() - 2)
+            elseif hitter and hitter:get_luaentity() then
+                hitter:punch(player, 1.0, {
+                    full_punch_interval = 1.0,
+                    damage_groups = {fleshy = 2},
+                }, nil)
+            end
+        end
+    end,
+})
+
+-- Scale Shields --
+
+-- Pure Water
+
+armor:register_armor("waterdragon:shield_pure_water_scales", {
+    description = S("Pure Water Draconic Scale Shield"),
+    inventory_image = "waterdragon_inv_shield_pure_water_scales.png",
+    groups = {armor_shield=1, armor_heal=30, armor_use=100,
+        physics_speed=0.1, physics_gravity=0.01, physics_jump=0.05, armor_fire=1},
+    armor_groups = {fleshy=100},
+    damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=10},
+    reciprocate_damage = true,
+    on_punched = function(hitter)
+        -- 20% chance to stun the attacker
+        if math.random(1, 5) == 1 then
+            if hitter and hitter:is_player() then
+                hitter:set_physics_override({speed = 0.5})
+                minetest.after(2, function()
+                    hitter:set_physics_override({speed = 1})
+                end)
+            elseif hitter and hitter:get_luaentity() then
+                hitter:get_luaentity().speed = hitter:get_luaentity().speed * 0.5
+                minetest.after(2, function()
+                    if hitter:get_luaentity() then
+                        hitter:get_luaentity().speed = hitter:get_luaentity().speed * 2
+                    end
+                end)
+            end
+        end
+    end,
+})
+
+-- Rare Water
+
+armor:register_armor("waterdragon:shield_rare_water_scales", {
+    description = S("Rare Water Draconic Scale Shield"),
+    inventory_image = "waterdragon_inv_shield_rare_water_scales.png",
+    groups = {armor_shield=1, armor_heal=40, armor_use=100,
+        physics_speed=0.15, physics_gravity=0.02, physics_jump=0.07, armor_fire=1},
+    armor_groups = {fleshy=120},
+    damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=15},
+    reciprocate_damage = true,
+    on_punched = function(hitter)
+        -- 25% chance to reflect damage back to the attacker
+        if math.random(1, 4) == 1 then
+            if hitter and hitter:is_player() then
+                hitter:set_hp(hitter:get_hp() - 2)
+            elseif hitter and hitter:get_luaentity() then
+                hitter:punch(player, 1.0, {
+                    full_punch_interval = 1.0,
+                    damage_groups = {fleshy = 2},
+                }, nil)
+            end
+        end
+    end,
 })

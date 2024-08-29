@@ -2205,3 +2205,6 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
+-- Rare Water Dragon special thing...
+
+
