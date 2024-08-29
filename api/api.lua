@@ -5,6 +5,11 @@
 -- Math --
 local S = waterdragon.S
 
+local function get_dragon_eye_item(self)
+	local eye_color = self.eye_color or "blue"
+    return "waterdragon:draconic_eye_" .. eye_color
+end
+
 local pi = math.pi
 local pi2 = pi * 2
 local abs = math.abs
@@ -49,6 +54,62 @@ local vec_round = vector.round
 
 local dir2yaw = minetest.dir_to_yaw
 local yaw2dir = minetest.yaw_to_dir
+
+-- Rare Water Dragon special thing...
+
+local detectable_nodes = {
+    "default:chest_locked",
+    "default:chest",
+	"default:steel_block",
+	"default:diamondblock",
+	"default:goldblock"
+}
+
+local function water_vision(pos, radius)
+    local found_objects = {}
+    for _, node_name in ipairs(detectable_nodes) do
+        local nodes = minetest.find_nodes_in_area(
+            {x = pos.x - radius, y = pos.y - radius, z = pos.z - radius},
+            {x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
+            node_name
+        )
+        for _, node_pos in ipairs(nodes) do
+            local above_node = minetest.get_node({x = node_pos.x, y = node_pos.y + 1, z = node_pos.z})
+            if minetest.get_item_group(above_node.name, "water") > 0 then
+                table.insert(found_objects, {name = node_name, pos = node_pos})
+            end
+        end
+    end
+    return found_objects
+end
+
+local eye_colours = { "blue", "orange", "red", "yellow" }
+
+for _, colour in ipairs(eye_colours) do
+    minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
+        description = S("Water Dragon Eye"),
+        inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
+        groups = { wtd_drops = 1 },
+        on_use = function(itemstack, user)
+            local pos = user:get_pos()
+            local radius = 30
+
+            local found_objects = water_vision(pos, radius)
+
+            if #found_objects > 0 then
+                local message = "Detected special nodes under the water: "
+                for i, obj in ipairs(found_objects) do
+                    message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
+                    if i < #found_objects then message = message .. ", " end
+                end
+                minetest.chat_send_player(user:get_player_name(), message)
+            else
+                minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
+            end
+            return itemstack
+        end,
+    })
+end
 
 --------------
 -- Settings --
@@ -1042,6 +1103,9 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
 			},
 		}
+		for i = 1, 5 do
+			table.insert(drops[i], { name = get_dragon_eye_item(self), min = 2, max = 2, chance = 1 })
+		end
 		self.drops = drops[stage]
 	end,
 	play_sound = function(self, sound)
@@ -2233,26 +2297,30 @@ local function water_vision(pos, radius)
     return found_objects
 end
 
+local eye_colours = { "blue", "orange", "red", "yellow" }
 
-minetest.register_craftitem("waterdragon:dragon_eye", {
-    description = S("Water Dragon Eye"),
-    inventory_image = "waterdragon_dragon_eye.png",
-    on_use = function(itemstack, user)
-        local pos = user:get_pos()
-        local radius = 30
+for _, colour in ipairs(eye_colours) do
+    minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
+        description = S("Water Dragon Eye"),
+        inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
+        groups = { wtd_drops = 1 },
+        on_use = function(itemstack, user)
+            local pos = user:get_pos()
+            local radius = 30
 
-        local found_objects = water_vision(pos, radius)
-        
-        if #found_objects > 0 then
-            local message = "Detected special nodes under the water:" .. " "
-            for i, obj in ipairs(found_objects) do
-                message = message .. obj.name .. " in " .. minetest.pos_to_string(obj.pos)
-                if i < #found_objects then message = message .. ", " end
+            local found_objects = water_vision(pos, radius)
+
+            if #found_objects > 0 then
+                local message = "Detected special nodes under the water: "
+                for i, obj in ipairs(found_objects) do
+                    message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
+                    if i < #found_objects then message = message .. ", " end
+                end
+                minetest.chat_send_player(user:get_player_name(), message)
+            else
+                minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
             end
-            minetest.chat_send_player(user:get_player_name(), message)
-        else
-            minetest.chat_send_player(user:get_player_name(), "There are no special nodes detected under the water")
-        end
-        return itemstack
-    end,
-})
+            return itemstack
+        end,
+    })
+end

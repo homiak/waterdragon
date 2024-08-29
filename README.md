@@ -40,3 +40,4 @@ This mod is based on Draconis and created by Scottii.
 - Fix bugs
 - Add shields
 - A new function for the Scottish Dragon Crate
+- Add the Water Dragon Eye craftitem
