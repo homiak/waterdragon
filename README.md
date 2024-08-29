@@ -36,3 +36,7 @@ This mod is based on Draconis and created by Scottii.
 - A new setting
 - A new chatcommand
 
+### Release v 2.2.0
+- Fix bugs
+- Add shields
+- A new function for the Scottish Dragon Crate

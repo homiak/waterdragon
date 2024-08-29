@@ -103,4 +103,9 @@ No owned Scottish Dragons found nearby=
 Scottish Dragon released=
 You must point at a Scottish Dragon=
 Your Scottish Dragon has been teleported to you!=
+Pure Water Draconic Steel Shield=
+Rare Water Draconic Steel Shield=
+Pure Water Draconic Scale Shield=
+Rare Water Draconic Scale Shield=
+
 
