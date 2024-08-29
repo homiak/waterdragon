@@ -2207,4 +2207,52 @@ end)
 
 -- Rare Water Dragon special thing...
 
+local detectable_nodes = {
+    "default:chest_locked",
+    "default:chest",
+	"default:steel_block",
+	"default:diamondblock",
+	"default:goldblock"
+}
 
+local function water_vision(pos, radius)
+    local found_objects = {}
+    for _, node_name in ipairs(detectable_nodes) do
+        local nodes = minetest.find_nodes_in_area(
+            {x = pos.x - radius, y = pos.y - radius, z = pos.z - radius},
+            {x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
+            node_name
+        )
+        for _, node_pos in ipairs(nodes) do
+            local above_node = minetest.get_node({x = node_pos.x, y = node_pos.y + 1, z = node_pos.z})
+            if minetest.get_item_group(above_node.name, "water") > 0 then
+                table.insert(found_objects, {name = node_name, pos = node_pos})
+            end
+        end
+    end
+    return found_objects
+end
+
+
+minetest.register_craftitem("waterdragon:dragon_eye", {
+    description = S("Water Dragon Eye"),
+    inventory_image = "waterdragon_dragon_eye.png",
+    on_use = function(itemstack, user)
+        local pos = user:get_pos()
+        local radius = 30
+
+        local found_objects = water_vision(pos, radius)
+        
+        if #found_objects > 0 then
+            local message = "Detected special nodes under the water:" .. " "
+            for i, obj in ipairs(found_objects) do
+                message = message .. obj.name .. " in " .. minetest.pos_to_string(obj.pos)
+                if i < #found_objects then message = message .. ", " end
+            end
+            minetest.chat_send_player(user:get_player_name(), message)
+        else
+            minetest.chat_send_player(user:get_player_name(), "There are no special nodes detected under the water")
+        end
+        return itemstack
+    end,
+})

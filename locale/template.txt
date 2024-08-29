@@ -107,5 +107,6 @@ Pure Water Draconic Steel Shield=
 Rare Water Draconic Steel Shield=
 Pure Water Draconic Scale Shield=
 Rare Water Draconic Scale Shield=
+Water Dragon Eye=
 
 

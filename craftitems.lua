@@ -1263,6 +1263,16 @@ local function craft_boots(def)
 	})
 end
 
+local function craft_shield(def)
+	minetest.register_craft({
+		output = def.output,
+		recipe = {
+			{ def.material, def.material, def.material },
+			{ "", "", "" },
+			{ "", def.material, "" },
+		},
+	})
+end
 -----------
 -- Tools --
 -----------
@@ -1398,6 +1408,10 @@ craft_boots({
 	output = "waterdragon:boots_pure_water_draconic_steel",
 	material = "waterdragon:draconic_steel_ingot_pure_water"
 })
+craft_shield({
+	output = "waterdragon:shield_pure_water_draconic_steel",
+	material = "waterdragon:draconic_steel_ingot_pure_water"
+})
 
 -- Rare Water-Forged Draconic Steel Armour --
 
@@ -1418,6 +1432,11 @@ craft_leggings({
 
 craft_boots({
 	output = "waterdragon:boots_rare_water_draconic_steel",
+	material = "waterdragon:draconic_steel_ingot_rare_water"
+})
+
+craft_shield({
+	output = "waterdragon:shield_rare_water_draconic_steel",
 	material = "waterdragon:draconic_steel_ingot_rare_water"
 })
 
@@ -1445,6 +1464,11 @@ craft_leggings({
 	material = "waterdragon:scales_pure_water_dragon"
 })
 
+craft_shield({
+	output = "waterdragon:shield_pure_water_scales",
+	material = "waterdragon:scales_pure_water_dragon"
+})
+
 -- Rare Water Scale Armour
 
 craft_leggings({
@@ -1464,6 +1488,11 @@ craft_chestplate({
 
 craft_boots({
 	output = "waterdragon:boots_rare_water_draconic",
+	material = "waterdragon:scales_rare_water_dragon"
+})
+
+craft_shield({
+	output = "waterdragon:shield_rare_water_scales",
 	material = "waterdragon:scales_rare_water_dragon"
 })
 
