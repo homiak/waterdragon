@@ -222,7 +222,7 @@ function waterdragon.attach_passenger(self, player)
 	-- Set players eye offset
 	player:set_eye_offset({
 		x = 0,
-		y = 115 * scale, -- Passenger's eye offset
+		y = 115 * scale, -- Set eye offset
 		z = -280 * scale
 	}, { x = 0, y = 0, z = 0 }) -- 3rd person eye offset is limited to 15 on each axis (Fix this, devs.)
 	player:set_look_horizontal(self.object:get_yaw() or 0)
@@ -760,17 +760,29 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     _self:set_forward_velocity(0)
                 end
                 _self:tilt_to(look_yaw, 4)
-                if _self.touching_ground
-                and control.down then
+                if _self.touching_ground then
                     is_landed = true
                     waterdragon.action_land(_self)
                 end
 
-
+                -- Добавляем атаку во время полета и зависания
                 if control.LMB and attack_cooldown <= 0 then
                     local start_pos = _self.object:get_pos()
-                    start_pos.y = start_pos.y + 1.5
-                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5.34))
+                    start_pos.y = start_pos.y + 1.5  -- Примерная высота головы дракона
+                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))  -- Дистанция атаки
+                    
+                    -- Воспроизведение звука при каждой попытке атаки
+                    local pos = _self.object:get_pos()
+                    if pos then
+                        minetest.sound_play("waterdragon_scottish_dragon_bite", {
+                            pos = pos,
+                            max_hear_distance = 10,
+                            gain = 1.0,
+                        }, true)  -- true для надежного воспроизведения
+                    end
+
+                    anim = "fly_punch"
+                    attack_cooldown = 1  -- Устанавливаем кулдаун атаки
                     
                     local ray = minetest.raycast(start_pos, end_pos, true, false)
                     for pointed_thing in ray do
@@ -778,18 +790,6 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                             local obj = pointed_thing.ref
                             if obj ~= player and obj ~= _self.object then
                                 _self:punch_target(obj)
-                                anim = "fly_punch"
-                                attack_cooldown = 1
-
-                                local pos = _self.object:get_pos()
-                                if pos then
-                                    minetest.sound_play("waterdragon_scottish_dragon_bite", {
-                                        pos = pos,
-                                        max_hear_distance = 10,
-                                        gain = 1.0,
-                                    }, true)
-                                end
-                                
                                 break
                             end
                         end
