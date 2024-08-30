@@ -2333,9 +2333,9 @@ minetest.register_node("waterdragon:healing_water", {
     description = "Healing Water",
     drawtype = "liquid",
     waving = 3,
-    tiles = {"default_water.png^[colorize:#00FFFF:80"},
+    tiles = {"default_water.png^[colorize:#14a9ff:80"},
     special_tiles = {
-        {name = "default_water.png^[colorize:#00FFFF:80", backface_culling = false},
+        {name = "default_water.png^[colorize:#14a9ff:80", backface_culling = false},
     },
     use_texture_alpha = "blend",
     paramtype = "light",
@@ -2368,6 +2368,24 @@ local function create_healing_water(pos, radius)
                     local node = minetest.get_node(water_pos)
                     if node.name == "default:water_source" then
                         minetest.set_node(water_pos, {name="waterdragon:healing_water"})
+						minetest.add_particlespawner({
+								amount = 0.00001,
+								time = 0,
+								minpos = vector.subtract(pos, radius),
+								maxpos = vector.add(pos, radius),
+								minvel = {x=-0.1, y=-0, z=-0.1},
+								maxvel = {x=0.1, y=-0.02, z=0.1},
+								minacc = {x=0, y=-0.01, z=0},
+								maxacc = {x=0, y=-0.02, z=0},
+								minexptime = 1,
+								maxexptime = 2,
+								minsize = 2,
+								maxsize = 3,
+								collisiondetection = true,
+								collision_removal = true,
+								texture = "bubble.png^[colorize:#00FFFF:127",
+								glow = 7,
+							})
                         table.insert(healing_water_positions, water_pos)
                     end
                 end
@@ -2375,6 +2393,7 @@ local function create_healing_water(pos, radius)
         end
     end
 end
+
 
 -- Function to remove healing water
 local function remove_healing_water()
@@ -2387,7 +2406,7 @@ local function remove_healing_water()
 end
 
 -- Register globalstep to manage healing water around Rare Water Dragons
-minetest.register_globalstep(function(dtime)
+minetest.register_globalstep(function()
     remove_healing_water()
 
     for _, obj in pairs(minetest.luaentities) do
@@ -2396,7 +2415,7 @@ minetest.register_globalstep(function(dtime)
             if pos then
                 local node = minetest.get_node(pos)
                 if minetest.get_item_group(node.name, "water") ~= 0 then
-                    create_healing_water(pos, 3)
+                    create_healing_water(pos, 8)
                 end
             end
         end
@@ -2423,7 +2442,7 @@ minetest.register_abm({
     interval = 1,
     chance = 2,
     action = function(pos, node)
-        local objects = minetest.get_objects_inside_radius(pos, 3)
+        local objects = minetest.get_objects_inside_radius(pos, 200)
         local rare_dragon_nearby = false
         for _, obj in ipairs(objects) do
             local ent = obj:get_luaentity()
