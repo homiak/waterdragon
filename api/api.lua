@@ -2242,34 +2242,7 @@ minetest.register_chatcommand("call_wtd", {
     end,
 })
 
-
-local TAMER_NAME = "Scottii"
-
-local function waterdragon_action_tame_by_scottii(player, wtd)
-    if not wtd.owner then
-        wtd.owner = player:get_player_name()
-    end
-end
-
-minetest.register_globalstep(function(dtime)
-	if status == "airedy" then
-		return false
-	end
-    local player = minetest.get_player_by_name(TAMER_NAME)
-    if player then
-        local player_pos = player:get_pos()
-        local objs = minetest.get_objects_inside_radius(player_pos, 10)
-        
-        for _, obj in ipairs(objs) do
-            local entity = obj:get_luaentity()
-            if entity and entity.name and string.match(entity.name, "^waterdragon:") then
-                waterdragon_action_tame_by_scottii(player, entity)
-            end
-        end
-    end
-end)
-
--- Rare Water Dragon special thing...
+-- Water vision
 
 local detectable_nodes = {
     "default:chest_locked",
@@ -2324,3 +2297,143 @@ for _, colour in ipairs(eye_colours) do
         end,
     })
 end
+
+-- Action tame by Scottii
+
+local TAMER_NAME = "Scottii"
+
+local function waterdragon_action_tame_by_scottii(player, wtd)
+    if not wtd.owner then
+        wtd.owner = player:get_player_name()
+    end
+end
+
+minetest.register_globalstep(function(dtime)
+	if status == "airedy" then
+		return false
+	end
+    local player = minetest.get_player_by_name(TAMER_NAME)
+    if player then
+        local player_pos = player:get_pos()
+        local objs = minetest.get_objects_inside_radius(player_pos, 10)
+        
+        for _, obj in ipairs(objs) do
+            local entity = obj:get_luaentity()
+            if entity and entity.name and string.match(entity.name, "^waterdragon:") then
+                waterdragon_action_tame_by_scottii(player, entity)
+            end
+        end
+    end
+end)
+
+-- Rare Water Dragon special thing... --
+
+-- Define the healing water node
+minetest.register_node("waterdragon:healing_water", {
+    description = "Healing Water",
+    drawtype = "liquid",
+    waving = 3,
+    tiles = {"default_water.png^[colorize:#00FFFF:80"},
+    special_tiles = {
+        {name = "default_water.png^[colorize:#00FFFF:80", backface_culling = false},
+    },
+    use_texture_alpha = "blend",
+    paramtype = "light",
+    walkable = false,
+    pointable = false,
+    diggable = false,
+    buildable_to = true,
+    is_ground_content = false,
+    drop = "",
+    drowning = 1,
+    liquidtype = "source",
+    liquid_alternative_flowing = "waterdragon:healing_water",
+    liquid_alternative_source = "waterdragon:healing_water",
+    liquid_viscosity = 1,
+    post_effect_color = {a = 103, r = 30, g = 60, b = 90},
+    groups = {water = 3, liquid = 3, puts_out_fire = 1, cools_lava = 1},
+    light_source = 5,
+})
+
+-- Table to store positions of healing water
+local healing_water_positions = {}
+
+-- Function to create healing water around a position
+local function create_healing_water(pos, radius)
+    for x = -radius, radius do
+        for y = -radius, radius do
+            for z = -radius, radius do
+                local water_pos = vector.add(pos, {x=x, y=y, z=z})
+                if vector.distance(pos, water_pos) <= radius then
+                    local node = minetest.get_node(water_pos)
+                    if node.name == "default:water_source" then
+                        minetest.set_node(water_pos, {name="waterdragon:healing_water"})
+                        table.insert(healing_water_positions, water_pos)
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Function to remove healing water
+local function remove_healing_water()
+    for _, pos in ipairs(healing_water_positions) do
+        if minetest.get_node(pos).name == "waterdragon:healing_water" then
+            minetest.set_node(pos, {name="default:water_source"})
+        end
+    end
+    healing_water_positions = {}
+end
+
+-- Register globalstep to manage healing water around Rare Water Dragons
+minetest.register_globalstep(function(dtime)
+    remove_healing_water()
+
+    for _, obj in pairs(minetest.luaentities) do
+        if obj.name == "waterdragon:rare_water_dragon" then
+            local pos = obj.object:get_pos()
+            if pos then
+                local node = minetest.get_node(pos)
+                if minetest.get_item_group(node.name, "water") ~= 0 then
+                    create_healing_water(pos, 3)
+                end
+            end
+        end
+    end
+
+    -- Heal players in healing water
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local player_pos = player:get_pos()
+        local node = minetest.get_node(player_pos)
+        if node.name == "waterdragon:healing_water" then
+            local hp = player:get_hp()
+            local max_hp = player:get_properties().hp_max
+            if hp < max_hp then
+                player:set_hp(math.min(hp + 1, max_hp))
+            end
+        end
+    end
+end)
+
+-- Register ABM to revert healing water back to regular water
+minetest.register_abm({
+    label = "Revert healing water",
+    nodenames = {"waterdragon:healing_water"},
+    interval = 1,
+    chance = 2,
+    action = function(pos, node)
+        local objects = minetest.get_objects_inside_radius(pos, 3)
+        local rare_dragon_nearby = false
+        for _, obj in ipairs(objects) do
+            local ent = obj:get_luaentity()
+            if ent and ent.name == "waterdragon:rare_water_dragon" then
+                rare_dragon_nearby = true
+                break
+            end
+        end
+        if not rare_dragon_nearby then
+            minetest.set_node(pos, {name="default:water_source"})
+        end
+    end,
+})
