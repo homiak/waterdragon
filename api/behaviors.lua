@@ -2,6 +2,8 @@
 -- Behaviors --
 ---------------
 
+-- Slam
+
 -- Новая функция on_punch для водяных драконов
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
     -- Сохраняем оригинальное поведение
@@ -30,6 +32,35 @@ minetest.register_on_mods_loaded(function()
             entity_def.on_punch = new_water_dragon_on_punch
             minetest.register_entity(":" .. dragon_type, entity_def)
         end
+    end
+end)
+
+-- Новая функция on_punch для шотландского дракона
+local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
+    -- Сохраняем оригинальное поведение
+    creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+
+    -- Добавляем новое поведение
+    if self.hp > 0 then  -- Убедимся, что дракон все еще жив
+        -- Шанс 50% на выполнение slam attack
+        if math.random() < 1 then
+            -- Отложим выполнение slam attack на короткое время
+            minetest.after(1, function()
+                if self.object:get_pos() then  -- Убедимся, что дракон все еще существует
+                    waterdragon.action_punch(self)
+                end
+            end)
+        end
+    end
+end
+
+-- Применяем новую функцию on_punch к шотландскому дракону
+minetest.register_on_mods_loaded(function()
+    local dragon_type = "waterdragon:scottish_dragon"
+    local entity_def = minetest.registered_entities[dragon_type]
+    if entity_def then
+        entity_def.on_punch = new_scottish_dragon_on_punch
+        minetest.register_entity(":" .. dragon_type, entity_def)
     end
 end)
 
