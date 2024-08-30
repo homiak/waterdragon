@@ -960,9 +960,9 @@ function waterdragon.pure_water_breath(self, pos2)
 	if breath_delay <= 0 then
 		local vel = self.object:get_velocity()
 		local particle_origin = {
-			x = pos.x + vel.x * 0.25,
-			y = pos.y + vel.y * 0.25,
-			z = pos.z + vel.z * 0.25
+			x = pos.x + dir.x * (self.growth_scale * 0.5) + vel.x * 200,
+			y = pos.y + dir.y * (self.growth_scale * 0.5) + vel.y * 200,
+			z = pos.z + dir.z * (self.growth_scale * 0.5) + vel.z * 200
 		}
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
@@ -973,12 +973,12 @@ function waterdragon.pure_water_breath(self, pos2)
 				collision_removal = true,
 				pos = particle_origin,
 				vel = { min = vec_multi(dir, 32), max = vec_multi(dir, 48) },
-				acc = { min = vec_new(-4, -4, -4), max = vec_new(4, 4, 4) },
+				acc = { min = vec_new(-20, -20, -20), max = vec_new(20, 20, 20) },
 				size = { min = 8 * scale, max = 12 * scale },
 				glow = 16,
 				texture = {
 					name = "waterdragon_water_particle.png",
-					alpha_tween = { 0.75, 0.25 },
+					alpha_tween = {100, 100 },
 					blend = "alpha"
 				}
 			})
@@ -990,10 +990,10 @@ function waterdragon.pure_water_breath(self, pos2)
 				maxpos = particle_origin,
 				minvel = vec_multi(dir, 32),
 				maxvel = vec_multi(dir, 48),
-				minacc = { x = -4, y = -4, z = -4 },
-				maxacc = { x = 4, y = 4, z = 4 },
-				minexptime = 0.02 * 32,
-				maxexptime = 0.04 * 32,
+				minacc = { x = -20, y = -20, z = -20 },
+				maxacc = { x = 20, y = 20, z = 20 },
+				minexptime = 0.02 * 302,
+				maxexptime = 0.04 * 302,
 				minsize = 8 * scale,
 				maxsize = 12 * scale,
 				collisiondetection = true,
