@@ -2,6 +2,10 @@
 -- API --
 ---------
 
+local S = waterdragon.S
+
+-- Bowing
+
 -- Система поклона для Water Dragon
 local S = waterdragon.S or function(s) return s end
 local bow_players = {}
@@ -21,7 +25,7 @@ local function finish_bow(player_name, dragon)
         bow_players[player_name] = {}
     end
     bow_players[player_name][dragon.wtd_id] = true
-    minetest.chat_send_player(player_name, S("You bow to the Water Dragon."))
+    minetest.chat_send_player(player_name, S("You bow to the Water Dragon"))
 end
 
 -- Функция для проверки, поклонился ли игрок дракону
@@ -77,9 +81,82 @@ minetest.register_on_leaveplayer(function(player)
     bow_timers[name] = nil
 end)
 
+-- Scottish bow
+
+-- Упрощенная система поклона для Шотландского Дракона
+local S = waterdragon.S or function(s) return s end
+local scottish_bow_players = {}
+local scottish_bow_timers = {}
+
+-- Функция для начала поклона
+local function start_scottish_bow(player_name, dragon)
+    scottish_bow_timers[player_name] = {
+        start_time = minetest.get_us_time(),
+        dragon = dragon
+    }
+end
+
+-- Функция для завершения поклона
+local function finish_scottish_bow(player_name, dragon)
+    scottish_bow_players[player_name] = dragon
+    minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
+end
+
+-- Функция для проверки, поклонился ли игрок дракону
+local function has_bowed_to_scottish_dragon(player_name, dragon)
+    return scottish_bow_players[player_name] == dragon
+end
+
+-- Глобальный шаг для обработки поклона
+minetest.register_globalstep(function(dtime)
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local player_name = player:get_player_name()
+        local control = player:get_player_control()
+        
+        if control.sneak then
+            if not scottish_bow_timers[player_name] then
+                local pos = player:get_pos()
+                local nearest_dragon = nil
+                local nearest_dist = 5  -- Максимальное расстояние для поклона
+
+                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
+                    local ent = obj:get_luaentity()
+                    if ent and ent.name == "waterdragon:scottish_dragon" then
+                        local dist = vector.distance(pos, obj:get_pos())
+                        if not nearest_dragon or dist < nearest_dist then
+                            nearest_dragon = ent
+                            nearest_dist = dist
+                        end
+                    end
+                end
+
+                if nearest_dragon then
+                    start_scottish_bow(player_name, nearest_dragon)
+                end
+            else
+                local bow_data = scottish_bow_timers[player_name]
+                local current_time = minetest.get_us_time()
+                if (current_time - bow_data.start_time) >= 1000000 then  -- 1 секунда в микросекундах
+                    if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
+                        finish_scottish_bow(player_name, bow_data.dragon)
+                    end
+                end
+            end
+        else
+            scottish_bow_timers[player_name] = nil
+        end
+    end
+end)
+
+-- Очистка данных при выходе игрока
+minetest.register_on_leaveplayer(function(player)
+    local name = player:get_player_name()
+    scottish_bow_players[name] = nil
+    scottish_bow_timers[name] = nil
+end)
 
 -- Math --
-local S = waterdragon.S
+
 
 local function get_dragon_eye_item(self)
 	local eye_color = self.eye_color or "blue"
@@ -2206,23 +2283,29 @@ end
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_rightclick(self, clicker)
-	if self.hp <= 0 then return end
-	local name = clicker:get_player_name()
+    if self.hp <= 0 then return end
+    local name = clicker:get_player_name()
 
-	if self:feed(clicker) then
-		return
-	end
-	local item_name = clicker:get_wielded_item():get_name() or ""
-	if (not self.owner
-	or name == self.owner)
-	and not self.rider
-	and item_name == "" then
-		if clicker:get_player_control().sneak then
-			self:show_formspec(clicker)
-		else
-			waterdragon.attach_player(self, clicker)
-		end
-	end
+    if self:feed(clicker) then
+        return
+    end
+    local item_name = clicker:get_wielded_item():get_name() or ""
+    if (not self.owner
+    or name == self.owner)
+    and not self.rider
+    and item_name == "" then
+        if clicker:get_player_control().sneak then
+            self:show_formspec(clicker)
+        else
+            if has_bowed_to_scottish_dragon(name, self) then
+                waterdragon.attach_player(self, clicker)
+            else
+                minetest.chat_send_player(name, S("You must bow to the Scottish Dragon before mounting it. Hold Shift for more then 1 second to bow"))
+            end
+        end
+    elseif not self.owner or name ~= self.owner then
+        minetest.chat_send_player(name, S("Hold Shift for 1 second near the Scottish Dragon to bow to it"))
+    end
 end
 
 
@@ -2230,7 +2313,7 @@ end
 
 -- Water Dragon
 
--- Полная функция waterdragon.dragon_rightclick
+-- waterdragon.dragon_rightclick
 function waterdragon.dragon_rightclick(self, clicker)
     local name = clicker:get_player_name()
     local inv = minetest.get_inventory({ type = "player", name = name })
@@ -2255,7 +2338,7 @@ function waterdragon.dragon_rightclick(self, clicker)
             if has_bowed_to_dragon(name, self) then
                 waterdragon.attach_player(self, clicker)
             else
-                minetest.chat_send_player(name, S("You must bow to the Water Dragon before mounting it. Hold Shift for 1 second to bow."))
+                minetest.chat_send_player(name, S("You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow"))
             end
         elseif self.age < 5 then
             self.shoulder_mounted = self:memorize("shoulder_mounted", true)
@@ -2263,7 +2346,7 @@ function waterdragon.dragon_rightclick(self, clicker)
                 { x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
         end
     elseif not self.owner or name ~= self.owner then
-        minetest.chat_send_player(name, S("Hold Shift for 1 second near the Water Dragon to bow to it."))
+        minetest.chat_send_player(name, S("Hold Shift for 1 second near the Water Dragon to bow to it"))
     end
     if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
         waterdragon.send_passenger_request(self, clicker)

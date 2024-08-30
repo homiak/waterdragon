@@ -108,5 +108,11 @@ Rare Water Draconic Steel Shield=
 Pure Water Draconic Scale Shield=
 Rare Water Draconic Scale Shield=
 Water Dragon Eye=
+You bow to the Water Dragon=
+You bow to the Scottish Dragon=
+You must bow to the Scottish Dragon before mounting it. Hold Shift for more then 1 second to bow=
+Hold Shift for 1 second near the Scottish Dragon to bow to it=
+You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow=
+Hold Shift for 1 second near the Water Dragon to bow to it=
 
 
