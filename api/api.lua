@@ -2,6 +2,82 @@
 -- API --
 ---------
 
+-- Система поклона для Water Dragon
+local S = waterdragon.S or function(s) return s end
+local bow_players = {}
+local bow_timers = {}
+
+-- Функция для начала поклона
+local function start_bow(player_name, dragon)
+    bow_timers[player_name] = {
+        start_time = minetest.get_us_time(),
+        dragon = dragon
+    }
+end
+
+-- Функция для завершения поклона
+local function finish_bow(player_name, dragon)
+    if not bow_players[player_name] then
+        bow_players[player_name] = {}
+    end
+    bow_players[player_name][dragon.wtd_id] = true
+    minetest.chat_send_player(player_name, S("You bow to the Water Dragon."))
+end
+
+-- Функция для проверки, поклонился ли игрок дракону
+local function has_bowed_to_dragon(player_name, dragon)
+    return bow_players[player_name] and bow_players[player_name][dragon.wtd_id]
+end
+
+-- Глобальный шаг для обработки поклона
+minetest.register_globalstep(function(dtime)
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local player_name = player:get_player_name()
+        local control = player:get_player_control()
+        
+        if control.sneak then
+            if not bow_timers[player_name] then
+                local pos = player:get_pos()
+                local nearest_dragon = nil
+                local nearest_dist = 5  -- Максимальное расстояние для поклона
+
+                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
+                    local ent = obj:get_luaentity()
+                    if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
+                        local dist = vector.distance(pos, obj:get_pos())
+                        if not nearest_dragon or dist < nearest_dist then
+                            nearest_dragon = ent
+                            nearest_dist = dist
+                        end
+                    end
+                end
+
+                if nearest_dragon then
+                    start_bow(player_name, nearest_dragon)
+                end
+            else
+                local bow_data = bow_timers[player_name]
+                local current_time = minetest.get_us_time()
+                if (current_time - bow_data.start_time) >= 1000000 then  -- 1 секунда в микросекундах
+                    if not has_bowed_to_dragon(player_name, bow_data.dragon) then
+                        finish_bow(player_name, bow_data.dragon)
+                    end
+                end
+            end
+        else
+            bow_timers[player_name] = nil
+        end
+    end
+end)
+
+-- Очистка данных при выходе игрока
+minetest.register_on_leaveplayer(function(player)
+    local name = player:get_player_name()
+    bow_players[name] = nil
+    bow_timers[name] = nil
+end)
+
+
 -- Math --
 local S = waterdragon.S
 
@@ -26,95 +102,6 @@ local rad = math.rad
 local function diff(a, b) -- Get difference between 2 angles
 	return atan2(sin(b - a), cos(b - a))
 end
-
-local S = waterdragon.S
-local player_bow_status = {}
-local player_bow_timer = {}
-
-local function start_bow(player, dragon)
-    local player_name = player:get_player_name()
-    player_bow_timer[player_name] = {
-        start_time = minetest.get_us_time(),
-        dragon = dragon
-    }
-end
-
-local function finish_bow(player, dragon)
-    local player_name = player:get_player_name()
-    if not player_bow_status[player_name] then
-        player_bow_status[player_name] = {}
-    end
-    player_bow_status[player_name][dragon.wtd_id] = true
-    minetest.chat_send_player(player_name, S("You bow to the Water Dragon."))
-end
-
-local function cancel_bow(player_name)
-    player_bow_timer[player_name] = nil
-end
-
-local function has_bowed_to_dragon(player, dragon)
-    local player_name = player:get_player_name()
-    return player_bow_status[player_name] and player_bow_status[player_name][dragon.wtd_id]
-end
-
-local function reset_bow_status(player_name)
-    player_bow_status[player_name] = nil
-    player_bow_timer[player_name] = nil
-end
-
--- Очистка статуса поклона при выходе игрока
-minetest.register_on_leaveplayer(function(player)
-    local player_name = player:get_player_name()
-    reset_bow_status(player_name)
-end)
-
--- Экспортируем функции для использования в других частях мода
-waterdragon.start_bow = start_bow
-waterdragon.finish_bow = finish_bow
-waterdragon.cancel_bow = cancel_bow
-waterdragon.has_bowed_to_dragon = has_bowed_to_dragon
-waterdragon.reset_bow_status = reset_bow_status
-
--- Глобальный шаг для обработки поклона
-minetest.register_globalstep(function(dtime)
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_name = player:get_player_name()
-        local control = player:get_player_control()
-        
-        if control.sneak then
-            if not player_bow_timer[player_name] then
-                -- Поиск ближайшего дракона
-                local pos = player:get_pos()
-                local nearest_dragon = nil
-                local nearest_dist = 5  -- Максимальное расстояние для поклона
-
-                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
-                    local ent = obj:get_luaentity()
-                    if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
-                        local dist = vector.distance(pos, obj:get_pos())
-                        if not nearest_dragon or dist < nearest_dist then
-                            nearest_dragon = ent
-                            nearest_dist = dist
-                        end
-                    end
-                end
-
-                if nearest_dragon then
-                    start_bow(player, nearest_dragon)
-                end
-            else
-                local bow_data = player_bow_timer[player_name]
-                local current_time = minetest.get_us_time()
-                if (current_time - bow_data.start_time) >= 1000000 then  -- 1 секунда в микросекундах
-                    finish_bow(player, bow_data.dragon)
-                    player_bow_timer[player_name] = nil
-                end
-            end
-        else
-            cancel_bow(player_name)
-        end
-    end
-end)
 
 local function interp_angle(a, b, w)
 	local cs = (1 - w) * cos(a) + w * cos(b)
@@ -2243,6 +2230,7 @@ end
 
 -- Water Dragon
 
+-- Полная функция waterdragon.dragon_rightclick
 function waterdragon.dragon_rightclick(self, clicker)
     local name = clicker:get_player_name()
     local inv = minetest.get_inventory({ type = "player", name = name })
@@ -2264,7 +2252,7 @@ function waterdragon.dragon_rightclick(self, clicker)
         if clicker:get_player_control().sneak then
             self:show_formspec(clicker)
         elseif not self.rider and self.age >= 20 then
-            if waterdragon.has_bowed_to_dragon(clicker, self) then
+            if has_bowed_to_dragon(name, self) then
                 waterdragon.attach_player(self, clicker)
             else
                 minetest.chat_send_player(name, S("You must bow to the Water Dragon before mounting it. Hold Shift for 1 second to bow."))
