@@ -34,7 +34,7 @@ local function has_bowed_to_dragon(player_name, dragon)
 end
 
 -- Глобальный шаг для обработки поклона
-minetest.register_globalstep(function(dtime)
+minetest.register_globalstep(function()
     for _, player in ipairs(minetest.get_connected_players()) do
         local player_name = player:get_player_name()
         local control = player:get_player_control()
@@ -43,7 +43,7 @@ minetest.register_globalstep(function(dtime)
             if not bow_timers[player_name] then
                 local pos = player:get_pos()
                 local nearest_dragon = nil
-                local nearest_dist = 5  -- Максимальное расстояние для поклона
+                local nearest_dist = 15  -- Максимальное расстояние для поклона
 
                 for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
                     local ent = obj:get_luaentity()
@@ -117,7 +117,7 @@ minetest.register_globalstep(function(dtime)
             if not scottish_bow_timers[player_name] then
                 local pos = player:get_pos()
                 local nearest_dragon = nil
-                local nearest_dist = 5  -- Максимальное расстояние для поклона
+                local nearest_dist = 15  -- Максимальное расстояние для поклона
 
                 for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
                     local ent = obj:get_luaentity()
