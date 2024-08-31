@@ -10,7 +10,7 @@ local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, to
     creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
     -- Добавляем новое поведение
-    if self.hp > 0 then  -- Убедимся, что дракон все еще жив
+    if self.hp > 0 and not self.rider then  -- Убедимся, что дракон все еще жив
         -- Шанс 50% на выполнение slam attack
         if math.random() < 1 then
             -- Отложим выполнение slam attack на короткое время
@@ -41,8 +41,8 @@ local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch,
     creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
     -- Добавляем новое поведение
-    if self.hp > 0 then  -- Убедимся, что дракон все еще жив
-        -- Шанс 50% на выполнение slam attack
+    if self.hp > 0 and not self.rider then  -- Убедимся, что дракон все еще жив
+        -- Шанс 100% на выполнение slam attack
         if math.random() < 1 then
             -- Отложим выполнение slam attack на короткое время
             minetest.after(1, function()

@@ -169,8 +169,8 @@ armor:register_armor("waterdragon:shield_pure_water_draconic_steel", {
     reciprocate_damage = true,
     on_punched = function(hitter)
         -- 20% chance to stun the attacker
-        if math.random(1, 5) == 1 then
-            if hitter and hitter:is_player() then
+        if math.random(1, 2) == 1 then
+            if hitter then
                 hitter:set_physics_override({speed = 0.5})
                 minetest.after(2, function()
                     hitter:set_physics_override({speed = 1})
@@ -198,8 +198,8 @@ armor:register_armor("waterdragon:shield_rare_water_draconic_steel", {
     reciprocate_damage = true,
     on_punched = function(player, hitter, time_from_last_punch, tool_capabilities)
         -- 25% chance to reflect damage back to the attacker
-        if math.random(1, 4) == 1 then
-            if hitter and hitter:is_player() then
+        if math.random(1, 2) == 1 then
+            if hitter then
                 hitter:set_hp(hitter:get_hp() - 2)
             elseif hitter and hitter:get_luaentity() then
                 hitter:punch(player, 1.0, {
@@ -225,8 +225,8 @@ armor:register_armor("waterdragon:shield_pure_water_scales", {
     reciprocate_damage = true,
     on_punched = function(hitter)
         -- 20% chance to stun the attacker
-        if math.random(1, 5) == 1 then
-            if hitter and hitter:is_player() then
+        if math.random(1, 2) == 1 then
+            if hitter then
                 hitter:set_physics_override({speed = 0.5})
                 minetest.after(2, function()
                     hitter:set_physics_override({speed = 1})
@@ -255,8 +255,8 @@ armor:register_armor("waterdragon:shield_rare_water_scales", {
     reciprocate_damage = true,
     on_punched = function(hitter)
         -- 25% chance to reflect damage back to the attacker
-        if math.random(1, 4) == 1 then
-            if hitter and hitter:is_player() then
+        if math.random(1, 2) == 1 then
+            if hitter then
                 hitter:set_hp(hitter:get_hp() - 2)
             elseif hitter and hitter:get_luaentity() then
                 hitter:punch(player, 1.0, {

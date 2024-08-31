@@ -1792,7 +1792,6 @@ end
 
 -- Scottish Dragon Crate --
 
-local S = minetest.get_translator("waterdragon")
 local storage = minetest.get_mod_storage()
 
 local function generate_scottish_id()
