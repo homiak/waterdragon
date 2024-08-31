@@ -508,7 +508,7 @@ local function forge_particle(pos, texture, animation)
 		maxsize = 8,
 		collisiondetection = false,
 		vertical = false,
-		glow = 16,
+		glow = 7,
 		texture = texture,
 		animation = animation,
 	})

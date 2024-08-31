@@ -106,7 +106,7 @@ minetest.register_craftitem("waterdragon:dragon_water_drop", {
 				minsize = 4,
 				maxsize = 4,
 				texture = particle,
-				glow = 16
+				glow = 7
 			})
 
 		-- Consume the item from the player's inventory
@@ -1641,7 +1641,7 @@ minetest.register_craftitem("waterdragon:bucket_dragon_water", {
 					minsize = 4,
 					maxsize = 4,
 					texture = particle,
-					glow = 16
+					glow = 7
 				})
 			else
 				minetest.chat_send_player(player:get_player_name(), S("The animal is already tamed"))
@@ -1665,7 +1665,7 @@ minetest.register_craftitem("waterdragon:bucket_dragon_water", {
 					minsize = 4,
 					maxsize = 4,
 					texture = particle2,
-					glow = 16
+					glow = 7
 				})
 			end
 		-- Consume the item from the player's inventory

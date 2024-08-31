@@ -975,7 +975,7 @@ function waterdragon.pure_water_breath(self, pos2)
 				vel = { min = vec_multi(dir, 32), max = vec_multi(dir, 48) },
 				acc = { min = vec_new(-20, -20, -20), max = vec_new(20, 20, 20) },
 				size = { min = 8 * scale, max = 12 * scale },
-				glow = 16,
+				glow = 7,
 				texture = {
 					name = "waterdragon_water_particle.png",
 					alpha_tween = {100, 100 },
@@ -999,7 +999,7 @@ function waterdragon.pure_water_breath(self, pos2)
 				collisiondetection = true,
 				collision_removal = true,
 				vertical = false,
-				glow = 16,
+				glow = 7,
 				texture = "waterdragon_water_particle.png"
 			})
 		end
@@ -1060,7 +1060,7 @@ function waterdragon.rare_water_breath(self, pos2)
 				vel = { min = vec_multi(dir, 32), max = vec_multi(dir, 48) },
 				acc = { min = vec_new(-4, -4, -4), max = vec_new(4, 4, 4) },
 				size = { min = 6 * scale, max = 8 * scale },
-				glow = 16,
+				glow = 7,
 				texpool = {
 					{ name = "waterdragon_rare_water_particle_1.png", alpha_tween = { 1, 0 }, blend = "alpha" },
 					{ name = "waterdragon_rare_water_particle_2.png", alpha_tween = { 1, 0 }, blend = "alpha" },
@@ -1084,7 +1084,7 @@ function waterdragon.rare_water_breath(self, pos2)
 				collisiondetection = true,
 				collision_removal = true,
 				vertical = false,
-				glow = 16,
+				glow = 7,
 				texture = "waterdragon_rare_water_particle_" .. random(3) .. ".png"
 			})
 		end
@@ -1800,7 +1800,7 @@ minetest.register_chatcommand("set_wtd_owner", {
 				minsize = 4,
 				maxsize = 4,
 				texture = particle,
-				glow = 16
+				glow = 7
 			})
 		else
 			minetest.chat_send_player(name, S("You must be pointing at a Water Dragon"))
