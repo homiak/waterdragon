@@ -6,33 +6,52 @@
 
 -- Новая функция on_punch для водяных драконов
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-	-- Сохраняем оригинальное поведение
-	creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+    -- Сохраняем оригинальное поведение
+    if self.original_on_punch then
+        self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
+    end
 
-	-- Добавляем новое поведение
-	if self.hp > 0 and not self.rider then -- Убедимся, что дракон все еще жив
-		-- Шанс 50% на выполнение slam attack
-		if math.random() < 1 then
-			-- Отложим выполнение slam attack на короткое время
-			minetest.after(1, function()
-				if self.object:get_pos() then -- Убедимся, что дракон все еще существует
-					waterdragon.action_slam(self)
-				end
-			end)
-		end
-	end
+    -- Добавляем новое поведение
+    if self.object:get_hp() > 0 and not self.rider then  -- Проверяем, что дракон жив и на нем не сидит игрок
+        if self.is_landed then
+            -- Если дракон на земле, выполняем slam attack сразу
+            minetest.after(0.5, function()
+                if self.object:get_pos() and not self.rider and self.is_landed then
+                    waterdragon.action_slam(self)
+                end
+            end)
+        else
+            -- Если дракон в воздухе, откладываем slam attack до приземления
+            self.pending_slam = true
+        end
+    end
 end
 
--- Применяем новую функцию on_punch к обоим типам водяных драконов
+-- Применяем новую функцию on_punch к водяным драконам
 minetest.register_on_mods_loaded(function()
-	local dragon_types = { "waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon" }
-	for _, dragon_type in ipairs(dragon_types) do
-		local entity_def = minetest.registered_entities[dragon_type]
-		if entity_def then
-			entity_def.on_punch = new_water_dragon_on_punch
-			minetest.register_entity(":" .. dragon_type, entity_def)
-		end
-	end
+    local dragon_types = {"waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon"}
+    for _, dragon_type in ipairs(dragon_types) do
+        local entity_def = minetest.registered_entities[dragon_type]
+        if entity_def then
+            entity_def.original_on_punch = entity_def.on_punch
+            entity_def.on_punch = new_water_dragon_on_punch
+            
+            -- Модифицируем функцию on_step для выполнения отложенного slam attack
+            local original_on_step = entity_def.on_step
+            entity_def.on_step = function(self, dtime)
+                if original_on_step then
+                    original_on_step(self, dtime)
+                end
+                
+                if self.pending_slam and self.is_landed and not self.rider then
+                    self.pending_slam = false
+                    waterdragon.action_slam(self)
+                end
+            end
+            
+            minetest.register_entity(":" .. dragon_type, entity_def)
+        end
+    end
 end)
 
 -- Новая функция on_punch для шотландского дракона
