@@ -6,62 +6,62 @@
 
 -- Новая функция on_punch для водяных драконов
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    -- Сохраняем оригинальное поведение
-    creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	-- Сохраняем оригинальное поведение
+	creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-    -- Добавляем новое поведение
-    if self.hp > 0 and not self.rider then  -- Убедимся, что дракон все еще жив
-        -- Шанс 50% на выполнение slam attack
-        if math.random() < 1 then
-            -- Отложим выполнение slam attack на короткое время
-            minetest.after(1, function()
-                if self.object:get_pos() then  -- Убедимся, что дракон все еще существует
-                    waterdragon.action_slam(self)
-                end
-            end)
-        end
-    end
+	-- Добавляем новое поведение
+	if self.hp > 0 and not self.rider then -- Убедимся, что дракон все еще жив
+		-- Шанс 50% на выполнение slam attack
+		if math.random() < 1 then
+			-- Отложим выполнение slam attack на короткое время
+			minetest.after(1, function()
+				if self.object:get_pos() then -- Убедимся, что дракон все еще существует
+					waterdragon.action_slam(self)
+				end
+			end)
+		end
+	end
 end
 
 -- Применяем новую функцию on_punch к обоим типам водяных драконов
 minetest.register_on_mods_loaded(function()
-    local dragon_types = {"waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon"}
-    for _, dragon_type in ipairs(dragon_types) do
-        local entity_def = minetest.registered_entities[dragon_type]
-        if entity_def then
-            entity_def.on_punch = new_water_dragon_on_punch
-            minetest.register_entity(":" .. dragon_type, entity_def)
-        end
-    end
+	local dragon_types = { "waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon" }
+	for _, dragon_type in ipairs(dragon_types) do
+		local entity_def = minetest.registered_entities[dragon_type]
+		if entity_def then
+			entity_def.on_punch = new_water_dragon_on_punch
+			minetest.register_entity(":" .. dragon_type, entity_def)
+		end
+	end
 end)
 
 -- Новая функция on_punch для шотландского дракона
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    -- Сохраняем оригинальное поведение
-    creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	-- Сохраняем оригинальное поведение
+	creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-    -- Добавляем новое поведение
-    if self.hp > 0 and not self.rider then  -- Убедимся, что дракон все еще жив
-        -- Шанс 100% на выполнение slam attack
-        if math.random() < 1 then
-            -- Отложим выполнение slam attack на короткое время
-            minetest.after(1, function()
-                if self.object:get_pos() then  -- Убедимся, что дракон все еще существует
-                    waterdragon.action_punch(self)
-                end
-            end)
-        end
-    end
+	-- Добавляем новое поведение
+	if self.hp > 0 and not self.rider then -- Убедимся, что дракон все еще жив
+		-- Шанс 100% на выполнение slam attack
+		if math.random() < 1 then
+			-- Отложим выполнение slam attack на короткое время
+			minetest.after(1, function()
+				if self.object:get_pos() then -- Убедимся, что дракон все еще существует
+					waterdragon.action_punch(self)
+				end
+			end)
+		end
+	end
 end
 
 -- Применяем новую функцию on_punch к шотландскому дракону
 minetest.register_on_mods_loaded(function()
-    local dragon_type = "waterdragon:scottish_dragon"
-    local entity_def = minetest.registered_entities[dragon_type]
-    if entity_def then
-        entity_def.on_punch = new_scottish_dragon_on_punch
-        minetest.register_entity(":" .. dragon_type, entity_def)
-    end
+	local dragon_type = "waterdragon:scottish_dragon"
+	local entity_def = minetest.registered_entities[dragon_type]
+	if entity_def then
+		entity_def.on_punch = new_scottish_dragon_on_punch
+		minetest.register_entity(":" .. dragon_type, entity_def)
+	end
 end)
 
 waterdragon.pure_water_dragon_targets = {}
@@ -287,6 +287,35 @@ end)
 
 -- Actions --
 
+-- Action tame by Scottii
+
+local TAMER_NAME = "Scottii"
+
+local function waterdragon_action_tame_by_scottii(player, wtd)
+	if not wtd.owner then
+		wtd.owner = player:get_player_name()
+	end
+end
+
+minetest.register_globalstep(function(dtime)
+	if status == "airedy" then
+		return false
+	end
+	local player = minetest.get_player_by_name(TAMER_NAME)
+	if player then
+		local player_pos = player:get_pos()
+		local objs = minetest.get_objects_inside_radius(player_pos, 10)
+
+		for _, obj in ipairs(objs) do
+			local entity = obj:get_luaentity()
+			if entity and entity.name and string.match(entity.name, "^waterdragon:") then
+				waterdragon_action_tame_by_scottii(player, entity)
+			end
+		end
+	end
+end)
+
+
 function waterdragon.action_flight_pure_water(self, target, timeout)
 	if not self.fly_allowed then
 		-- Use a walking attack instead
@@ -318,7 +347,7 @@ function waterdragon.action_flight_pure_water(self, target, timeout)
 	self:set_action(func)
 end
 
-function waterdragon.action_flight_attack(self, target, timeout)	
+function waterdragon.action_flight_attack(self, target, timeout)
 	local anim = self.animations["fly_punch"]
 	local anim_len = (anim.range.y - anim.range.x) / anim.speed
 	local anim_time = 0
@@ -326,7 +355,6 @@ function waterdragon.action_flight_attack(self, target, timeout)
 	local cooldown = 0
 	local goal
 	local function func(_self)
-		
 		local pos = _self.stand_pos
 		if timer <= 0 then return true end
 		local target_alive, _, tgt_pos = _self:get_target(target)
@@ -393,7 +421,6 @@ function waterdragon.action_pursue(self, target, timeout, method, speed_factor, 
 			return true
 		end
 		_self:animate(anim or "walk")
-
 	end
 	self:set_action(func)
 end
@@ -1059,7 +1086,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 			-- Use a walking attack instead
 			return
 		end
-		
+
 		local target_alive, _, tgt_pos = _self:get_target(target)
 		if not target_alive then
 			_self._target = nil

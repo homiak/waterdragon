@@ -13,72 +13,72 @@ local bow_timers = {}
 
 -- Функция для начала поклона
 local function start_bow(player_name, dragon)
-    bow_timers[player_name] = {
-        start_time = minetest.get_us_time(),
-        dragon = dragon
-    }
+	bow_timers[player_name] = {
+		start_time = minetest.get_us_time(),
+		dragon = dragon
+	}
 end
 
 -- Функция для завершения поклона
 local function finish_bow(player_name, dragon)
-    if not bow_players[player_name] then
-        bow_players[player_name] = {}
-    end
-    bow_players[player_name][dragon.wtd_id] = true
-    minetest.chat_send_player(player_name, S("You bow to the Water Dragon"))
+	if not bow_players[player_name] then
+		bow_players[player_name] = {}
+	end
+	bow_players[player_name][dragon.wtd_id] = true
+	minetest.chat_send_player(player_name, S("You bow to the Water Dragon"))
 end
 
 -- Функция для проверки, поклонился ли игрок дракону
 local function has_bowed_to_dragon(player_name, dragon)
-    return bow_players[player_name] and bow_players[player_name][dragon.wtd_id]
+	return bow_players[player_name] and bow_players[player_name][dragon.wtd_id]
 end
 
 -- Глобальный шаг для обработки поклона
 minetest.register_globalstep(function()
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_name = player:get_player_name()
-        local control = player:get_player_control()
-        
-        if control.sneak then
-            if not bow_timers[player_name] then
-                local pos = player:get_pos()
-                local nearest_dragon = nil
-                local nearest_dist = 15  -- Максимальное расстояние для поклона
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local player_name = player:get_player_name()
+		local control = player:get_player_control()
 
-                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
-                    local ent = obj:get_luaentity()
-                    if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
-                        local dist = vector.distance(pos, obj:get_pos())
-                        if not nearest_dragon or dist < nearest_dist then
-                            nearest_dragon = ent
-                            nearest_dist = dist
-                        end
-                    end
-                end
+		if control.sneak then
+			if not bow_timers[player_name] then
+				local pos = player:get_pos()
+				local nearest_dragon = nil
+				local nearest_dist = 15 -- Максимальное расстояние для поклона
 
-                if nearest_dragon then
-                    start_bow(player_name, nearest_dragon)
-                end
-            else
-                local bow_data = bow_timers[player_name]
-                local current_time = minetest.get_us_time()
-                if (current_time - bow_data.start_time) >= 1000000 then  -- 1 секунда в микросекундах
-                    if not has_bowed_to_dragon(player_name, bow_data.dragon) then
-                        finish_bow(player_name, bow_data.dragon)
-                    end
-                end
-            end
-        else
-            bow_timers[player_name] = nil
-        end
-    end
+				for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
+					local ent = obj:get_luaentity()
+					if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
+						local dist = vector.distance(pos, obj:get_pos())
+						if not nearest_dragon or dist < nearest_dist then
+							nearest_dragon = ent
+							nearest_dist = dist
+						end
+					end
+				end
+
+				if nearest_dragon then
+					start_bow(player_name, nearest_dragon)
+				end
+			else
+				local bow_data = bow_timers[player_name]
+				local current_time = minetest.get_us_time()
+				if (current_time - bow_data.start_time) >= 1000000 then -- 1 секунда в микросекундах
+					if not has_bowed_to_dragon(player_name, bow_data.dragon) then
+						finish_bow(player_name, bow_data.dragon)
+					end
+				end
+			end
+		else
+			bow_timers[player_name] = nil
+		end
+	end
 end)
 
 -- Очистка данных при выходе игрока
 minetest.register_on_leaveplayer(function(player)
-    local name = player:get_player_name()
-    bow_players[name] = nil
-    bow_timers[name] = nil
+	local name = player:get_player_name()
+	bow_players[name] = nil
+	bow_timers[name] = nil
 end)
 
 -- Scottish bow
@@ -90,69 +90,69 @@ local scottish_bow_timers = {}
 
 -- Функция для начала поклона
 local function start_scottish_bow(player_name, dragon)
-    scottish_bow_timers[player_name] = {
-        start_time = minetest.get_us_time(),
-        dragon = dragon
-    }
+	scottish_bow_timers[player_name] = {
+		start_time = minetest.get_us_time(),
+		dragon = dragon
+	}
 end
 
 -- Функция для завершения поклона
 local function finish_scottish_bow(player_name, dragon)
-    scottish_bow_players[player_name] = dragon
-    minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
+	scottish_bow_players[player_name] = dragon
+	minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
 end
 
 -- Функция для проверки, поклонился ли игрок дракону
 local function has_bowed_to_scottish_dragon(player_name, dragon)
-    return scottish_bow_players[player_name] == dragon
+	return scottish_bow_players[player_name] == dragon
 end
 
 -- Глобальный шаг для обработки поклона
 minetest.register_globalstep(function(dtime)
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_name = player:get_player_name()
-        local control = player:get_player_control()
-        
-        if control.sneak then
-            if not scottish_bow_timers[player_name] then
-                local pos = player:get_pos()
-                local nearest_dragon = nil
-                local nearest_dist = 15  -- Максимальное расстояние для поклона
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local player_name = player:get_player_name()
+		local control = player:get_player_control()
 
-                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
-                    local ent = obj:get_luaentity()
-                    if ent and ent.name == "waterdragon:scottish_dragon" then
-                        local dist = vector.distance(pos, obj:get_pos())
-                        if not nearest_dragon or dist < nearest_dist then
-                            nearest_dragon = ent
-                            nearest_dist = dist
-                        end
-                    end
-                end
+		if control.sneak then
+			if not scottish_bow_timers[player_name] then
+				local pos = player:get_pos()
+				local nearest_dragon = nil
+				local nearest_dist = 15 -- Максимальное расстояние для поклона
 
-                if nearest_dragon then
-                    start_scottish_bow(player_name, nearest_dragon)
-                end
-            else
-                local bow_data = scottish_bow_timers[player_name]
-                local current_time = minetest.get_us_time()
-                if (current_time - bow_data.start_time) >= 1000000 then  -- 1 секунда в микросекундах
-                    if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
-                        finish_scottish_bow(player_name, bow_data.dragon)
-                    end
-                end
-            end
-        else
-            scottish_bow_timers[player_name] = nil
-        end
-    end
+				for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
+					local ent = obj:get_luaentity()
+					if ent and ent.name == "waterdragon:scottish_dragon" then
+						local dist = vector.distance(pos, obj:get_pos())
+						if not nearest_dragon or dist < nearest_dist then
+							nearest_dragon = ent
+							nearest_dist = dist
+						end
+					end
+				end
+
+				if nearest_dragon then
+					start_scottish_bow(player_name, nearest_dragon)
+				end
+			else
+				local bow_data = scottish_bow_timers[player_name]
+				local current_time = minetest.get_us_time()
+				if (current_time - bow_data.start_time) >= 1000000 then -- 1 секунда в микросекундах
+					if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
+						finish_scottish_bow(player_name, bow_data.dragon)
+					end
+				end
+			end
+		else
+			scottish_bow_timers[player_name] = nil
+		end
+	end
 end)
 
 -- Очистка данных при выходе игрока
 minetest.register_on_leaveplayer(function(player)
-    local name = player:get_player_name()
-    scottish_bow_players[name] = nil
-    scottish_bow_timers[name] = nil
+	local name = player:get_player_name()
+	scottish_bow_players[name] = nil
+	scottish_bow_timers[name] = nil
 end)
 
 -- Math --
@@ -160,7 +160,7 @@ end)
 
 local function get_dragon_eye_item(self)
 	local eye_color = self.eye_color or "blue"
-    return "waterdragon:draconic_eye_" .. eye_color
+	return "waterdragon:draconic_eye_" .. eye_color
 end
 
 local pi = math.pi
@@ -212,57 +212,57 @@ local yaw2dir = minetest.yaw_to_dir
 -- Rare Water Dragon special thing...
 
 local detectable_nodes = {
-    "default:chest_locked",
-    "default:chest",
+	"default:chest_locked",
+	"default:chest",
 	"default:steel_block",
 	"default:diamondblock",
 	"default:goldblock"
 }
 
 local function water_vision(pos, radius)
-    local found_objects = {}
-    for _, node_name in ipairs(detectable_nodes) do
-        local nodes = minetest.find_nodes_in_area(
-            {x = pos.x - radius, y = pos.y - radius, z = pos.z - radius},
-            {x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
-            node_name
-        )
-        for _, node_pos in ipairs(nodes) do
-            local above_node = minetest.get_node({x = node_pos.x, y = node_pos.y + 1, z = node_pos.z})
-            if minetest.get_item_group(above_node.name, "water") > 0 then
-                table.insert(found_objects, {name = node_name, pos = node_pos})
-            end
-        end
-    end
-    return found_objects
+	local found_objects = {}
+	for _, node_name in ipairs(detectable_nodes) do
+		local nodes = minetest.find_nodes_in_area(
+			{ x = pos.x - radius, y = pos.y - radius, z = pos.z - radius },
+			{ x = pos.x + radius, y = pos.y + radius, z = pos.z + radius },
+			node_name
+		)
+		for _, node_pos in ipairs(nodes) do
+			local above_node = minetest.get_node({ x = node_pos.x, y = node_pos.y + 1, z = node_pos.z })
+			if minetest.get_item_group(above_node.name, "water") > 0 then
+				table.insert(found_objects, { name = node_name, pos = node_pos })
+			end
+		end
+	end
+	return found_objects
 end
 
 local eye_colours = { "blue", "orange", "red", "yellow" }
 
 for _, colour in ipairs(eye_colours) do
-    minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
-        description = S("Water Dragon Eye"),
-        inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
-        groups = { wtd_drops = 1 },
-        on_use = function(itemstack, user)
-            local pos = user:get_pos()
-            local radius = 30
+	minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
+		description = S("Water Dragon Eye"),
+		inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
+		groups = { wtd_drops = 1 },
+		on_use = function(itemstack, user)
+			local pos = user:get_pos()
+			local radius = 30
 
-            local found_objects = water_vision(pos, radius)
+			local found_objects = water_vision(pos, radius)
 
-            if #found_objects > 0 then
-                local message = "Detected special nodes under the water: "
-                for i, obj in ipairs(found_objects) do
-                    message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
-                    if i < #found_objects then message = message .. ", " end
-                end
-                minetest.chat_send_player(user:get_player_name(), message)
-            else
-                minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
-            end
-            return itemstack
-        end,
-    })
+			if #found_objects > 0 then
+				local message = "Detected special nodes under the water: "
+				for i, obj in ipairs(found_objects) do
+					message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
+					if i < #found_objects then message = message .. ", " end
+				end
+				minetest.chat_send_player(user:get_player_name(), message)
+			else
+				minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
+			end
+			return itemstack
+		end,
+	})
 end
 
 --------------
@@ -760,7 +760,7 @@ minetest.register_entity("waterdragon:dragon_pure_water", {
 							local output = minetest.get_craft_result({
 								method = "cooking",
 								width = 1,
-								items = {name}
+								items = { name }
 							})
 							if output.item
 								and output.item:get_name()
@@ -978,7 +978,7 @@ function waterdragon.pure_water_breath(self, pos2)
 				glow = 7,
 				texture = {
 					name = "waterdragon_water_particle.png",
-					alpha_tween = {100, 100 },
+					alpha_tween = { 100, 100 },
 					blend = "alpha"
 				}
 			})
@@ -1129,15 +1129,15 @@ end
 
 waterdragon.wtd_api = {
 	action_flight_to_land = function(self)
-        if not self:get_action() then
-            creatura.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
-        end
-        if self.touching_ground then
-            waterdragon.action_land(self)
-            return true
-        end
-        return false
-    end,
+		if not self:get_action() then
+			creatura.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
+		end
+		if self.touching_ground then
+			waterdragon.action_land(self)
+			return true
+		end
+		return false
+	end,
 	animate = function(self, anim)
 		if self.animations and self.animations[anim] then
 			if self._anim == anim then return end
@@ -1220,41 +1220,41 @@ waterdragon.wtd_api = {
 		local drops = {
 			[1] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:dragon_horn", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_bone", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6, chance = 1 },
+				{ name = "waterdragon:dragon_bone",                  min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:wing_horn",                    min = 1, max = 3, chance = 2 },
 			},
 			[2] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 2 },
-				{ name = "waterdragon:dragon_bone", min = 1, max = 3,  chance = 3 },
-				{ name = "waterdragon:dragon_horn", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:draconic_tooth", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_water_drop", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:dragon_bone",                  min = 1, max = 3,  chance = 3 },
+				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
 			},
 			[3] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
-				{ name = "waterdragon:dragon_horn", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_bone", min = 3, max = 8,  chance = 1 },
-				{ name = "waterdragon:draconic_tooth", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_water_drop", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_bone",                  min = 3, max = 8,  chance = 1 },
+				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
 			},
 			[4] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
-				{ name = "waterdragon:dragon_bone", min = 6,  max = 10, chance = 1 },
-				{ name = "waterdragon:dragon_horn", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:draconic_tooth", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_water_drop", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:dragon_bone",                  min = 6, max = 10, chance = 1 },
+				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
 			},
 			[5] = {
-				{ name = "waterdragon:dragon_water_drop", min = 1, max = 3, chance = 2 },
-				{ name = "waterdragon:dragon_horn", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:draconic_tooth", min = 3, max = 6,  chance = 1 },
-				{ name = "waterdragon:dragon_bone", min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
+				{ name = "waterdragon:dragon_bone",                  min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
-				{ name = "waterdragon:wing_horn", min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
 			},
 		}
 		for i = 1, 5 do
@@ -1568,7 +1568,7 @@ waterdragon.scottish_wtd_api = {
 			self._anim = anim
 			local old_prty = 1
 			if old_anim
-			and self.animations[old_anim].prty then
+				and self.animations[old_anim].prty then
 				old_prty = self.animations[old_anim].prty
 			end
 			local prty = 1
@@ -1599,13 +1599,13 @@ waterdragon.scottish_wtd_api = {
 			sounds = self.child_sounds
 		end
 		local spec = sounds and sounds[sound]
-		local parameters = {object = self.object}
+		local parameters = { object = self.object }
 		if type(spec) == "table" then
 			local name = spec.name
 			if spec.variations then
 				name = name .. "_" .. random(spec.variations)
 			elseif #spec
-			and #spec > 1 then
+				and #spec > 1 then
 				spec = sounds[sound][random(#sounds[sound])]
 				name = spec.name
 			end
@@ -1656,15 +1656,15 @@ waterdragon.scottish_wtd_api = {
 		else
 			tgt_angle = interp_angle(rad(rot.x), 0, step)
 		end
-		local offset = {x = 0, y = anim_data.pos.y, z = anim_data.pos.z}
-		self.object:set_bone_position("Jaw.CTRL", offset, {x = clamp(tgt_angle, -45, 0), y = 0, z = 0})
+		local offset = { x = 0, y = anim_data.pos.y, z = anim_data.pos.z }
+		self.object:set_bone_position("Jaw.CTRL", offset, { x = clamp(tgt_angle, -45, 0), y = 0, z = 0 })
 	end,
 	move_tail = waterdragon.wtd_api.move_tail,
 	move_head = waterdragon.wtd_api.move_head,
 	feed = function(self, player)
 		local name = player:get_player_name()
 		if not self.owner
-		or self.owner ~= name then
+			or self.owner ~= name then
 			return
 		end
 		local item, item_name = self:follow_wielded_item(player)
@@ -1678,7 +1678,7 @@ waterdragon.scottish_wtd_api = {
 				self:heal(self.max_health / 5)
 			end
 			if self.hunger
-			and self.hunger < (self.max_health * 0.5) * scale then
+				and self.hunger < (self.max_health * 0.5) * scale then
 				self.hunger = self.hunger + 5
 				self:memorize("hunger", self.hunger)
 			end
@@ -1686,8 +1686,8 @@ waterdragon.scottish_wtd_api = {
 				self.food = (self.food or 0) + 1
 			end
 			if self.food
-			and self.food >= 20
-			and self.age then
+				and self.food >= 20
+				and self.age then
 				self.food = 0
 				self:increase_age()
 			end
@@ -1704,10 +1704,10 @@ waterdragon.scottish_wtd_api = {
 				time = 0.1,
 				minpos = minppos,
 				maxpos = maxppos,
-				minvel = {x=-1, y=1, z=-1},
-				maxvel = {x=1, y=2, z=1},
-				minacc = {x=0, y=-5, z=0},
-				maxacc = {x=0, y=-9, z=0},
+				minvel = { x = -1, y = 1, z = -1 },
+				maxvel = { x = 1, y = 2, z = 1 },
+				minacc = { x = 0, y = -5, z = 0 },
+				maxacc = { x = 0, y = -9, z = 0 },
 				minexptime = 1,
 				maxexptime = 1,
 				minsize = 4 * scale,
@@ -1723,7 +1723,7 @@ waterdragon.scottish_wtd_api = {
 	play_wing_sound2 = function(self)
 		local offset = self.frame_offset or 0
 		if offset > 20
-		and not self.flap_sound_played2 then
+			and not self.flap_sound_played2 then
 			minetest.sound_play("waterdragon_flap", {
 				object = self.object,
 				gain = 3.0,
@@ -1760,6 +1760,53 @@ minetest.register_privilege("dragon_uisge", {
 	give_to_admin = false
 })
 
+minetest.register_chatcommand("call_wtd", {
+	params = "[radius]",
+	description = S("Teleport your nearest Water Dragon to you within the specified radius"),
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then return false, "Player not found" end
+
+		local radius = tonumber(param) or 100 -- Default radius is 100 blocks
+		local player_pos = player:get_pos()
+		local nearest_dragon = nil
+		local nearest_dist = radius
+
+		-- Search for the nearest Water Dragon within the radius
+		for _, obj in pairs(minetest.get_objects_inside_radius(player_pos, radius)) do
+			local ent = obj:get_luaentity()
+			if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
+				if ent.owner == name then
+					local dist = vector.distance(player_pos, obj:get_pos())
+					if dist < nearest_dist then
+						nearest_dragon = ent
+						nearest_dist = dist
+					end
+				end
+			end
+		end
+
+		if nearest_dragon then
+			-- Teleport the Water Dragon to the player
+			local teleport_pos = vector.new(player_pos.x, player_pos.y + 1, player_pos.z)
+			nearest_dragon.object:set_pos(teleport_pos)
+
+			-- Turn the Water Dragon to face the same direction as the player
+			local player_look_dir = player:get_look_dir()
+			local yaw = minetest.dir_to_yaw(player_look_dir)
+			nearest_dragon.object:set_yaw(yaw)
+
+			-- Set the "stand" animation if the animate method exists
+			if nearest_dragon.animate then
+				nearest_dragon:animate("stand")
+			end
+
+			return true, S("The nearest Water Dragon has been called and has flied to you!")
+		else
+			return false, "No Water Dragons found within " .. radius .. " blocks"
+		end
+	end,
+})
 
 minetest.register_chatcommand("set_wtd_owner", {
 	description = S("Sets owner of pointed Water Dragon"),
@@ -1779,7 +1826,7 @@ minetest.register_chatcommand("set_wtd_owner", {
 			local particle = "waterdragon_particle_green.png"
 			ent.owner = param_name
 			ent:memorize("owner", ent.owner)
-			minetest.chat_send_player(name, S("the Water Dragon is now owned by").." " .. param_name)
+			minetest.chat_send_player(name, S("the Water Dragon is now owned by") .. " " .. param_name)
 			minetest.add_particlespawner({
 				amount = 16,
 				time = 0.25,
@@ -1814,80 +1861,80 @@ minetest.register_chatcommand("set_wtd_owner", {
 
 
 local function is_player_in_attack_blacklist(owner, player_name)
-    return waterdragon.wtd_attack_bl[owner] and table.indexof(waterdragon.wtd_attack_bl[owner], player_name) ~= -1
+	return waterdragon.wtd_attack_bl[owner] and table.indexof(waterdragon.wtd_attack_bl[owner], player_name) ~= -1
 end
 
 minetest.register_globalstep(function(dtime)
-    for _, obj in pairs(minetest.luaentities) do
-        if obj.name and string.match(obj.name, "^waterdragon:") and obj.owner then
-            for _, player in ipairs(minetest.get_connected_players()) do
-                local player_name = player:get_player_name()
-                if is_player_in_attack_blacklist(obj.owner, player_name) then
-                    obj._target = player
-                    if obj.stance then
-                        obj.stance = "neutral"
-                    end
-                    break
-                end
-            end
-        end
-    end
+	for _, obj in pairs(minetest.luaentities) do
+		if obj.name and string.match(obj.name, "^waterdragon:") and obj.owner then
+			for _, player in ipairs(minetest.get_connected_players()) do
+				local player_name = player:get_player_name()
+				if is_player_in_attack_blacklist(obj.owner, player_name) then
+					obj._target = player
+					if obj.stance then
+						obj.stance = "neutral"
+					end
+					break
+				end
+			end
+		end
+	end
 end)
 
 
 minetest.register_chatcommand("wtd_blacklist_add", {
-    description = S("Adds player to attack blacklist of Water Dragons"),
-    params = "<player_name>",
-    func = function(name, param)
-        local target = param:match("^(%S+)$")
-        if not target then
-            return false, "Invalid usage. Use: /wtd_blacklist_add <player_name>"
-        end
-        if not minetest.player_exists(target) then
-            return false, S("Player does not exist")
-        end
-        waterdragon.wtd_attack_bl[name] = waterdragon.wtd_attack_bl[name] or {}
-        table.insert(waterdragon.wtd_attack_bl[name], target)
-        waterdragon.force_storage_save = true
-        return true, S("The player has been added to the Water Dragon attack blacklist")
-    end,
+	description = S("Adds player to attack blacklist of Water Dragons"),
+	params = "<player_name>",
+	func = function(name, param)
+		local target = param:match("^(%S+)$")
+		if not target then
+			return false, "Invalid usage. Use: /wtd_blacklist_add <player_name>"
+		end
+		if not minetest.player_exists(target) then
+			return false, S("Player does not exist")
+		end
+		waterdragon.wtd_attack_bl[name] = waterdragon.wtd_attack_bl[name] or {}
+		table.insert(waterdragon.wtd_attack_bl[name], target)
+		waterdragon.force_storage_save = true
+		return true, S("The player has been added to the Water Dragon attack blacklist")
+	end,
 })
 
 minetest.register_chatcommand("wtd_blacklist_remove", {
-    description = S("Removes player from attack blacklist of the Water Dragons"),
-    params = "<player_name>",
-    func = function(name, param)
-        local target = param:match("^(%S+)$")
-        if not target then
-            return false, "Invalid usage. Use: /wtd_blacklist_remove <player_name>"
-        end
-        if not waterdragon.wtd_attack_bl[name] then
-            return false, S("You don't have any players in your attack blacklist")
-        end
-        local index = table.indexof(waterdragon.wtd_attack_bl[name], target)
-        if index == -1 then
-            return false, "The player is not in your Water Dragons' attack blacklist"
-        end
-        table.remove(waterdragon.wtd_attack_bl[name], index)
-        waterdragon.force_storage_save = true
-        return true, S("The player has been removed from the Water Dragon attack blacklist")
-    end,
+	description = S("Removes player from attack blacklist of the Water Dragons"),
+	params = "<player_name>",
+	func = function(name, param)
+		local target = param:match("^(%S+)$")
+		if not target then
+			return false, "Invalid usage. Use: /wtd_blacklist_remove <player_name>"
+		end
+		if not waterdragon.wtd_attack_bl[name] then
+			return false, S("You don't have any players in your attack blacklist")
+		end
+		local index = table.indexof(waterdragon.wtd_attack_bl[name], target)
+		if index == -1 then
+			return false, "The player is not in your Water Dragons' attack blacklist"
+		end
+		table.remove(waterdragon.wtd_attack_bl[name], index)
+		waterdragon.force_storage_save = true
+		return true, S("The player has been removed from the Water Dragon attack blacklist")
+	end,
 })
 
 minetest.register_chatcommand("wtd_blacklist_show", {
-    description = "List all players in your Water Dragons' attack blacklist",
-    func = function(name)
-        if not waterdragon.wtd_attack_bl[name] or #waterdragon.wtd_attack_bl[name] == 0 then
-            return true, "Your Water Dragons' attack blacklist is empty."
-        end
+	description = "List all players in your Water Dragons' attack blacklist",
+	func = function(name)
+		if not waterdragon.wtd_attack_bl[name] or #waterdragon.wtd_attack_bl[name] == 0 then
+			return true, "Your Water Dragons' attack blacklist is empty."
+		end
 
-        local list = "Players in your Water Dragons' attack blacklist:\n"
-        for i, player_name in ipairs(waterdragon.wtd_attack_bl[name]) do
-            list = list .. i .. ". " .. player_name .. "\n"
-        end
-        
-        return true, list
-    end
+		local list = "Players in your Water Dragons' attack blacklist:\n"
+		for i, player_name in ipairs(waterdragon.wtd_attack_bl[name]) do
+			list = list .. i .. ". " .. player_name .. "\n"
+		end
+
+		return true, list
+	end
 })
 
 ----------------------
@@ -1931,10 +1978,10 @@ minetest.register_on_mods_loaded(function()
 					end
 					for object, data in pairs(waterdragon.scottish_dragons) do
 						if object
-						and object:get_pos()
-						and data.owner
-						and data.owner == player_name
-						and vec_dist(pos, object:get_pos()) < 64 then
+							and object:get_pos()
+							and data.owner
+							and data.owner == player_name
+							and vec_dist(pos, object:get_pos()) < 64 then
 							object:get_luaentity()._target = self.object
 						end
 					end
@@ -2082,9 +2129,8 @@ function waterdragon.scottish_dragon_activate(self)
 	self.time_from_last_sound = 0
 	self.flap_sound_timer = 5.0
 	self.flap_sound_played = false
-	waterdragon.scottish_dragons[self.object] = {owner = self.owner}
+	waterdragon.scottish_dragons[self.object] = { owner = self.owner }
 end
-
 
 -- Water Dragon
 
@@ -2126,11 +2172,11 @@ function waterdragon.dragon_step(self, dtime)
 	end
 
 	-- Dynamic Physics
-	self.speed = 50 * clamp((self.growth_scale), 0.1, 1) -- Speed increases with size
+	self.speed = 50 * clamp((self.growth_scale), 0.1, 1)     -- Speed increases with size
 	self.turn_rate = 6 - 3 * clamp((self.growth_scale), 0.1, 1) -- Turning radius widens with size
 	if not is_flying then
-		self.speed = self.speed * 0.18  -- Speed reduced when landed
-		self.turn_rate = self.turn_rate * 1.5 -- Turning radius reduced when landed
+		self.speed = self.speed * 0.18                       -- Speed reduced when landed
+		self.turn_rate = self.turn_rate * 1.5                -- Turning radius reduced when landed
 	end
 	-- Timers
 	if self:timer(1) then
@@ -2244,13 +2290,13 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		-- Dynamic Stats
 		local fly_stam = self.flight_stamina or 1600
 		if is_flying
-		and not self.in_liquid
-		and fly_stam > 0 then -- Drain Stamina when flying
+			and not self.in_liquid
+			and fly_stam > 0 then         -- Drain Stamina when flying
 			fly_stam = fly_stam - 1
 			self.turn_rate = self.turn_rate * 0.75 -- Turning radius incrased when flying
 		else
 			self.speed = self.speed * 0.2 -- Speed reduced when landed
-			if fly_stam < 1600 then -- Regen Stamina when landed
+			if fly_stam < 1600 then       -- Regen Stamina when landed
 				fly_stam = fly_stam + self.dtime * 8
 			end
 		end
@@ -2259,7 +2305,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if #self.attack_cooldown > 0 then
 			for obj, cooldown in pairs(self.attack_cooldown) do
 				if obj
-				and obj:get_pos() then
+					and obj:get_pos() then
 					if cooldown - 1 <= 0 then
 						self.attack_cooldown[obj] = nil
 					else
@@ -2276,244 +2322,170 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if obj then self._ignore_obj[obj] = nil end
 	end
 	if not waterdragon.scottish_dragons[self.object] then
-		waterdragon.scottish_dragons[self.object] = {owner = self.owner}
+		waterdragon.scottish_dragons[self.object] = { owner = self.owner }
 	end
 end
 
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_rightclick(self, clicker)
-    if self.hp <= 0 then return end
-    local name = clicker:get_player_name()
+	if self.hp <= 0 then return end
+	local name = clicker:get_player_name()
 
-    if self:feed(clicker) then
-        return
-    end
-    local item_name = clicker:get_wielded_item():get_name() or ""
-    if (not self.owner
-    or name == self.owner)
-    and not self.rider
-    and item_name == "" then
-        if clicker:get_player_control().sneak then
-            self:show_formspec(clicker)
-        else
-            if has_bowed_to_scottish_dragon(name, self) then
-                waterdragon.attach_player(self, clicker)
-            else
-                minetest.chat_send_player(name, S("You must bow to the Scottish Dragon before mounting it. Hold Shift for more then 1 second to bow"))
-            end
-        end
-    elseif not self.owner or name ~= self.owner then
-        minetest.chat_send_player(name, S("Hold Shift for 1 second near the Scottish Dragon to bow to it"))
-    end
+	if self:feed(clicker) then
+		return
+	end
+	local item_name = clicker:get_wielded_item():get_name() or ""
+	if (not self.owner
+			or name == self.owner)
+		and not self.rider
+		and item_name == "" then
+		if clicker:get_player_control().sneak then
+			self:show_formspec(clicker)
+		else
+			if has_bowed_to_scottish_dragon(name, self) then
+				waterdragon.attach_player(self, clicker)
+			else
+				minetest.chat_send_player(name,
+					S("You must bow to the Scottish Dragon before mounting it. Hold Shift for more then 1 second to bow"))
+			end
+		end
+	elseif not self.owner or name ~= self.owner then
+		minetest.chat_send_player(name, S("Hold Shift for 1 second near the Scottish Dragon to bow to it"))
+	end
 end
-
-
-
 
 -- Water Dragon
 
 -- waterdragon.dragon_rightclick
 function waterdragon.dragon_rightclick(self, clicker)
-    local name = clicker:get_player_name()
-    local inv = minetest.get_inventory({ type = "player", name = name })
-    if waterdragon.contains_book(inv) then
-        waterdragon.add_page(inv, "waterdragons")
-    end
-    if self.hp <= 0 then
-        if waterdragon.drop_items(self) then
-            waterdragon.waterdragons[self.wtd_id] = nil
-            self.object:remove()
-        end
-        return
-    end
-    if self:feed(clicker) then
-        return
-    end
-    local item_name = clicker:get_wielded_item():get_name() or ""
-    if self.owner and name == self.owner and item_name == "" then
-        if clicker:get_player_control().sneak then
-            self:show_formspec(clicker)
-        elseif not self.rider and self.age >= 20 then
-            if has_bowed_to_dragon(name, self) then
-                waterdragon.attach_player(self, clicker)
-            else
-                minetest.chat_send_player(name, S("You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow"))
-            end
-        elseif self.age < 5 then
-            self.shoulder_mounted = self:memorize("shoulder_mounted", true)
-            self.object:set_attach(clicker, "",
-                { x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
-        end
-    elseif not self.owner or name ~= self.owner then
-        minetest.chat_send_player(name, S("Hold Shift for 1 second near the Water Dragon to bow to it"))
-    end
-    if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
-        waterdragon.send_passenger_request(self, clicker)
-    end
+	local name = clicker:get_player_name()
+	local inv = minetest.get_inventory({ type = "player", name = name })
+	if waterdragon.contains_book(inv) then
+		waterdragon.add_page(inv, "waterdragons")
+	end
+	if self.hp <= 0 then
+		if waterdragon.drop_items(self) then
+			waterdragon.waterdragons[self.wtd_id] = nil
+			self.object:remove()
+		end
+		return
+	end
+	if self:feed(clicker) then
+		return
+	end
+	local item_name = clicker:get_wielded_item():get_name() or ""
+	if self.owner and name == self.owner and item_name == "" then
+		if clicker:get_player_control().sneak then
+			self:show_formspec(clicker)
+		elseif not self.rider and self.age >= 20 then
+			if has_bowed_to_dragon(name, self) then
+				waterdragon.attach_player(self, clicker)
+			else
+				minetest.chat_send_player(name,
+					S("You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow"))
+			end
+		elseif self.age < 5 then
+			self.shoulder_mounted = self:memorize("shoulder_mounted", true)
+			self.object:set_attach(clicker, "",
+				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
+		end
+	elseif not self.owner or name ~= self.owner then
+		minetest.chat_send_player(name, S("Hold Shift for 1 second near the Water Dragon to bow to it"))
+	end
+	if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
+		waterdragon.send_passenger_request(self, clicker)
+	end
 end
-
--- Something special
-
-minetest.register_chatcommand("call_wtd", {
-    params = "[radius]",
-    description = S("Teleport your nearest Water Dragon to you within the specified radius"),
-    func = function(name, param)
-        local player = minetest.get_player_by_name(name)
-        if not player then return false, "Player not found" end
-        
-        local radius = tonumber(param) or 100  -- Default radius is 100 blocks
-        local player_pos = player:get_pos()
-        local nearest_dragon = nil
-        local nearest_dist = radius
-
-        -- Search for the nearest Water Dragon within the radius
-        for _, obj in pairs(minetest.get_objects_inside_radius(player_pos, radius)) do
-            local ent = obj:get_luaentity()
-            if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
-                if ent.owner == name then
-                    local dist = vector.distance(player_pos, obj:get_pos())
-                    if dist < nearest_dist then
-                        nearest_dragon = ent
-                        nearest_dist = dist
-                    end
-                end
-            end
-        end
-
-        if nearest_dragon then
-            -- Teleport the Water Dragon to the player
-            local teleport_pos = vector.new(player_pos.x, player_pos.y + 1, player_pos.z)
-            nearest_dragon.object:set_pos(teleport_pos)
-
-            -- Turn the Water Dragon to face the same direction as the player
-            local player_look_dir = player:get_look_dir()
-            local yaw = minetest.dir_to_yaw(player_look_dir)
-            nearest_dragon.object:set_yaw(yaw)
-
-            -- Set the "stand" animation if the animate method exists
-            if nearest_dragon.animate then
-                nearest_dragon:animate("stand")
-            end
-            
-            return true, S("The nearest Water Dragon has been called and has flied to you!")
-        else
-            return false, "No Water Dragons found within " .. radius .. " blocks"
-        end
-    end,
-})
 
 -- Water vision
 
 local detectable_nodes = {
-    "default:chest_locked",
-    "default:chest",
+	"default:chest_locked",
+	"default:chest",
 	"default:steel_block",
 	"default:diamondblock",
 	"default:goldblock"
 }
 
 local function water_vision(pos, radius)
-    local found_objects = {}
-    for _, node_name in ipairs(detectable_nodes) do
-        local nodes = minetest.find_nodes_in_area(
-            {x = pos.x - radius, y = pos.y - radius, z = pos.z - radius},
-            {x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
-            node_name
-        )
-        for _, node_pos in ipairs(nodes) do
-            local above_node = minetest.get_node({x = node_pos.x, y = node_pos.y + 1, z = node_pos.z})
-            if minetest.get_item_group(above_node.name, "water") > 0 then
-                table.insert(found_objects, {name = node_name, pos = node_pos})
-            end
-        end
-    end
-    return found_objects
+	local found_objects = {}
+	for _, node_name in ipairs(detectable_nodes) do
+		local nodes = minetest.find_nodes_in_area(
+			{ x = pos.x - radius, y = pos.y - radius, z = pos.z - radius },
+			{ x = pos.x + radius, y = pos.y + radius, z = pos.z + radius },
+			node_name
+		)
+		for _, node_pos in ipairs(nodes) do
+			local above_node = minetest.get_node({ x = node_pos.x, y = node_pos.y + 1, z = node_pos.z })
+			if minetest.get_item_group(above_node.name, "water") > 0 then
+				table.insert(found_objects, { name = node_name, pos = node_pos })
+			end
+		end
+	end
+	return found_objects
 end
 
 local eye_colours = { "blue", "orange", "red", "yellow" }
 
 for _, colour in ipairs(eye_colours) do
-    minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
-        description = S("Water Dragon Eye"),
-        inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
-        groups = { wtd_drops = 1 },
-        on_use = function(itemstack, user)
-            local pos = user:get_pos()
-            local radius = 30
+	minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
+		description = S("Water Dragon Eye"),
+		inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
+		groups = { wtd_drops = 1 },
+		on_use = function(itemstack, user)
+			local pos = user:get_pos()
+			local radius = 30
 
-            local found_objects = water_vision(pos, radius)
+			local found_objects = water_vision(pos, radius)
 
-            if #found_objects > 0 then
-                local message = "Detected special nodes under the water: "
-                for i, obj in ipairs(found_objects) do
-                    message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
-                    if i < #found_objects then message = message .. ", " end
-                end
-                minetest.chat_send_player(user:get_player_name(), message)
-            else
-                minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
-            end
-            return itemstack
-        end,
-    })
+			if #found_objects > 0 then
+				local message = "Detected special nodes under the water: "
+				for i, obj in ipairs(found_objects) do
+					message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
+					if i < #found_objects then message = message .. ", " end
+				end
+				minetest.chat_send_player(user:get_player_name(), message)
+			else
+				minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
+			end
+			return itemstack
+		end,
+	})
 end
 
--- Action tame by Scottii
+--------------------
+-- Special things --
+--------------------
 
-local TAMER_NAME = "Scottii"
-
-local function waterdragon_action_tame_by_scottii(player, wtd)
-    if not wtd.owner then
-        wtd.owner = player:get_player_name()
-    end
-end
-
-minetest.register_globalstep(function(dtime)
-	if status == "airedy" then
-		return false
-	end
-    local player = minetest.get_player_by_name(TAMER_NAME)
-    if player then
-        local player_pos = player:get_pos()
-        local objs = minetest.get_objects_inside_radius(player_pos, 10)
-        
-        for _, obj in ipairs(objs) do
-            local entity = obj:get_luaentity()
-            if entity and entity.name and string.match(entity.name, "^waterdragon:") then
-                waterdragon_action_tame_by_scottii(player, entity)
-            end
-        end
-    end
-end)
 
 -- Rare Water Dragon special thing... --
 
--- Define the healing water node
 minetest.register_node("waterdragon:healing_water", {
-    description = "Healing Water",
-    drawtype = "liquid",
-    waving = 3,
-    tiles = {"default_water.png^[colorize:#14a9ff:80"},
-    special_tiles = {
-        {name = "default_water.png^[colorize:#14a9ff:80", backface_culling = false},
-    },
-    use_texture_alpha = "blend",
-    paramtype = "light",
-    walkable = false,
-    pointable = false,
-    diggable = false,
-    buildable_to = true,
-    is_ground_content = false,
-    drop = "",
-    drowning = 1,
-    liquidtype = "source",
-    liquid_alternative_flowing = "waterdragon:healing_water",
-    liquid_alternative_source = "waterdragon:healing_water",
-    liquid_viscosity = 1,
-    post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-    groups = {water = 3, liquid = 3, puts_out_fire = 1, cools_lava = 1},
-    light_source = 5,
+	description = "Healing Water",
+	drawtype = "liquid",
+	waving = 3,
+	tiles = { "default_water.png^[colorize:#14a9ff:80" },
+	special_tiles = {
+		{ name = "default_water.png^[colorize:#14a9ff:80", backface_culling = false },
+	},
+	use_texture_alpha = "blend",
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "waterdragon:healing_water",
+	liquid_alternative_source = "waterdragon:healing_water",
+	liquid_viscosity = 1,
+	post_effect_color = { a = 103, r = 30, g = 60, b = 90 },
+	groups = { water = 3, liquid = 3, puts_out_fire = 1, cools_lava = 1 },
+	light_source = 5,
+	groups = { not_in_creative_inventory = 1 }
 })
 
 -- Table to store positions of healing water
@@ -2521,99 +2493,99 @@ local healing_water_positions = {}
 
 -- Function to create healing water around a position
 local function create_healing_water(pos, radius)
-    for x = -radius, radius do
-        for y = -radius, radius do
-            for z = -radius, radius do
-                local water_pos = vector.add(pos, {x=x, y=y, z=z})
-                if vector.distance(pos, water_pos) <= radius then
-                    local node = minetest.get_node(water_pos)
-                    if node.name == "default:water_source" then
-                        minetest.set_node(water_pos, {name="waterdragon:healing_water"})
+	for x = -radius, radius do
+		for y = -radius, radius do
+			for z = -radius, radius do
+				local water_pos = vector.add(pos, { x = x, y = y, z = z })
+				if vector.distance(pos, water_pos) <= radius then
+					local node = minetest.get_node(water_pos)
+					if node.name == "default:water_source" then
+						minetest.set_node(water_pos, { name = "waterdragon:healing_water" })
 						minetest.add_particlespawner({
-								amount = 0.00001,
-								time = 0,
-								minpos = vector.subtract(pos, radius),
-								maxpos = vector.add(pos, radius),
-								minvel = {x=-0.1, y=-0, z=-0.1},
-								maxvel = {x=0.1, y=-0.02, z=0.1},
-								minacc = {x=0, y=-0.01, z=0},
-								maxacc = {x=0, y=-0.02, z=0},
-								minexptime = 1,
-								maxexptime = 2,
-								minsize = 2,
-								maxsize = 3,
-								collisiondetection = true,
-								collision_removal = true,
-								texture = "bubble.png^[colorize:#00FFFF:127",
-								glow = 7,
-							})
-                        table.insert(healing_water_positions, water_pos)
-                    end
-                end
-            end
-        end
-    end
+							amount = 0.00001,
+							time = 0,
+							minpos = vector.subtract(pos, radius),
+							maxpos = vector.add(pos, radius),
+							minvel = { x = -0.1, y = -0, z = -0.1 },
+							maxvel = { x = 0.1, y = -0.02, z = 0.1 },
+							minacc = { x = 0, y = -0.01, z = 0 },
+							maxacc = { x = 0, y = -0.02, z = 0 },
+							minexptime = 1,
+							maxexptime = 2,
+							minsize = 2,
+							maxsize = 3,
+							collisiondetection = true,
+							collision_removal = true,
+							texture = "bubble.png^[colorize:#00FFFF:127",
+							glow = 7,
+						})
+						table.insert(healing_water_positions, water_pos)
+					end
+				end
+			end
+		end
+	end
 end
 
 
 -- Function to remove healing water
 local function remove_healing_water()
-    for _, pos in ipairs(healing_water_positions) do
-        if minetest.get_node(pos).name == "waterdragon:healing_water" then
-            minetest.set_node(pos, {name="default:water_source"})
-        end
-    end
-    healing_water_positions = {}
+	for _, pos in ipairs(healing_water_positions) do
+		if minetest.get_node(pos).name == "waterdragon:healing_water" then
+			minetest.set_node(pos, { name = "default:water_source" })
+		end
+	end
+	healing_water_positions = {}
 end
 
 -- Register globalstep to manage healing water around Rare Water Dragons
 minetest.register_globalstep(function()
-    remove_healing_water()
+	remove_healing_water()
 
-    for _, obj in pairs(minetest.luaentities) do
-        if obj.name == "waterdragon:rare_water_dragon" then
-            local pos = obj.object:get_pos()
-            if pos then
-                local node = minetest.get_node(pos)
-                if minetest.get_item_group(node.name, "water") ~= 0 then
-                    create_healing_water(pos, 8)
-                end
-            end
-        end
-    end
+	for _, obj in pairs(minetest.luaentities) do
+		if obj.name == "waterdragon:rare_water_dragon" then
+			local pos = obj.object:get_pos()
+			if pos then
+				local node = minetest.get_node(pos)
+				if minetest.get_item_group(node.name, "water") ~= 0 then
+					create_healing_water(pos, 8)
+				end
+			end
+		end
+	end
 
-    -- Heal players in healing water
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_pos = player:get_pos()
-        local node = minetest.get_node(player_pos)
-        if node.name == "waterdragon:healing_water" then
-            local hp = player:get_hp()
-            local max_hp = player:get_properties().hp_max
-            if hp < max_hp then
-                player:set_hp(math.min(hp + 1, max_hp))
-            end
-        end
-    end
+	-- Heal players in healing water
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local player_pos = player:get_pos()
+		local node = minetest.get_node(player_pos)
+		if node.name == "waterdragon:healing_water" then
+			local hp = player:get_hp()
+			local max_hp = player:get_properties().hp_max
+			if hp < max_hp then
+				player:set_hp(math.min(hp + 1, max_hp))
+			end
+		end
+	end
 end)
 
 -- Register ABM to revert healing water back to regular water
 minetest.register_abm({
-    label = "Revert healing water",
-    nodenames = {"waterdragon:healing_water"},
-    interval = 1,
-    chance = 2,
-    action = function(pos, node)
-        local objects = minetest.get_objects_inside_radius(pos, 200)
-        local rare_dragon_nearby = false
-        for _, obj in ipairs(objects) do
-            local ent = obj:get_luaentity()
-            if ent and ent.name == "waterdragon:rare_water_dragon" then
-                rare_dragon_nearby = true
-                break
-            end
-        end
-        if not rare_dragon_nearby then
-            minetest.set_node(pos, {name="default:water_source"})
-        end
-    end,
+	label = "Revert healing water",
+	nodenames = { "waterdragon:healing_water" },
+	interval = 1,
+	chance = 2,
+	action = function(pos, node)
+		local objects = minetest.get_objects_inside_radius(pos, 200)
+		local rare_dragon_nearby = false
+		for _, obj in ipairs(objects) do
+			local ent = obj:get_luaentity()
+			if ent and ent.name == "waterdragon:rare_water_dragon" then
+				rare_dragon_nearby = true
+				break
+			end
+		end
+		if not rare_dragon_nearby then
+			minetest.set_node(pos, { name = "default:water_source" })
+		end
+	end,
 })
