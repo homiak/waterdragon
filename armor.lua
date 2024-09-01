@@ -155,6 +155,26 @@ armor:register_armor("waterdragon:boots_rare_water_draconic", {
 -- Shields --
 -------------
 
+local REFLECTION_RANGE = 25  -- Damage reflection range in blocks
+
+local function reflect_damage(player, damage)
+    local hitter_name = player:get_meta():get_string("last_attacker")
+    local hitter = minetest.get_player_by_name(hitter_name)
+    
+    if player and hitter then
+        local player_pos = player:get_pos()
+        local hitter_pos = hitter:get_pos()
+        local distance = vector.distance(player_pos, hitter_pos)
+        
+        if distance <= REFLECTION_RANGE then
+            local reflected_damage = damage * 0.8
+            hitter:set_hp(hitter:get_hp() - reflected_damage)
+            return damage * 0.2  -- Player receives only 20% of the original damage
+        end
+    end
+    return damage  -- If attacker is out of range or not found, player receives full damage
+end
+
 -- Draconic Steel --
 
 -- Pure Water
@@ -167,23 +187,8 @@ armor:register_armor("waterdragon:shield_pure_water_draconic_steel", {
     armor_groups = {fleshy=100},
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=30},
     reciprocate_damage = true,
-    on_punched = function(hitter)
-        -- 20% chance to stun the attacker
-        if math.random(1, 2) == 1 then
-            if hitter then
-                hitter:set_physics_override({speed = 0.5})
-                minetest.after(2, function()
-                    hitter:set_physics_override({speed = 1})
-                end)
-            elseif hitter and hitter:get_luaentity() then
-                hitter:get_luaentity().speed = hitter:get_luaentity().speed * 0.5
-                minetest.after(2, function()
-                    if hitter:get_luaentity() then
-                        hitter:get_luaentity().speed = hitter:get_luaentity().speed * 2
-                    end
-                end)
-            end
-        end
+    on_damage_taken = function(player, index, stack, use, damage)
+        return reflect_damage(player, damage)
     end,
 })
 
@@ -196,18 +201,8 @@ armor:register_armor("waterdragon:shield_rare_water_draconic_steel", {
     armor_groups = {fleshy=120},
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=30},
     reciprocate_damage = true,
-    on_punched = function(player, hitter, time_from_last_punch, tool_capabilities)
-        -- 25% chance to reflect damage back to the attacker
-        if math.random(1, 2) == 1 then
-            if hitter then
-                hitter:set_hp(hitter:get_hp() - 2)
-            elseif hitter and hitter:get_luaentity() then
-                hitter:punch(player, 1.0, {
-                    full_punch_interval = 1.0,
-                    damage_groups = {fleshy = 2},
-                }, nil)
-            end
-        end
+    on_damage_taken = function(player, index, stack, use, damage)
+        return reflect_damage(player, damage)
     end,
 })
 
@@ -223,23 +218,8 @@ armor:register_armor("waterdragon:shield_pure_water_scales", {
     armor_groups = {fleshy=100},
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=10},
     reciprocate_damage = true,
-    on_punched = function(hitter)
-        -- 20% chance to stun the attacker
-        if math.random(1, 2) == 1 then
-            if hitter then
-                hitter:set_physics_override({speed = 0.5})
-                minetest.after(2, function()
-                    hitter:set_physics_override({speed = 1})
-                end)
-            elseif hitter and hitter:get_luaentity() then
-                hitter:get_luaentity().speed = hitter:get_luaentity().speed * 0.5
-                minetest.after(2, function()
-                    if hitter:get_luaentity() then
-                        hitter:get_luaentity().speed = hitter:get_luaentity().speed * 2
-                    end
-                end)
-            end
-        end
+    on_damage_taken = function(player, index, stack, use, damage)
+        return reflect_damage(player, damage)
     end,
 })
 
@@ -253,17 +233,7 @@ armor:register_armor("waterdragon:shield_rare_water_scales", {
     armor_groups = {fleshy=120},
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=15},
     reciprocate_damage = true,
-    on_punched = function(hitter)
-        -- 25% chance to reflect damage back to the attacker
-        if math.random(1, 2) == 1 then
-            if hitter then
-                hitter:set_hp(hitter:get_hp() - 2)
-            elseif hitter and hitter:get_luaentity() then
-                hitter:punch(player, 1.0, {
-                    full_punch_interval = 1.0,
-                    damage_groups = {fleshy = 2},
-                }, nil)
-            end
-        end
+    on_damage_taken = function(player, index, stack, use, damage)
+        return reflect_damage(player, damage)
     end,
 })
