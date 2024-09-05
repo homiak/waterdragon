@@ -168,7 +168,7 @@ end
 
 local function register_dragon_eye(colour)
     minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
-        description = "Water Dragon Eye",
+        description = S("Water Dragon Eye"),
         inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
         on_use = function(itemstack, user, pointed_thing)
             if not user then return end

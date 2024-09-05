@@ -116,7 +116,11 @@ You must bow to the Scottish Dragon before mounting it. Hold Shift for more then
 Hold Shift for 1 second near the Scottish Dragon to bow to it=Удерживайте Shift в течение 1 секунды рядом с Шотландским Драконом, чтобы поклониться ему
 You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow=Вы должны поклониться Водяному Дракону перед тем, как сесть на него. Удерживайте Shift более 1 секунды, чтобы поклониться
 Hold Shift for 1 second near the Water Dragon to bow to it=Удерживайте Shift в течение 1 секунды рядом с Водяным Драконом, чтобы поклониться ему
-
+Teleports your Water Dragon to you by its ID=Телепортирует вашего Водяного Дракона к вам по его ID
+Please provide a Water Dragon ID=Пожалуйста, укажите ID Водяного Дракона
+No Water Dragon found with this ID=Водяной Дракон с этим ID не найден
+This Water Dragon doesn't belong to you=Этот Водяной Дракон вам не принадлежит
+Your Water Dragon has been teleported to you!=Ваш Водяной Дракон телепортирован к вам!
 
 
 

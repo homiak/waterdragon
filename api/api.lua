@@ -1721,7 +1721,7 @@ minetest.register_chatcommand("get_wtd_by_id", {
 
         local dragon_data = waterdragon.waterdragons[wtd_id]
         if not dragon_data then
-            return false, S("No Water Dragon found with ID: @1", wtd_id)
+            return false, S("No Water Dragon found with this ID")
         end
 
         if dragon_data.owner ~= name then
@@ -1783,7 +1783,7 @@ minetest.register_chatcommand("get_wtd_by_id", {
             end
         end
 
-        return true, S("Your Water Dragon (ID: @1) has been teleported to you!", wtd_id)
+        return true, S("Your Water Dragon has been teleported to you!")
     end,
 })
 
