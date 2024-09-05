@@ -82,8 +82,9 @@ local function get_dragon_formspec(self)
 		"bgcolor[#000000;false]",
 		"background[0,0;16,10;waterdragon_forms_bg_b.png]",
 		"label[6.8,0.8;" .. correct_name(self.name) .. " (" .. correct_name(self.gender) .. ")]",
-		"label[7,1.5;" .. current_age .. " Year(s) Old]",
-		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or "Set Name") .. "]",
+		"label[7,1.5;" .. current_age .. " " .. S("Year(s) Old") .. "]",
+		"label[7,2.2;" .. "ID:" .. " " .. self.wtd_id .. "]",
+		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or S("Set Name")) .. "]",
 		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
@@ -94,7 +95,8 @@ local function get_dragon_formspec(self)
 		"tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
 		"image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
 		"tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
-		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;true;false;]"
+		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;true;false;]",
+		"button[9.75,8.75;2.6,0.5;btn_customize;" .. S("Customize") .. "]"
 	}
 	table.insert(form, "button[9.75,8.75;2.6,0.5;btn_customize;Customize]")
 	return table.concat(form, "")
