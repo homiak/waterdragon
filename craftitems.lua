@@ -142,7 +142,7 @@ for color, hex in pairs(waterdragon.colors_pure_water) do
 	function is_taming_ability_enabled()
 		return taming_ability_enabled
 	end
-		groups = { dragon_scales = 1 }
+		groups = { wtd_scales = 1 }
 	table.insert(wtd_drops, "waterdragon:scales_pure_water_dragon")
 end
 
@@ -150,7 +150,7 @@ for color, hex in pairs(waterdragon.colors_rare_water) do
 	minetest.register_craftitem("waterdragon:scales_rare_water_dragon", {
 		description = S("Rare Water Dragon Scales"),
 		inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
-		groups = { dragon_scales = 1 }
+		groups = { wtd_scales = 1 }
 	})
 	table.insert(wtd_drops, "waterdragon:scales_rare_water_dragon")
 end
