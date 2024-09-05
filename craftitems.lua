@@ -155,61 +155,58 @@ for color, hex in pairs(waterdragon.colors_rare_water) do
 	table.insert(wtd_drops, "waterdragon:scales_rare_water_dragon")
 end
 
--- Rare Water Dragon special thing...
+local eye_colours = { "blue", "orange", "red", "yellow" }
+local search_radius = 20 -- Default search radius
 
-local detectable_nodes = {
-    "default:chest_locked",
-    "default:chest",
-	"default:steel_block",
-	"default:diamondblock",
-	"default:goldblock"
-}
-
-local function water_vision(pos, radius)
-    local found_objects = {}
-    for _, node_name in ipairs(detectable_nodes) do
-        local nodes = minetest.find_nodes_in_area(
-            {x = pos.x - radius, y = pos.y - radius, z = pos.z - radius},
-            {x = pos.x + radius, y = pos.y + radius, z = pos.z + radius},
-            node_name
-        )
-        for _, node_pos in ipairs(nodes) do
-            local above_node = minetest.get_node({x = node_pos.x, y = node_pos.y + 1, z = node_pos.z})
-            if minetest.get_item_group(above_node.name, "water") > 0 then
-                table.insert(found_objects, {name = node_name, pos = node_pos})
-            end
-        end
-    end
-    return found_objects
+local function find_nearby_dragon_egg(pos)
+    local egg_types = {
+        "waterdragon:egg_rare_water",
+        "waterdragon:egg_pure_water"
+    }
+    return minetest.find_node_near(pos, search_radius, egg_types)
 end
 
-local eye_colours = { "blue", "orange", "red", "yellow" }
-
-for _, colour in ipairs(eye_colours) do
+local function register_dragon_eye(colour)
     minetest.register_craftitem("waterdragon:draconic_eye_" .. colour, {
-        description = S("Water Dragon Eye"),
+        description = "Water Dragon Eye",
         inventory_image = "waterdragon_draconic_eye_" .. colour .. ".png",
-        groups = { wtd_drops = 1 },
-        on_use = function(itemstack, user)
-            local pos = user:get_pos()
-            local radius = 30
-
-            local found_objects = water_vision(pos, radius)
-
-            if #found_objects > 0 then
-                local message = "Detected special nodes under the water: "
-                for i, obj in ipairs(found_objects) do
-                    message = message .. obj.name .. " at " .. minetest.pos_to_string(obj.pos)
-                    if i < #found_objects then message = message .. ", " end
-                end
-                minetest.chat_send_player(user:get_player_name(), message)
-            else
-                minetest.chat_send_player(user:get_player_name(), "No special nodes detected under the water")
+        on_use = function(itemstack, user, pointed_thing)
+            if not user then return end
+            
+            local player_pos = user:get_pos()
+            if not player_pos then
+                minetest.chat_send_player(user:get_player_name(), "Unable to determine your position.")
+                return
             end
-            return itemstack
+
+            local egg_pos = find_nearby_dragon_egg(player_pos)
+            if egg_pos then
+                minetest.chat_send_player(user:get_player_name(), "Dragon Egg found within " .. search_radius .. " blocks!")
+            else
+                minetest.chat_send_player(user:get_player_name(), "No Dragon Eggs found within " .. search_radius .. " blocks.")
+            end
         end,
     })
 end
+
+-- Register all four eye colors
+for _, colour in ipairs(eye_colours) do
+    register_dragon_eye(colour)
+end
+
+-- Command to change search radius
+minetest.register_chatcommand("search_wtd_egg", {
+    params = "<radius>",
+    description = "Set the search radius for Water Dragon Eyes",
+    func = function(name, param)
+        local radius = tonumber(param)
+        if not radius or radius < 1 then
+            return false, "Invalid radius. Please enter a number greater than 0."
+        end
+        search_radius = radius
+        return true, "Search radius for Water Dragon Eyes set to " .. radius .. " blocks."
+    end,
+})
 
 ---------------
 -- Materials --
