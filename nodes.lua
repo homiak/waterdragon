@@ -174,7 +174,6 @@ local S = waterdragon.S
 local random = math.random
 
 local steel_ingot = "default:steel_ingot"
-local stack_size = minetest.registered_items[steel_ingot].stack_max or 99
 
 local forge_core = {
 	["waterdragon:draconic_forge_pure_water"] = "waterdragon:dragonstone_block_pure_water",
@@ -239,12 +238,12 @@ local function melt_ingots(pos, wtd_id)
 	local input = inv:get_stack("input", 1)
 	local crucible = inv:get_stack("crucible", 1)
 	if input:get_name() ~= steel_ingot
-	or input:get_count() < stack_size
+	or input:get_count() < 1
 	or crucible:get_name() ~= "waterdragon:dragonstone_crucible" then
 		minetest.get_node_timer(pos):stop()
 		update_forge_form(meta, minetest.get_node(pos).name:match("_(%w+)_water"))
 	else
-		input:take_item(stack_size)
+		input:take_item(1)
 		inv:set_stack("input", 1, input)
 		local full_crucible = ItemStack("waterdragon:dragonstone_crucible_full")
 		full_crucible:get_meta():set_string("wtd_id", wtd_id)

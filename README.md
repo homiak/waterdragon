@@ -43,3 +43,9 @@ This mod is based on Draconis and created by Scottii.
 - Add the Water Dragon Eye craftitem
 - Add bowing
 - Add healing water
+
+### Release v 2.3.0
+- Fix bugs
+- New chatcommand
+- Fix forge
+- Fix translation
