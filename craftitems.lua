@@ -1710,81 +1710,9 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
 
 minetest.register_craftitem("waterdragon:wing_horn", {
     description = S("Wing Horn"),
-    inventory_image = "waterdragon_wing_horn.png",
-    on_use = function(itemstack, user)
-        Throw_wing_horn(itemstack, user)
-        return itemstack
-    end,
+    tiles = "waterdragon_wing_horn.png",
+	groups = {wtd_drops = 1}
 })
-
-function Throw_wing_horn(itemstack, player)
-    local pos = player:get_pos()
-    pos.y = pos.y + 1.5
-    local dir = player:get_look_dir()
-    local horn = minetest.add_entity(pos, "waterdragon:wing_horn_entity")
-	local throw = "waterdragon_throw"
-    
-    horn:set_velocity({x=dir.x * 15, y=dir.y * 15, z=dir.z * 15})
-    horn:set_acceleration({x=0, y=-9.8, z=0})
-    minetest.sound_play({
-		name = throw,
-		gain = 1.0,
-		max_hear_distance = 20,
-		loop = false
-	})
-    itemstack:take_item()
-    return itemstack
-end
-
-minetest.register_entity("waterdragon:wing_horn_entity", {
-    physical = false,
-    visual = "sprite",
-    visual_size = {x=0.5, y=0.5},
-    textures = {"waterdragon_wing_horn.png"},
-    collisionbox = {0,0,0,0,0,0},
-    
-    on_step = function(self)
-        local pos = self.object:get_pos()
-        local node = minetest.get_node(pos)
-        
-        if node.name ~= "air" then
-            self.object:remove()
-            minetest.add_item(pos, "waterdragon:wing_horn")
-        end
-    end,
-    
-    on_punch = function(self)
-        local pos = self.object:get_pos()
-        minetest.add_item(pos, "waterdragon:wing_horn")
-        self.object:remove()
-    end,
-})
-
-local function check_and_revive(pos)
-    local objs = minetest.get_objects_inside_radius(pos, 1)
-    for _, obj in ipairs(objs) do
-        local luaentity = obj:get_luaentity()
-        if luaentity then
-		obj:set_hp(0)
-		end
-		return true
-    end
-	return false
-end
-
-minetest.registered_entities["waterdragon:wing_horn_entity"].on_step = function(self)
-    local pos = self.object:get_pos()
-    local node = minetest.get_node(pos)
-    
-    if node.name ~= "air" then
-        if check_and_revive(pos) then
-            self.object:remove()
-        else
-            minetest.add_item(pos, "waterdragon:wing_horn")
-            self.object:remove()
-        end
-    end
-end
 
 
 -- Scottish Dragon Crate --
