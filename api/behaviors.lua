@@ -1206,7 +1206,9 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 
     local function func(_self)
         if not _self.fly_allowed then
-            -- Используем наземную атаку вместо воздушной
+            return
+        end
+		if self.flight_stamina < 100 then
             return
         end
 
