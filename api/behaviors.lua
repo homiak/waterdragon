@@ -1093,104 +1093,217 @@ end)
 
 -- Attack
 
+-- Вспомогательные функции
+local function vec_dist(a, b)
+    local x, y, z = a.x - b.x, a.y - b.y, a.z - b.z
+    return math.sqrt(x * x + y * y + z * z)
+end
+
+local function vec_dir(a, b)
+    local x, y, z = b.x - a.x, b.y - a.y, b.z - a.z
+    local length = vec_dist(a, b)
+    if length == 0 then
+        return {x = 0, y = 0, z = 0}
+    end
+    return {x = x / length, y = y / length, z = z / length}
+end
+
+local function dir2yaw(dir)
+    return math.atan2(dir.z, dir.x)
+end
+
+local function diff(a, b)
+    return math.atan2(math.sin(b - a), math.cos(b - a))
+end
+
+-- Функция для броска wing_horn
+local function throw_wing_horn(self, target)
+    local pos = self.object:get_pos()
+    if not pos then return end
+    local tgt_pos = target:get_pos()
+    if not tgt_pos then return end
+    local dir = vec_dir(pos, tgt_pos)
+    local obj = minetest.add_entity(pos, "waterdragon:wing_horn")
+    if obj then
+        local ent = obj:get_luaentity()
+        if ent then
+            ent.owner = self.object -- Сохраняем ссылку на создателя
+        end
+        obj:set_velocity({x = dir.x * 15, y = dir.y * 15, z = dir.z * 15})
+        obj:set_acceleration({x = 0, y = -9.8, z = 0})
+        minetest.after(10, function()
+            if obj and obj:get_luaentity() then
+                obj:remove()
+            end
+        end)
+    end
+end
+
+function waterdragon.is_target_flying(target)
+    if not target then
+        return false
+    end
+    
+    local pos = target:get_pos()
+    if not pos then
+        return false
+    end
+    
+    -- Проверяем несколько блоков вниз
+    for i = 0, 4 do
+        local check_pos = {x = pos.x, y = pos.y - i, z = pos.z}
+        local node = minetest.get_node_or_nil(check_pos)
+        if not node then
+            return false -- Если не можем получить информацию о блоке, считаем, что цель не летит
+        end
+        
+        local node_def = minetest.registered_nodes[node.name]
+        if node_def and (node_def.walkable or (node_def.drawtype == "liquid" and node_def.liquidtype ~= "none")) then
+            return i > 1 -- Считаем, что цель летит, если твердый блок или жидкость находятся ниже, чем на 1 блок
+        end
+    end
+    
+    return true -- Если не нашли твердых блоков или жидкости в пределах 5 блоков вниз, считаем, что цель летит
+end
+
+-- Регистрация сущности wing_horn
+minetest.register_entity("waterdragon:wing_horn", {
+    initial_properties = {
+        visual = "sprite",
+        textures = {"waterdragon_wing_horn.png"},
+        physical = true,
+        collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
+    },
+    owner = nil,
+    on_step = function(self, dtime)
+        if not self.object:get_pos() then return end
+        local pos = self.object:get_pos()
+        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+            if obj ~= self.object and obj ~= self.owner then
+                if obj:is_player() then
+                    obj:set_hp(0)
+                    self.object:remove()
+                    return
+                elseif obj:get_luaentity() and obj:get_luaentity().health then
+                    obj:get_luaentity().health = 0
+                    self.object:remove()
+                    return
+                end
+            end
+        end
+    end
+})
+
+-- Основная функция атаки
 creatura.register_utility("waterdragon:attack", function(self, target)
-	local is_landed = true
-	local init = false
-	local takeoff_init = false
-	local land_init = false
-	local fov_timer = 0
-	local switch_timer = 20
-	local function func(_self)
-		if not self.fly_allowed then
-			-- Use a walking attack instead
-			return
-		end
+    local is_landed = true
+    local init = false
+    local takeoff_init = false
+    local land_init = false
+    local fov_timer = 0
+    local switch_timer = 20
+    local wing_horn_cooldown = 0
 
-		local target_alive, _, tgt_pos = _self:get_target(target)
-		if not target_alive then
-			_self._target = nil
-			return true
-		end
-		local pos = _self.object:get_pos()
-		local yaw = _self.object:get_yaw()
-		if not pos then return end
-		local yaw2tgt = dir2yaw(vec_dir(pos, tgt_pos))
-		if abs(diff(yaw, yaw2tgt)) > 0.3 then
-			fov_timer = fov_timer + _self.dtime
-		end
-		switch_timer = switch_timer - _self.dtime
-		if not self:get_action() then
-			-- Decide to attack from ground or air
-			if not init then
-				local dist2floor = creatura.sensor_floor(_self, 7, true)
-				if dist2floor > 6
-					or is_target_flying(target) then -- Fly if too far from ground
-					is_landed = false
-				end
-				init = true
-			elseif switch_timer <= 0 then
-				local switch_chance = (is_landed and 6) or 3
-				is_landed = random(switch_chance) > 1
-				takeoff_init = not is_landed
-				land_init = is_landed
-				switch_timer = 20
-			end
+    local function func(_self)
+        if not _self.fly_allowed then
+            -- Используем наземную атаку вместо воздушной
+            return
+        end
 
-			-- Land if flying while in landed state
-			if land_init then
-				if not self.touching_ground then
-					local pos2 = tgt_pos
-					if is_target_flying(target) then
-						pos2 = { x = pos.x, y = pos.y - 7, z = pos.z }
-					end
-					creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
-				else
-					waterdragon.action_land(self)
-					land_init = false
-				end
-				return
-			end
+        local target_alive, _, tgt_pos = _self:get_target(target)
+        if not target_alive then
+            _self._target = nil
+            return true
+        end
 
-			-- Takeoff if walking while in flying state
-			if takeoff_init
-				and self.touching_ground then
-				waterdragon.action_takeoff(self)
-				takeoff_init = false
-				return
-			end
+        local pos = _self.object:get_pos()
+        local yaw = _self.object:get_yaw()
+        if not pos then return end
 
-			-- Choose Attack
-			local dist = vec_dist(pos, tgt_pos)
-			local attack_range = (is_landed and 8) or 16
-			if dist <= attack_range then -- Close-range Attacks
-				if is_landed then
-					if fov_timer < 1
-						and target:is_player() then
-						waterdragon.action_repel(_self, target)
-					else
-						waterdragon.action_slam(_self, target)
-						is_landed = false
-						fov_timer = 0
-					end
-				else
-					if random(3) < 2 then
-						waterdragon.action_flight_pure_water(_self, target, 12)
-					else
-						waterdragon.action_hover_pure_water(_self, target, 3)
-					end
-				end
-			else
-				if is_landed then
-					waterdragon.action_pursue(_self, target, 2, "creatura:obstacle_avoidance", 0.75, "walk_slow")
-				else
-					tgt_pos.y = tgt_pos.y + 14
-					creatura.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
-				end
-			end
-		end
-	end
-	self:set_utility(func)
+        local yaw2tgt = dir2yaw(vec_dir(pos, tgt_pos))
+        if math.abs(diff(yaw, yaw2tgt)) > 0.3 then
+            fov_timer = fov_timer + _self.dtime
+        end
+
+        switch_timer = switch_timer - _self.dtime
+        wing_horn_cooldown = wing_horn_cooldown - _self.dtime
+
+        if not _self:get_action() then
+            -- Решение об атаке с земли или воздуха
+            if not init then
+                local dist2floor = creatura.sensor_floor(_self, 7, true)
+                if dist2floor > 6 or waterdragon.is_target_flying(target) then
+                    is_landed = false
+                end
+                init = true
+            elseif switch_timer <= 0 then
+                local switch_chance = (is_landed and 6) or 3
+                is_landed = math.random(switch_chance) > 1
+                takeoff_init = not is_landed
+                land_init = is_landed
+                switch_timer = 20
+            end
+
+            -- Приземление, если летим в наземном состоянии
+            if land_init then
+                if not _self.touching_ground then
+                    local pos2 = tgt_pos
+                    if waterdragon.is_target_flying(target) then
+                        pos2 = {x = pos.x, y = pos.y - 7, z = pos.z}
+                    end
+                    creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
+                else
+                    waterdragon.action_land(_self)
+                    land_init = false
+                end
+                return
+            end
+
+            -- Взлет, если ходим в летающем состоянии
+            if takeoff_init and _self.touching_ground then
+                waterdragon.action_takeoff(_self)
+                takeoff_init = false
+                return
+            end
+
+            -- Выбор атаки
+            local dist = vec_dist(pos, tgt_pos)
+            local attack_range = (is_landed and 8) or 16
+
+            if dist <= attack_range then -- Атаки ближнего боя
+                if wing_horn_cooldown <= 0 and math.random() < 0.3 then -- 30% шанс бросить wing_horn
+                    throw_wing_horn(_self, target)
+                    wing_horn_cooldown = 5 -- Кулдаун в 5 секунд после броска wing_horn
+                else
+                    if is_landed then
+                        if fov_timer < 1 and target:is_player() then
+                            waterdragon.action_repel(_self, target)
+                        else
+                            waterdragon.action_slam(_self, target)
+                            is_landed = false
+                            fov_timer = 0
+                        end
+                    else
+                        if math.random(3) < 2 then
+                            waterdragon.action_flight_pure_water(_self, target, 12)
+                        else
+                            waterdragon.action_hover_pure_water(_self, target, 3)
+                        end
+                    end
+                end
+            else
+                if is_landed then
+                    waterdragon.action_pursue(_self, target, 2, "creatura:obstacle_avoidance", 0.75, "walk_slow")
+                else
+                    tgt_pos.y = tgt_pos.y + 14
+                    creatura.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
+                end
+            end
+        end
+    end
+    self:set_utility(func)
 end)
+
 
 creatura.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
 	local hidden_timer = 1

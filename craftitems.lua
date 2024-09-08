@@ -1710,7 +1710,7 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
 
 minetest.register_craftitem("waterdragon:wing_horn", {
     description = S("Wing Horn"),
-    tiles = "waterdragon_wing_horn.png",
+    inventory_image = "waterdragon_wing_horn.png",
 	groups = {wtd_drops = 1}
 })
 
