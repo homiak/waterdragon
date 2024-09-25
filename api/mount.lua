@@ -722,8 +722,7 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 if control.up then
                     anim = "fly"
                     _self:set_weighted_velocity(32, look_dir)
-                    if look_dir.y < -0.33
-                    and control.LMB then
+                    if look_dir.y < -0.33 then
                         if momentum < 28 then
                             momentum = momentum + (_self.dtime * 20) * abs(look_dir.y)
                         end
