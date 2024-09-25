@@ -542,12 +542,7 @@ creatura.register_utility("waterdragon:mount", function(self)
                     anim = "walk"
                 end
                 if control.jump then
-					if not self.fly_allowed then
-						minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
-						is_landed = true
-						waterdragon.action_land(self)
-						return
-					end
+					
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
@@ -563,19 +558,10 @@ creatura.register_utility("waterdragon:mount", function(self)
                     minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
                 else
                     if control.up then
-						if not self.fly_allowed then
-							minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
-							is_landed = true
-							waterdragon.action_land(self)							return
-						end
+						
                         anim = "fly"
                         if _self.pitch_fly then
-							if not self.fly_allowed then
-								minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
-								is_landed = true
-								waterdragon.action_land(self)
-								return
-							end
+							
                             _self:set_vertical_velocity(12 * look_dir.y)
                         end
                         _self:set_forward_velocity(24)
@@ -586,12 +572,7 @@ creatura.register_utility("waterdragon:mount", function(self)
                     _self:tilt_to(look_yaw, 2)
                     if not _self.pitch_fly then
                         if control.jump then
-							if not self.fly_allowed then
-								minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
-								is_landed = true
-								waterdragon.action_land(self)
-								return
-							end
+							
                             _self:set_vertical_velocity(12)
                         elseif control.down then
                             _self:set_vertical_velocity(-12)
@@ -728,12 +709,7 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     anim = "walk"
                 end
                 if control.jump then
-                    if not self.fly_allowed then
-                        minetest.chat_send_player(player_name, S("The Water Dragon is not allowed to fly"))
-                        is_landed = true
-                        waterdragon.action_land(self)
-                        return
-                    end
+                    
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
@@ -765,11 +741,10 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     waterdragon.action_land(_self)
                 end
 
-                -- Добавляем атаку во время полета и зависания
                 if control.LMB and attack_cooldown <= 0 then
                     local start_pos = _self.object:get_pos()
-                    start_pos.y = start_pos.y + 1.5  -- Примерная высота головы дракона
-                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))  -- Дистанция атаки
+                    start_pos.y = start_pos.y + 1.5
+                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))
                     
                     -- Воспроизведение звука при каждой попытке атаки
                     local pos = _self.object:get_pos()
@@ -797,8 +772,7 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 end
             end
 
-            if control.LMB
-            and anim == "fly"
+            if anim == "fly"
             and momentum > 0 then
                 _self:set_weighted_velocity(32 + momentum, look_dir)
                 anim = "dive"
