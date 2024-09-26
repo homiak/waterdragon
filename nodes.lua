@@ -505,3 +505,210 @@ end
 -- Register both forges
 register_draconic_forge("pure_water")
 register_draconic_forge("rare_water")
+
+---------------------------
+-- Scottish Dragon Forge --
+---------------------------
+
+local random = math.random
+
+minetest.register_node("waterdragon:scottish_dragon_forge", {
+    description = S("Scottish Dragon Steel Forge"),
+    tiles = {
+        "waterdragon_scottish_dragon_forge_top.png",
+        "waterdragon_scottish_dragon_forge_bottom.png",
+        "waterdragon_scottish_dragon_forge_side.png",
+    },
+    paramtype2 = "facedir",
+    groups = {cracky = 1, level = 2},
+    is_ground_content = false,
+    
+    on_construct = function(pos)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        inv:set_size("input", 1)
+        inv:set_size("crucible", 1)
+        inv:set_size("output", 1)
+        update_forge_form(meta, "scottish")
+    end,
+
+    can_dig = function(pos)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        return inv:is_empty("input") and inv:is_empty("crucible") and inv:is_empty("output")
+    end,
+
+    allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+        if minetest.is_protected(pos, player:get_player_name()) then
+            return 0
+        end
+        if listname == "input" and stack:get_name() == "default:steel_ingot" then
+            return stack:get_count()
+        end
+        if listname == "crucible" and stack:get_name() == "waterdragon:dragonstone_crucible" then
+            return 1
+        end
+        return 0
+    end,
+
+    allow_metadata_inventory_move = function() return 0 end,
+
+    allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+        if minetest.is_protected(pos, player:get_player_name()) then
+            return 0
+        end
+        return stack:get_count()
+    end,
+
+    on_metadata_inventory_put = function(pos)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        local timer = minetest.get_node_timer(pos)
+
+        if not inv:is_empty("input") and not inv:is_empty("crucible") then
+            timer:start(1)
+        end
+    end,
+
+    on_metadata_inventory_take = function(pos)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        local timer = minetest.get_node_timer(pos)
+
+        if inv:is_empty("input") or inv:is_empty("crucible") then
+            timer:stop()
+        end
+        update_forge_form(meta, "scottish")
+    end,
+
+    on_timer = function(pos)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        local input = inv:get_stack("input", 1)
+        local crucible = inv:get_stack("crucible", 1)
+
+        if input:get_name() == "default:steel_ingot" and input:get_count() > 0 and
+           crucible:get_name() == "waterdragon:dragonstone_crucible" then
+            meta:set_int("melt_perc", (meta:get_int("melt_perc") or 0) + 5)
+            if meta:get_int("melt_perc") >= 100 then
+                meta:set_int("melt_perc", 0)
+                input:take_item(1)
+                inv:set_stack("input", 1, input)
+                inv:set_stack("crucible", 1, "waterdragon:dragonstone_crucible_full")
+            end
+        elseif crucible:get_name() == "waterdragon:dragonstone_crucible_full" then
+            meta:set_int("cool_perc", (meta:get_int("cool_perc") or 0) + 1)
+            if meta:get_int("cool_perc") >= 100 then
+                meta:set_int("cool_perc", 0)
+                local ingot = ItemStack("waterdragon:scottish_dragon_steel_ingot")
+                local ingot_meta = ingot:get_meta()
+                ingot_meta:set_string("scottish_id", meta:get_string("last_scottish_id") or waterdragon.get_scottish_dragon_identifier())
+                if inv:room_for_item("output", ingot) then
+                    inv:add_item("output", ingot)
+                    inv:set_stack("crucible", 1, "waterdragon:dragonstone_crucible")
+                else
+                    meta:set_int("cool_perc", 100)
+                end
+            end
+        else
+            meta:set_int("melt_perc", 0)
+            meta:set_int("cool_perc", 0)
+        end
+
+        update_forge_form(meta, "scottish")
+        return true
+    end,
+
+    on_fly = function(pos, scottish_id)
+        local meta = minetest.get_meta(pos)
+        local inv = meta:get_inventory()
+        local crucible = inv:get_stack("crucible", 1)
+
+        if crucible:get_name() == "waterdragon:dragonstone_crucible_full" then
+            meta:set_int("cool_perc", math.min((meta:get_int("cool_perc") or 0) + 25, 100))
+            meta:set_string("last_scottish_id", scottish_id)
+        end
+
+        minetest.add_particlespawner({
+            amount = 30,
+            time = 1,
+            minpos = vector.subtract(pos, 0.5),
+            maxpos = vector.add(pos, 0.5),
+            minvel = {x=-1, y=0, z=-1},
+            maxvel = {x=1, y=2, z=1},
+            minacc = {x=0, y=0, z=0},
+            maxacc = {x=0, y=1, z=0},
+            minexptime = 1,
+            maxexptime = 2,
+            minsize = 1,
+            maxsize = 3,
+            texture = "waterdragon_water_particle.png",
+        })
+
+        update_forge_form(meta, "scottish")
+    end
+})
+
+
+function update_forge_form(meta, forge_type)
+    local melt_perc = meta:get_int("melt_perc") or 0
+    local cool_perc = meta:get_int("cool_perc") or 0
+    local formspec = table.concat({
+        "formspec_version[3]",
+        "size[11,10]",
+        "image[0,0;11,10;waterdragon_form_forge_bg.png]",
+        "image[3.475,1.3;1.56,0.39;waterdragon_form_pure_water_empty.png^[transformR270]",
+        "image[6.35,1.325;1.95,0.39;waterdragon_form_pure_water_elbow_up_empty.png^[transformR270]",
+        "image[7.91,1.7;0.39,1.69;waterdragon_form_pure_water_elbow_down_empty.png^[transformFY]]",
+        "list[current_player;main;0.65,5;8,4;]",
+        "list[context;input;2.325,1.05;1,1;]",
+        "list[context;crucible;5.175,1.05;1,1;]",
+        "list[context;output;7.65,3.5;1,1;]",
+        "listring[current_player;main]",
+        "listring[context;input]",
+        "listring[current_player;main]",
+        "listring[context;crucible]",
+        "listring[current_player;main]",
+        "listring[context;output]",
+        "listring[current_player;main]"
+    })
+    
+    if melt_perc > 0 and melt_perc <= 100 then
+        formspec = formspec .. "image[3.475,1.3;1.56,0.39;waterdragon_form_pure_water_empty.png^[lowpart:"..
+        melt_perc..":waterdragon_form_pure_water_full.png^[transformR270]]"
+    end
+    
+    if cool_perc > 0 and cool_perc <= 100 then
+        local elbow_p1 = math.min(cool_perc * 2, 100)
+        local elbow_p2 = math.max(cool_perc * 2 - 100, 0)
+        formspec = formspec .. "image[6.35,1.325;1.95,0.39;waterdragon_form_pure_water_elbow_up_empty.png^[lowpart:"..
+        elbow_p1..":waterdragon_form_pure_water_elbow_up_full.png^[transformR270]]"
+        if elbow_p2 > 0 then
+            formspec = formspec .. "image[7.91,1.7;0.39,1.69;waterdragon_form_pure_water_elbow_down_empty.png^[lowpart:"..
+            elbow_p2..":waterdragon_form_pure_water_elbow_down_full.png^[transformFY]]"
+        end
+    end
+    
+    meta:set_string("formspec", formspec)
+end
+
+minetest.register_craftitem("waterdragon:scottish_dragon_steel_ingot", {
+    description = S("Scottish Dragon Steel Ingot"),
+    inventory_image = "waterdragon_scottish_dragon_steel_ingot.png",
+})
+
+waterdragon.on_scottish_dragon_fly = function(pos, scottish_id)
+    local node = minetest.get_node(pos)
+    if node.name == "waterdragon:scottish_dragon_forge" then
+        local def = minetest.registered_nodes[node.name]
+        if def and def.on_fly then
+            def.on_fly(pos, scottish_id)
+        end
+    end
+end
+
+function waterdragon.get_scottish_dragon_identifier()
+    local adjectives = {"Brave", "Fierce", "Mighty", "Noble", "Proud", "Stalwart", "Valiant"}
+    local nouns = {"Highlander", "Clansman", "Warrior", "Chieftain", "Laird", "Piper", "Scotsman"}
+    return adjectives[random(#adjectives)] .. " " .. nouns[random(#nouns)]
+end
