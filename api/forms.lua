@@ -142,43 +142,46 @@ end
 --------------------------
 
 local function get_scottish_dragon_formspec(self)
-	-- Stats
-	local health = get_stat(self, "hp", "max_health")
-	local hunger = get_stat(self, "hunger", "max_hunger")
-	local stamina = get_perc(self.flight_stamina, 900)
-	-- Visuals
-	local frame_range = self.animations["stand"].range
-	local frame_loop = frame_range.x .. "," .. frame_range.y
-	local texture = self:get_props().textures[1]
-	local health_ind = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png"
-	local hunger_ind = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png"
-	local stamina_ind = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png"
-	-- Settings
-	local fly_allowed = "Flight Allowed"
-	local fly_image = "waterdragon_forms_flight_allowed.png"
-	if not self.fly_allowed then
-		fly_allowed = "Flight Not Allowed"
-		fly_image = "waterdragon_forms_flight_disallowed.png"
-	end
-	local form = {
-		"formspec_version[4]",
-		"size[16,10]",
-		"bgcolor[#0000ff;false]",
-		"background[0,0;16,10;waterdragon_forms_bg_b.png]",
-		"label[6.8,0.8;" .. correct_name(self.name) .. "]",
-		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or "Set Name") .. "]",
-		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
-		"image[1.1,1.3;1,1;" .. health_ind .. "]",
-		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
-		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
-		"tooltip[13.45,7.6;1.9,1.9;" .. correct_name(self.stance) .. "]",
-		"image_button[13.45,7.6;1.9,1.9;waterdragon_forms_dragon_" .. self.stance .. ".png;btn_wtd_stance;;false;false;]",
-		"tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
-		"image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
-		"tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
-		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]"
-	}
-	return table.concat(form, "")
+    -- Stats
+    local health = get_stat(self, "hp", "max_health")
+    local hunger = get_stat(self, "hunger", "max_hunger")
+    local stamina = get_perc(self.flight_stamina, 900)
+    -- Visuals
+    local frame_range = self.animations["stand"].range
+    local frame_loop = frame_range.x .. "," .. frame_range.y
+    local texture = self:get_props().textures[1]
+    local health_ind = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png"
+    local hunger_ind = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png"
+    local stamina_ind = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png"
+    -- Settings
+    local fly_allowed = "Flight Allowed"
+    local fly_image = "waterdragon_forms_flight_allowed.png"
+    if not self.fly_allowed then
+        fly_allowed = "Flight Not Allowed"
+        fly_image = "waterdragon_forms_flight_disallowed.png"
+    end
+    -- Identifier
+    local scottish_id = self.scottish_id or waterdragon.get_scottish_dragon_identifier()
+    local form = {
+        "formspec_version[4]",
+        "size[16,10]",
+        "bgcolor[#0000ff;false]",
+        "background[0,0;16,10;waterdragon_forms_bg_b.png]",
+        "label[6.8,0.8;" .. correct_name(self.name) .. "]",
+        "label[6.8,1.3;" .. scottish_id .. "]",
+        "button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or "Set Name") .. "]",
+        "model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
+        "image[1.1,1.3;1,1;" .. health_ind .. "]",
+        "image[1.1,3.3;1,1;" .. hunger_ind .. "]",
+        "image[1.1,5.3;1,1;" .. stamina_ind .. "]",
+        "tooltip[13.45,7.6;1.9,1.9;" .. correct_name(self.stance) .. "]",
+        "image_button[13.45,7.6;1.9,1.9;waterdragon_forms_dragon_" .. self.stance .. ".png;btn_wtd_stance;;false;false;]",
+        "tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
+        "image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
+        "tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
+        "image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]"
+    }
+    return table.concat(form, "")
 end
 
 waterdragon.scottish_wtd_api.show_formspec = function(self, player)
