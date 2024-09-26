@@ -127,24 +127,6 @@ minetest.register_craftitem("waterdragon:dragon_bone", {
 })
 
 table.insert(wtd_drops, "waterdragon:dragon_bone")
-for color, hex in pairs(waterdragon.colors_pure_water) do
-	minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
-		description = S("Pure Water Dragon Scales"),
-		inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
-		on_use = function(itemstack, user)
-			local name = user:get_player_name()
-			taming_ability_enabled = not taming_ability_enabled
-			local status = taming_ability_enabled and " already" or " airedy"
-			minetest.chat_send_player(name, S("You can" .. status .. " interact with the Water Dragons"))
-			return itemstack
-		end,
-	})
-	function is_taming_ability_enabled()
-		return taming_ability_enabled
-	end
-		groups = { wtd_scales = 1 }
-	table.insert(wtd_drops, "waterdragon:scales_pure_water_dragon")
-end
 
 for color, hex in pairs(waterdragon.colors_rare_water) do
 	minetest.register_craftitem("waterdragon:scales_rare_water_dragon", {

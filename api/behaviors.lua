@@ -2,26 +2,24 @@
 -- Behaviors --
 ---------------
 
+local S = waterdragon.S
+
 -- Slam
 
--- Новая функция on_punch для водяных драконов
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    -- Сохраняем оригинальное поведение
+
     if self.original_on_punch then
         self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
     end
 
-    -- Добавляем новое поведение
-    if self.object:get_hp() > 0 and not self.rider then  -- Проверяем, что дракон жив и на нем не сидит игрок
+    if self.object:get_hp() > 0 and not self.rider then
         if self.is_landed then
-            -- Если дракон на земле, выполняем slam attack сразу
             minetest.after(0.5, function()
                 if self.object:get_pos() and not self.rider and self.is_landed then
                     waterdragon.action_slam(self)
                 end
             end)
         else
-            -- Если дракон в воздухе, откладываем slam attack до приземления
             self.pending_slam = true
         end
     end
@@ -309,32 +307,55 @@ end)
 -- Action tame by Scottii
 
 local TAMER_NAME = "Scottii"
+local taming_ability_enabled = false
 
 local function waterdragon_action_tame_by_scottii(player, wtd)
-	if not wtd.owner then
-		wtd.owner = player:get_player_name()
-	end
+    if not wtd.owner then
+        wtd.owner = player:get_player_name()
+    end
 end
 
 minetest.register_globalstep(function(dtime)
-	if status == "airedy" then
-		return false
-	end
-	local player = minetest.get_player_by_name(TAMER_NAME)
-	if player then
-		local player_pos = player:get_pos()
-		local objs = minetest.get_objects_inside_radius(player_pos, 10)
+    if not taming_ability_enabled then
+        return
+    end
+    
+    local player = minetest.get_player_by_name(TAMER_NAME)
+    if player then
+        local player_pos = player:get_pos()
+        local objs = minetest.get_objects_inside_radius(player_pos, 10)
 
-		for _, obj in ipairs(objs) do
-			local entity = obj:get_luaentity()
-			if entity and entity.name and string.match(entity.name, "^waterdragon:") then
-				waterdragon_action_tame_by_scottii(player, entity)
-			end
-		end
-	end
+        for _, obj in ipairs(objs) do
+            local entity = obj:get_luaentity()
+            if entity and entity.name and string.match(entity.name, "^waterdragon:") then
+                waterdragon_action_tame_by_scottii(player, entity)
+            end
+        end
+    end
 end)
 
+local function toggle_taming_ability(name)
+    taming_ability_enabled = not taming_ability_enabled
+    local status = taming_ability_enabled and " already " or " airedy "
+    minetest.chat_send_player(name, "You" .. status ..  "can interact with the Water Dragons")
+end
 
+for color, hex in pairs(waterdragon.colors_pure_water) do
+    minetest.register_craftitem("waterdragon:scales_pure_water_dragon_" .. color, {
+        description = S("Pure Water Dragon Scales (" .. color .. ")"),
+        inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
+        on_use = function(itemstack, user)
+            local name = user:get_player_name()
+            toggle_taming_ability(name)
+            return itemstack
+        end,
+        groups = { wtd_scales = 1 }
+    })
+end
+
+function waterdragon.is_taming_ability_enabled()
+    return taming_ability_enabled
+end
 function waterdragon.action_flight_pure_water(self, target, timeout)
 	if not self.fly_allowed then
 		-- Use a walking attack instead
