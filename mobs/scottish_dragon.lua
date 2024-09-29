@@ -168,10 +168,19 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 		waterdragon.scottish_dragon_step(self, dtime)
 	end,
 	death_func = function(self)
-		if self:get_utility() ~= "waterdragon:die" then
-			self:initiate_utility("waterdragon:die", self)
-		end
-	end,
+        if self:get_utility() ~= "waterdragon:die" then
+            self:initiate_utility("waterdragon:die", self)
+        end
+        
+        local pos = self.object:get_pos()
+        if pos then
+            minetest.add_item(pos, "waterdragon:scales_scottish_dragon 12")
+            minetest.add_item(pos, "waterdragon:dragon_water_drop 3")
+            minetest.add_item(pos, "waterdragon:dragon_bone 6")
+            minetest.add_item(pos, "waterdragon:wing_horn 2")
+            minetest.add_item(pos, "waterdragon:draconic_tooth 1")
+        end
+    end,
 	on_rightclick = function(self, clicker)
 		waterdragon.scottish_dragon_rightclick(self, clicker)
 	end,
@@ -215,4 +224,10 @@ creatura.register_mob_spawn("waterdragon:scottish_dragon", {
 	max_group = 2,
 	biomes = biomes,
 	nodes = {"group:leaves"}
+})
+
+
+minetest.register_craftitem("waterdragon:scales_scottish_dragon", {
+    description = S("Scottish Dragon Scales"),
+    inventory_image = "waterdragon_scottish_dragon_scales.png",
 })
