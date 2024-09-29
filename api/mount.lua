@@ -276,7 +276,7 @@ function waterdragon.detach_player(self, player)
 		player:hud_remove(data.huds["stamina"])
 		player:hud_remove(data.huds["breath"])
 	end
-	player:hud_set_flags({ wielditem = false })
+	player:hud_set_flags({ wielditem = true })
 	-- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
 	waterdragon.unset_fake_player(player)
 	-- Set Water Dragon data
