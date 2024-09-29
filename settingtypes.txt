@@ -4,6 +4,9 @@ water_nest_spawning (Nest Spawning) bool true
 #    Water Dragon Nest Spawn Rate. 1 in x chance per chunk generated for a Water Dragon Nest to spawn. This setting only applies when Nest Spawning is enabled.
 water_nest_spawn_rate (Nest Spawn Rate) int 128
 
+#    Scottish Water Dragon Nest Spawn Rate. 1 in x chance per chunk generated for a Scottish Water Dragon Nest to spawn. This setting only applies when Nest Spawning is enabled.
+water_scottish_nest_spawn_rate (Scottish Nest Spawn Rate) int 128
+
 #    If true, Water Dragons will spawn in roosts and caverns like Minecrafts Ice and Fire mod.
 water_cavern_spawning (Rare Water and Pure Water Cavern Spawning) bool false
 
