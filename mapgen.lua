@@ -81,6 +81,11 @@ local function is_cold_biome(pos)
 	return data.heat < 45 and data.humidity < 75
 end
 
+local function is_scottish_biome(pos)
+	local data = minetest.get_biome_data(pos)
+	return data.heat < 30 and data.humidity < 60
+end
+
 local function is_warm_biome(pos)
 	local data = minetest.get_biome_data(pos)
 	return data.heat > 60 and data.humidity < 80
@@ -615,6 +620,44 @@ minetest.register_on_generated(function(minp, maxp)
 			end
 		end
 
+		if water_scottish_nest_spawn_rate and math.random(water_scottish_nest_spawn_rate) < 2 then
+			local heights = {}
+	
+			for z = min_z + 8, max_z - 7, 8 do
+				for x = min_x + 8, max_x - 7, 8 do
+					for y = min_y, max_y do
+						local vi = area:index(x, y, z)
+						local vi_name = minetest.get_name_from_content_id(data[vi])
+						if not creatura.get_node_def(vi_name).walkable then
+							table.insert(heights, y)
+							break
+						end
+					end
+				end
+			end
+	
+			local avg_height = average(heights)
+	
+			if avg_height > 4 then
+				pos.y = avg_height
+	
+				local heightmap = minetest.get_mapgen_object("heightmap")
+	
+				if heightmap and #heightmap > 0 then
+					pos.y = heightmap[math.floor(#heightmap / 2)]
+				end
+	
+				if is_scottish_biome(pos) then
+					generate_scottish_dragon_nest(minp, maxp, area, data)
+					vm:set_data(data)
+					vm:set_lighting({day = 0, night = 0})
+					vm:calc_lighting()
+					vm:update_liquids()
+					vm:write_to_map()
+				end
+			end
+		end
+
 		local avg_height = average(heights)
 
 		if avg_height > 4 then
@@ -664,3 +707,90 @@ minetest.register_on_generated(function(minp, maxp)
 		end
 	end
 end)
+
+-- Определение блока scottish_dragon_dragonstone_block
+minetest.register_node("waterdragon:scottish_dragon_dragonstone_block", {
+    description = "Scottish Dragon Dragonstone Block",
+    tiles = {"waterdragon_scottish_dragon_forge_bottom.png"},
+    groups = {cracky = 2},
+    is_ground_content = false,
+    sounds = default.node_sound_stone_defaults(),
+})
+
+function generate_scottish_dragon_nest(minp, maxp, area, data)
+
+    local min_y = minp.y
+    local max_y = maxp.y
+
+    local min_x = minp.x
+    local max_x = maxp.x
+    local min_z = minp.z
+    local max_z = maxp.z
+
+    local center_x = math.floor((min_x + max_x) / 2)
+    local center_y = math.floor((min_y + max_y) / 2)
+    local center_z = math.floor((min_z + max_z) / 2)
+    local pos = {
+        x = center_x,
+        y = center_y,
+        z = center_z
+    }
+
+    local surface = false
+    for y = max_y, 2, -1 do
+        local vi = area:index(center_x, y, center_z)
+        if data[vi] ~= c_air then
+            break
+        elseif data[vi] == c_air
+        and data[area:index(center_x, y - 1, center_z)] ~= c_air
+        and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
+            surface = y
+            break
+        end
+    end
+
+    if not surface
+    or surface - 6 < min_y then return end
+
+    center_y = surface
+
+    local sidelen = max_x - min_x + 1
+    local chulens = {x = sidelen, y = sidelen, z = sidelen}
+    local minposxyz = {x = min_x, y = min_y, z = min_z}
+
+    local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
+
+    local c_dragonstone = minetest.get_content_id("waterdragon:scottish_dragon_dragonstone_block")
+
+    local nixyz = 1
+    for z = min_z, max_z do
+        for y = min_y, max_y do
+            local vi = area:index(min_x, y, z)
+            for x = min_x, max_x do
+                local noise = (nvals_nest[nixyz] + 1) * 7.88
+                local height = math.abs(y - center_y)
+                local dist_slope = (noise - height) * 0.77
+                local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - dist_slope
+                
+                if distance < 15 - (height * 0.66)
+                and distance > 4 + ((y - center_y) * 2) then
+                    data[vi] = c_dragonstone
+                elseif distance < 15 - (height * 0.66)
+                and distance < 4 + ((y - center_y) * 2)
+                and data[vi] ~= c_dragonstone then
+                    data[vi] = c_air
+                end
+                
+                if distance < 15 - (height * 0.33)
+                and distance > 4 + ((y - center_y) * 1.5)
+                and y < center_y then
+                    data[vi] = c_dragonstone
+                end
+                
+                
+                nixyz = nixyz + 1
+                vi = vi + 1
+            end
+        end
+    end
+end

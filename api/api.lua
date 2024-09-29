@@ -2228,7 +2228,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		local fly_stam = self.flight_stamina or 1600
 		if is_flying
 			and not self.in_liquid
-			and fly_stam > 0 then         -- Drain Stamina when flying
+			and fly_stam > 0 then -- Drain Stamina when flying
 			fly_stam = fly_stam - 1
 			self.turn_rate = self.turn_rate * 0.75 -- Turning radius incrased when flying
 		else
