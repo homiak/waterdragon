@@ -158,56 +158,65 @@ local function set_hud(player, def)
 end
 
 function waterdragon.attach_player(self, player)
-	if not player
-		or not player:get_look_horizontal()
-		or not player:is_player() then
-		return
-	end
-	local scale = self.growth_scale or 1
-	-- Attach Player
-	player:set_attach(self.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
-	-- Set Players Eye Offset
-	player:set_eye_offset({
-		x = 0,
-		y = 115 * scale, -- Set eye offset
-		z = -280 * scale
-	}, { x = 0, y = 0, z = 0 }) -- 3rd person eye offset is limited to 15 on each axis (Fix this, devs.)
-	player:set_look_horizontal(self.object:get_yaw() or 0)
-	-- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
-	waterdragon.set_fake_player(self, player)
-	-- Set Water Dragon Data
-	self.rider = player
-	-- Set HUD
-	if not self.attack_stamina then
-		return
-	end
-	local data = waterdragon.mounted_player_data[player:get_player_name()] or {}
+    if not player
+        or not player:get_look_horizontal()
+        or not player:is_player() then
+        return
+    end
 
-	if not data.huds then
-		local health = self.hp / math.ceil(self.max_health * scale) * 100
-		local hunger = self.hunger / math.ceil(self.max_hunger * scale) * 500
-		local stamina = self.flight_stamina / 900 * 100
-		local breath = self.attack_stamina / 100 * 100
-		player:hud_set_flags({ wielditem = false })
-		data.huds = {
-			["health"] = set_hud(player, {
-				text = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png",
-				position = { x = 0, y = 0.7 }
-			}),
-			["hunger"] = set_hud(player, {
-				text = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png",
-				position = { x = 0, y = 0.8 }
-			}),
-			["stamina"] = set_hud(player, {
-				text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
-				position = { x = 0, y = 0.9 }
-			}),
-			["breath"] = set_hud(player, {
-				text = "waterdragon_forms_breath_bg.png^[lowpart:" .. breath .. ":waterdragon_forms_breath_fg.png",
-				position = { x = 0, y = 1 }
-			})
-		}
-	end
+    if self.no_remount then
+        minetest.chat_send_player(player:get_player_name(), "This Scottish Dragon cannot be mounted, because it is in hover mode. To stop hovering, use the /stop_hover command")
+        return
+    end
+
+    local scale = self.growth_scale or 1
+    -- Attach Player
+    player:set_attach(self.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+    -- Set Players Eye Offset
+    player:set_eye_offset({
+        x = 0,
+        y = 115 * scale, -- Set eye offset
+        z = -280 * scale
+    }, { x = 0, y = 0, z = 0 }) -- 3rd person eye offset is limited to 15 on each axis (Fix this, devs.)
+    player:set_look_horizontal(self.object:get_yaw() or 0)
+    -- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
+    waterdragon.set_fake_player(self, player)
+    -- Set Water Dragon Data
+    self.rider = player
+    -- Set HUD
+    if not self.attack_stamina then
+        return
+    end
+    local data = waterdragon.mounted_player_data[player:get_player_name()] or {}
+
+    if not data.huds then
+        local health = self.hp / math.ceil(self.max_health * scale) * 100
+        local hunger = self.hunger / math.ceil(self.max_hunger * scale) * 500
+        local stamina = self.flight_stamina / 900 * 100
+        local breath = self.attack_stamina / 100 * 100
+        player:hud_set_flags({ wielditem = false })
+        data.huds = {
+            ["health"] = set_hud(player, {
+                text = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png",
+                position = { x = 0, y = 0.7 }
+            }),
+            ["hunger"] = set_hud(player, {
+                text = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png",
+                position = { x = 0, y = 0.8 }
+            }),
+            ["stamina"] = set_hud(player, {
+                text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
+                position = { x = 0, y = 0.9 }
+            }),
+            ["breath"] = set_hud(player, {
+                text = "waterdragon_forms_breath_bg.png^[lowpart:" .. breath .. ":waterdragon_forms_breath_fg.png",
+                position = { x = 0, y = 1 }
+            })
+        }
+    end
+    
+    -- Сохраняем обновленные данные игрока
+    waterdragon.mounted_player_data[player:get_player_name()] = data
 end
 
 function waterdragon.attach_passenger(self, player)
@@ -260,32 +269,226 @@ function waterdragon.attach_passenger(self, player)
 end
 
 function waterdragon.detach_player(self, player)
-	if not player
-		or not player:get_look_horizontal()
-		or not player:is_player() then
-		return
-	end
-	local player_name = player:get_player_name()
-	local data = waterdragon.mounted_player_data[player_name]
-	-- Attach Player
-	player:set_detach()
-	-- Set HUD
-	if self.attack_stamina then
-		player:hud_remove(data.huds["health"])
-		player:hud_remove(data.huds["hunger"])
-		player:hud_remove(data.huds["stamina"])
-		player:hud_remove(data.huds["breath"])
-	end
-	player:hud_set_flags({ wielditem = false })
-	-- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
-	waterdragon.unset_fake_player(player)
-	-- Set Water Dragon data
-	if player == self.rider then
-		self.rider = nil
-	else
-		self.passenger = nil
-	end
+    if not player
+        or not player:get_look_horizontal()
+        or not player:is_player() then
+        return
+    end
+    local player_name = player:get_player_name()
+    local data = waterdragon.mounted_player_data[player_name]
+    -- Detach Player
+    player:set_detach()
+    -- Set HUD
+    if self.attack_stamina then
+        player:hud_remove(data.huds["health"])
+        player:hud_remove(data.huds["hunger"])
+        player:hud_remove(data.huds["stamina"])
+        player:hud_remove(data.huds["breath"])
+    end
+    player:hud_set_flags({ wielditem = false })
+    -- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
+    waterdragon.unset_fake_player(player)
+    -- Set Water Dragon data
+    if player == self.rider then
+        self.rider = nil
+    else
+        self.passenger = nil
+    end
 end
+
+creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
+    local is_landed = creatura.sensor_floor(self, 5, true) < 4
+    local view_held = false
+    local view_point = 2
+    local momentum = 0
+    self:halt()
+    
+    local func = function(_self)
+        local player = _self.rider
+        if not player or not player:get_look_horizontal() then
+            return true
+        end
+
+        local player_name = player:get_player_name()
+        local control = player:get_player_control()
+
+        local look_dir = player:get_look_dir()
+        local look_yaw = minetest.dir_to_yaw(look_dir)
+
+        local player_data = waterdragon.mounted_player_data[player_name]
+
+        if not player_data then return true end
+
+        local player_props = player:get_properties()
+
+        if player_props.visual_size.x ~= 0 then
+            player:set_properties({
+                visual_size = {x = 0, y = 0, z = 0},
+            })
+        end
+
+        if control.aux1 then
+            if not view_held then
+                if view_point == 2 then
+                    view_point = 1
+                    player_data.fake_player:set_properties({
+                        visual_size = {x = 0, y = 0, z = 0},
+                    })
+                    player:hud_set_flags({wielditem = true})
+                elseif view_point == 1 then
+                    view_point = 2
+                    local dragon_size = _self.object:get_properties().visual_size
+                    player_data.fake_player:set_properties({
+                        visual_size = {
+                            x = 1 / dragon_size.x,
+                            y = 1 / dragon_size.y
+                        }
+                    })
+                    player:hud_set_flags({wielditem = false})
+                end
+                view_held = true
+            end
+        else
+            view_held = false
+        end
+
+        if not _self:get_action() then
+            local anim
+
+            if _self.hover_enabled then
+                _self:set_gravity(0)
+                anim = "hover"
+                _self:set_vertical_velocity(0)
+                _self:set_forward_velocity(0)
+                
+                local pos = _self.object:get_pos()
+                pos.y = pos.y + math.sin(minetest.get_gametime() * 0.1) * 0.05
+                _self.object:set_pos(pos)
+            elseif is_landed then
+                _self:set_gravity(-9.8)
+                anim = "stand"
+                if control.up then
+                    _self:set_forward_velocity(12)
+                    _self:turn_to(look_yaw, 4)
+                    anim = "walk"
+                end
+                if control.jump then
+                    is_landed = false
+                    waterdragon.action_takeoff(_self)
+                end
+                if control.LMB then
+                    waterdragon.action_punch(_self)
+                end
+            else
+                _self:set_gravity(0)
+                anim = "hover"
+                if control.up then
+                    anim = "fly"
+                    _self:set_weighted_velocity(32, look_dir)
+                    if look_dir.y < -0.33 then
+                        if momentum < 28 then
+                            momentum = momentum + (_self.dtime * 20) * math.abs(look_dir.y)
+                        end
+                    elseif momentum > 0 then
+                        momentum = momentum - _self.dtime * 15
+                        if momentum < 0 then momentum = 0 end
+                    end
+                else
+                    momentum = math.max(0, momentum - _self.dtime * 10)
+                    _self:set_vertical_velocity(0)
+                    _self:set_forward_velocity(momentum)
+                end
+                _self:tilt_to(look_yaw, 4)
+                if _self.touching_ground then
+                    is_landed = true
+                    waterdragon.action_land(_self)
+                end
+
+                if control.LMB then
+                    local start_pos = _self.object:get_pos()
+                    start_pos.y = start_pos.y + 1.5
+                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))
+                    
+                    local pos = _self.object:get_pos()
+                    if pos then
+                        minetest.sound_play("waterdragon_scottish_dragon_bite", {
+                            pos = pos,
+                            max_hear_distance = 10,
+                            gain = 1.0,
+                        }, true)
+                    end
+
+                    anim = "fly_punch"
+                    
+                    local ray = minetest.raycast(start_pos, end_pos, true, false)
+                    for pointed_thing in ray do
+                        if pointed_thing.type == "object" then
+                            local obj = pointed_thing.ref
+                            if obj ~= player and obj ~= _self.object then
+                                _self:punch_target(obj)
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+
+            if anim == "fly" and momentum > 0 then
+                _self:set_weighted_velocity(32 + momentum, look_dir)
+                anim = "dive"
+            end
+
+            if anim then
+                _self:animate(anim)
+            end
+        end
+
+        if view_point == 2 then
+            local goal_y = 0 - 60 * look_dir.y
+            local goal_z = -120 + 60 * math.abs(look_dir.y)
+            if _self._anim == "dive" then
+                local accel_offset = 60 + momentum
+                goal_y = 40 - accel_offset * look_dir.y
+                goal_z = -160 + accel_offset * math.abs(look_dir.y)
+            end
+            local offset = player:get_eye_offset()
+            if math.abs(goal_y - offset.y) > 0.1 or math.abs(goal_z - offset.z) > 0.1 then
+                local lerp_w = _self.dtime * 2
+                player:set_eye_offset({
+                    x = 0,
+                    y = offset.y + (goal_y - offset.y) * lerp_w,
+                    z = offset.z + (goal_z - offset.z) * lerp_w},
+                {x = 0, y = 0, z = 0})
+            end
+        else
+            local goal_y = 25
+            local goal_z = 10
+            if _self._anim == "fly" then
+                goal_y = goal_y + 15 * look_dir.y
+                goal_z = goal_z - 20 * look_dir.y
+            elseif _self._anim == "dive" then
+                local accel_offset = momentum * 0.5
+                goal_y = goal_y + accel_offset * look_dir.y
+                goal_z = goal_z - accel_offset * look_dir.y
+            end
+            local offset = player:get_eye_offset()
+            if math.abs(goal_y - offset.y) > 0.1 or math.abs(goal_z - offset.z) > 0.1 then
+                local lerp_w = _self.dtime * 4
+                player:set_eye_offset({
+                    x = 0,
+                    y = offset.y + (goal_y - offset.y) * lerp_w,
+                    z = offset.z + (goal_z - offset.z) * lerp_w},
+                {x = 0, y = 0, z = 0})
+            end
+        end
+
+        if control.sneak or player:get_player_name() ~= _self.owner then
+            waterdragon.detach_player(_self, player)
+            return true
+        end
+    end
+    self:set_utility(func)
+end)
 
 local requesting_passenger = {}
 
@@ -638,7 +841,92 @@ creatura.register_utility("waterdragon:mount", function(self)
 end)
 
 
+-- Helper function to find the nearest Scottish dragon
+local function find_nearest_scottish_dragon(player, radius)
+    local pos = player:get_pos()
+    local objects = minetest.get_objects_inside_radius(pos, radius)
+    local nearest_dragon = nil
+    local min_distance = radius
 
+    for _, obj in ipairs(objects) do
+        local entity = obj:get_luaentity()
+        if entity and entity.name == "waterdragon:scottish_dragon" then
+            local dragon_pos = obj:get_pos()
+            local distance = vector.distance(pos, dragon_pos)
+            if distance < min_distance then
+                nearest_dragon = entity
+                min_distance = distance
+            end
+        end
+    end
+
+    return nearest_dragon
+end
+
+-- Hover command
+minetest.register_chatcommand("hover", {
+    description = "Enable hover mode for the nearest Scottish dragon and start hover animation.",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found."
+        end
+
+        local dragon = player:get_attach()
+        if dragon and dragon:get_luaentity() and dragon:get_luaentity().name == "waterdragon:scottish_dragon" then
+            dragon = dragon:get_luaentity()
+        else
+            dragon = find_nearest_scottish_dragon(player, 10)  -- Search within 10 node radius
+        end
+
+        if not dragon then
+            return false, "No Scottish Dragons found nearby."
+        end
+
+        dragon.hover_enabled = true
+        dragon.no_remount = true  -- Prevent remounting
+
+        -- Start hover animation
+        dragon:animate("hover")
+		dragon:animate("hover")
+
+        -- Dismount the player if they're riding
+        if player:get_attach() and player:get_attach():get_luaentity() == dragon then
+            waterdragon.detach_player(dragon, player)
+        end
+
+        minetest.chat_send_player(name, "Hover mode enabled for the nearest Scottish dragon. It is now hovering and cannot be mounted.")
+        return true
+    end,
+})
+
+-- Stop hover command
+minetest.register_chatcommand("stop_hover", {
+    description = "Disable hover mode for the nearest Scottish dragon.",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            return false, "Player not found."
+        end
+
+        local dragon = find_nearest_scottish_dragon(player, 10)  -- Search within 10 node radius
+        if not dragon then
+            return false, "No Scottish Dragons found nearby."
+        end
+
+        dragon.hover_enabled = false
+        dragon.no_remount = false  -- Allow remounting again
+
+        -- Stop hover animation and return to default animation
+        dragon:animate("stand")  -- or another suitable default animation
+
+        minetest.chat_send_player(name, "Hover mode disabled for the nearest Scottish dragon. It can now be mounted.")
+        return true
+    end,
+})
+
+
+-- Scottish Dragon Mount Utility
 creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
     local is_landed = creatura.sensor_floor(self, 5, true) < 4
     local view_held = false
@@ -646,10 +934,10 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
     local momentum = 0
     local attack_cooldown = 0
     self:halt()
+    
     local func = function(_self)
         local player = _self.rider
-        if not player
-        or not player:get_look_horizontal() then
+        if not player or not player:get_look_horizontal() then
             return true
         end
 
@@ -697,7 +985,6 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         if not _self:get_action() then
-
             local anim
 
             if is_landed then
@@ -709,7 +996,6 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     anim = "walk"
                 end
                 if control.jump then
-                    
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
@@ -718,21 +1004,28 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 end
             else
                 _self:set_gravity(0)
-                anim = "hover"
-                if control.up then
-                    anim = "fly"
-                    _self:set_weighted_velocity(32, look_dir)
-                    if look_dir.y < -0.33 then
-                        if momentum < 28 then
-                            momentum = momentum + (_self.dtime * 20) * abs(look_dir.y)
-                        end
-                    elseif momentum > 0 then
-                        momentum = momentum - _self.dtime * 15
-                        if momentum < 0 then momentum = 0 end
-                    end
-                else
+                if _self.hover_enabled then
+                    anim = "hover"
                     _self:set_vertical_velocity(0)
                     _self:set_forward_velocity(0)
+                else
+                    anim = "hover"
+                    if control.up then
+                        anim = "fly"
+                        _self:set_weighted_velocity(32, look_dir)
+                        if look_dir.y < -0.33 then
+                            if momentum < 28 then
+                                momentum = momentum + (_self.dtime * 20) * math.abs(look_dir.y)
+                            end
+                        elseif momentum > 0 then
+                            momentum = momentum - _self.dtime * 15
+                            if momentum < 0 then momentum = 0 end
+                        end
+                    else
+                        momentum = math.max(0, momentum - _self.dtime * 10)
+                        _self:set_vertical_velocity(0)
+                        _self:set_forward_velocity(momentum)
+                    end
                 end
                 _self:tilt_to(look_yaw, 4)
                 if _self.touching_ground then
@@ -745,18 +1038,17 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     start_pos.y = start_pos.y + 1.5
                     local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))
                     
-                    -- Воспроизведение звука при каждой попытке атаки
                     local pos = _self.object:get_pos()
                     if pos then
                         minetest.sound_play("waterdragon_scottish_dragon_bite", {
                             pos = pos,
                             max_hear_distance = 10,
                             gain = 1.0,
-                        }, true)  -- true для надежного воспроизведения
+                        }, true)
                     end
 
                     anim = "fly_punch"
-                    attack_cooldown = 1  -- Устанавливаем кулдаун атаки
+                    attack_cooldown = 1
                     
                     local ray = minetest.raycast(start_pos, end_pos, true, false)
                     for pointed_thing in ray do
@@ -771,8 +1063,7 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 end
             end
 
-            if anim == "fly"
-            and momentum > 0 then
+            if anim == "fly" and momentum > 0 then
                 _self:set_weighted_velocity(32 + momentum, look_dir)
                 anim = "dive"
             end
@@ -786,15 +1077,14 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
 
         if view_point == 2 then
             local goal_y = 0 - 60 * look_dir.y
-            local goal_z = -120 + 60 * abs(look_dir.y)
+            local goal_z = -120 + 60 * math.abs(look_dir.y)
             if _self._anim == "dive" then
                 local accel_offset = 60 + momentum
                 goal_y = 40 - accel_offset * look_dir.y
-                goal_z = -160 + accel_offset * abs(look_dir.y)
+                goal_z = -160 + accel_offset * math.abs(look_dir.y)
             end
             local offset = player:get_eye_offset()
-            if abs(goal_y - offset.y) > 0.1
-            or abs(goal_z - offset.z) > 0.1 then
+            if math.abs(goal_y - offset.y) > 0.1 or math.abs(goal_z - offset.z) > 0.1 then
                 local lerp_w = _self.dtime * 2
                 player:set_eye_offset({
                     x = 0,
@@ -814,8 +1104,7 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 goal_z = goal_z - accel_offset * look_dir.y
             end
             local offset = player:get_eye_offset()
-            if abs(goal_y - offset.y) > 0.1
-            or abs(goal_z - offset.z) > 0.1 then
+            if math.abs(goal_y - offset.y) > 0.1 or math.abs(goal_z - offset.z) > 0.1 then
                 local lerp_w = _self.dtime * 4
                 player:set_eye_offset({
                     x = 0,
@@ -825,11 +1114,11 @@ creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
             end
         end
 
-        if control.sneak
-        or player:get_player_name() ~= _self.owner then
+        if control.sneak or player:get_player_name() ~= _self.owner then
             waterdragon.detach_player(_self, player)
             return true
         end
     end
     self:set_utility(func)
 end)
+
