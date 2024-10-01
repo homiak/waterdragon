@@ -302,7 +302,6 @@ modding.register_movement_method("waterdragon:fly_simple", function(self)
 	return func
 end)
 
--- Actions --
 
 -- Action tame by Scottii
 
@@ -341,8 +340,8 @@ local function toggle_taming_ability(name)
 end
 
 for color, hex in pairs(waterdragon.colors_pure_water) do
-    minetest.register_craftitem("waterdragon:scales_pure_water_dragon_" .. color, {
-        description = S("Pure Water Dragon Scales (" .. color .. ")"),
+    minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
+        description = S("Pure Water Dragon Scales"),
         inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
         on_use = function(itemstack, user)
             local name = user:get_player_name()
@@ -1114,7 +1113,7 @@ end)
 
 -- Attack
 
--- Вспомогательные функции
+
 local function vec_dist(a, b)
     local x, y, z = a.x - b.x, a.y - b.y, a.z - b.z
     return math.sqrt(x * x + y * y + z * z)
@@ -1137,7 +1136,7 @@ local function diff(a, b)
     return math.atan2(math.sin(b - a), math.cos(b - a))
 end
 
--- Функция для броска wing_horn
+
 local function throw_wing_horn(self, target)
     local pos = self.object:get_pos()
     if not pos then return end
@@ -1148,7 +1147,7 @@ local function throw_wing_horn(self, target)
     if obj then
         local ent = obj:get_luaentity()
         if ent then
-            ent.owner = self.object -- Сохраняем ссылку на создателя
+            ent.owner = self.object
         end
         obj:set_velocity({x = dir.x * 15, y = dir.y * 15, z = dir.z * 15})
         obj:set_acceleration({x = 0, y = -9.8, z = 0})
@@ -1170,24 +1169,24 @@ function waterdragon.is_target_flying(target)
         return false
     end
     
-    -- Проверяем несколько блоков вниз
+
     for i = 0, 4 do
         local check_pos = {x = pos.x, y = pos.y - i, z = pos.z}
         local node = minetest.get_node_or_nil(check_pos)
         if not node then
-            return false -- Если не можем получить информацию о блоке, считаем, что цель не летит
+            return false
         end
         
         local node_def = minetest.registered_nodes[node.name]
         if node_def and (node_def.walkable or (node_def.drawtype == "liquid" and node_def.liquidtype ~= "none")) then
-            return i > 1 -- Считаем, что цель летит, если твердый блок или жидкость находятся ниже, чем на 1 блок
+            return i > 1
         end
     end
     
-    return true -- Если не нашли твердых блоков или жидкости в пределах 5 блоков вниз, считаем, что цель летит
+    return true
 end
 
--- Регистрация сущности wing_horn
+
 minetest.register_entity("waterdragon:wing_horn", {
     initial_properties = {
         visual = "sprite",
@@ -1215,7 +1214,7 @@ minetest.register_entity("waterdragon:wing_horn", {
     end
 })
 
--- Основная функция атаки
+
 modding.register_utility("waterdragon:attack", function(self, target)
     local is_landed = true
     local init = false
