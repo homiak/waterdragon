@@ -55,7 +55,7 @@ end)
 -- Новая функция on_punch для шотландского дракона
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
 	-- Сохраняем оригинальное поведение
-	creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
 	-- Добавляем новое поведение
 	if self.hp > 0 and not self.rider then -- Убедимся, что дракон все еще жив
@@ -90,9 +90,9 @@ waterdragon.scottish_dragon_targets = {}
 minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_entities) do
 		local is_mobkit = (def.logic ~= nil or def.brainfuc ~= nil)
-		local is_creatura = def._creatura_mob
+		local is_modding = def._modding_mob
 		if is_mobkit
-			or is_creatura
+			or is_modding
 			or def._cmi_is_mob then
 			if name ~= "waterdragon:pure_water_dragon" then
 				table.insert(waterdragon.pure_water_dragon_targets, name)
@@ -158,7 +158,7 @@ end
 
 check_time()
 
-local moveable = creatura.is_pos_moveable
+local moveable = modding.is_pos_moveable
 
 local function is_target_flying(target)
 	if not target or not target:get_pos() then return end
@@ -167,8 +167,8 @@ local function is_target_flying(target)
 	local node = minetest.get_node(pos)
 	if not node then return false end
 	if minetest.get_item_group(node.name, "igniter") > 0
-		or creatura.get_node_def(node.name).drawtype == "liquid"
-		or creatura.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then
+		or modding.get_node_def(node.name).drawtype == "liquid"
+		or modding.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then
 		return false
 	end
 	local flying = true
@@ -178,7 +178,7 @@ local function is_target_flying(target)
 			y = pos.y - i,
 			z = pos.z
 		}
-		if creatura.get_node_def(fly_pos).walkable then
+		if modding.get_node_def(fly_pos).walkable then
 			flying = false
 			break
 		end
@@ -188,8 +188,8 @@ end
 
 local function shared_owner(obj1, obj2)
 	if not obj1 or not obj2 then return false end
-	obj1 = creatura.is_valid(obj1)
-	obj2 = creatura.is_valid(obj2)
+	obj1 = modding.is_valid(obj1)
+	obj2 = modding.is_valid(obj2)
 	if obj1
 		and obj2
 		and obj1:get_luaentity()
@@ -217,21 +217,21 @@ end
 
 local function find_target(self, list)
 	local owner = self.owner and minetest.get_player_by_name(self.owner)
-	local targets = creatura.get_nearby_players(self)
+	local targets = modding.get_nearby_players(self)
 	if #targets > 0 then -- If there are players nearby
 		local target = targets[random(#targets)]
 		local is_creative = target:is_player() and minetest.is_creative_enabled(target)
 		local is_owner = owner and target == owner
 		if is_creative or is_owner then targets = {} end
 	end
-	targets = (#targets < 1 and list and creatura.get_nearby_objects(self, list)) or targets
+	targets = (#targets < 1 and list and modding.get_nearby_objects(self, list)) or targets
 	if #targets < 1 then return end
 	return targets[random(#targets)]
 end
 
 -- Movement Methods --
 
-creatura.register_movement_method("waterdragon:fly_pathfind", function(self)
+modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 	local path = {}
 	local steer_to
 	local steer_timer = 0.01
@@ -244,7 +244,7 @@ creatura.register_movement_method("waterdragon:fly_pathfind", function(self)
 		if not pos then return end
 		steer_timer = (steer_timer > 0 and steer_timer - _self.dtime) or 0.25
 		if #path > 0 then steer_timer = 1 end
-		steer_to = (steer_timer <= 0 and creatura.get_context_steering(self, goal, 8)) or steer_to
+		steer_to = (steer_timer <= 0 and modding.get_context_steering(self, goal, 8)) or steer_to
 		-- Return true when goal is reached
 		if vec_dist(pos, goal) < wayp_threshold then
 			_self:halt()
@@ -254,7 +254,7 @@ creatura.register_movement_method("waterdragon:fly_pathfind", function(self)
 		local goal_dir = steer_to or vec_dir(pos, goal)
 		if steer_to then
 			if #path < 2 then
-				path = creatura.find_path(_self, pos, goal, _self.width, _self.height, 200, false, true) or {}
+				path = modding.find_path(_self, pos, goal, _self.width, _self.height, 200, false, true) or {}
 			end
 		end
 		if #path > 1 then
@@ -273,7 +273,7 @@ creatura.register_movement_method("waterdragon:fly_pathfind", function(self)
 	return func
 end)
 
-creatura.register_movement_method("waterdragon:fly_simple", function(self)
+modding.register_movement_method("waterdragon:fly_simple", function(self)
 	local steer_to
 	local steer_timer = 0.25
 	local width = self.width
@@ -290,7 +290,7 @@ creatura.register_movement_method("waterdragon:fly_simple", function(self)
 		end
 		-- Calculate Movement
 		steer_timer = (steer_timer > 0 and steer_timer - self.dtime) or 0.25
-		steer_to = (steer_timer <= 0 and creatura.get_context_steering(self, goal, 4)) or steer_to
+		steer_to = (steer_timer <= 0 and modding.get_context_steering(self, goal, 4)) or steer_to
 		local speed = abs(_self.speed or 2) * speed_factor or 0.5
 		local turn_rate = abs(_self.turn_rate or 7)
 		-- Apply Movement
@@ -456,7 +456,7 @@ function waterdragon.action_pursue(self, target, timeout, method, speed_factor, 
 			goal = tgt_pos
 		end
 		if timer <= 0
-			or _self:move_to(goal, method or "creatura:obstacle_avoidance", speed_factor or 0.5) then
+			or _self:move_to(goal, method or "modding:obstacle_avoidance", speed_factor or 0.5) then
 			_self:halt()
 			return true
 		end
@@ -666,7 +666,7 @@ function waterdragon.action_slam(self)
 				if tgt_pos then
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
-					if (creatura.is_alive(ent)
+					if (modding.is_alive(ent)
 							and not ent._ignore)
 						or is_player then
 						local dir = vec_dir(pos, tgt_pos)
@@ -730,7 +730,7 @@ function waterdragon.action_repel(self)
 				if tgt_pos then
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
-					if (creatura.is_alive(ent)
+					if (modding.is_alive(ent)
 							and not ent._ignore)
 						or is_player then
 						local dir = vec_dir(pos, tgt_pos)
@@ -776,7 +776,7 @@ function waterdragon.action_punch(self)
 				if tgt_pos then
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
-					if (creatura.is_alive(ent)
+					if (modding.is_alive(ent)
 							and not ent._ignore)
 						or is_player then
 						_self:punch_target(object, _self.damage)
@@ -805,11 +805,11 @@ end
 
 -- Sleep
 
-creatura.register_utility("waterdragon:sleep", function(self)
+modding.register_utility("waterdragon:sleep", function(self)
 	local function func(_self)
 		if not _self:get_action() then
 			_self.object:set_yaw(_self.object:get_yaw())
-			creatura.action_idle(_self, 3, "sleep")
+			modding.action_idle(_self, 3, "sleep")
 		end
 	end
 	self:set_utility(func)
@@ -817,7 +817,7 @@ end)
 
 -- Wander
 
-creatura.register_utility("waterdragon:wander", function(self)
+modding.register_utility("waterdragon:wander", function(self)
 	local center = self.object:get_pos()
 	if not center then return end
 	local function func(_self)
@@ -826,19 +826,19 @@ creatura.register_utility("waterdragon:wander", function(self)
 			if move then
 				local pos2 = _self:get_wander_pos(3, 6)
 				if vec_dist(pos2, center) > 16 then
-					creatura.action_idle(_self, random(2, 5))
+					modding.action_idle(_self, random(2, 5))
 				else
-					creatura.action_move(_self, pos2, 4, "creatura:obstacle_avoidance", 0.5)
+					modding.action_move(_self, pos2, 4, "modding:obstacle_avoidance", 0.5)
 				end
 			else
-				creatura.action_idle(_self, random(2, 5))
+				modding.action_idle(_self, random(2, 5))
 			end
 		end
 	end
 	self:set_utility(func)
 end)
 
-creatura.register_utility("waterdragon:die", function(self)
+modding.register_utility("waterdragon:die", function(self)
 	local timer = 1.5
 	local init = false
 	local die = "waterdragon_death"
@@ -850,7 +850,7 @@ creatura.register_utility("waterdragon:die", function(self)
 				max_hear_distance = 20,
 				loop = false
 			})
-			creatura.action_fallover(_self)
+			modding.action_fallover(_self)
 			init = true
 		end
 		timer = timer - _self.dtime
@@ -879,7 +879,7 @@ creatura.register_utility("waterdragon:die", function(self)
 				},
 				glow = 1
 			})
-			creatura.drop_items(_self)
+			modding.drop_items(_self)
 			_self.object:remove()
 		end
 	end
@@ -888,7 +888,7 @@ end)
 
 -- Wander Flight
 
-creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
+modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 	if not self.fly_allowed then
 		-- If the Water Dragon is not allowed to fly
 		return
@@ -916,7 +916,7 @@ creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 		if not pos then return end
 		height_timer = height_timer - self.dtime
 		if height_timer <= 0 then
-			local dist2floor = creatura.sensor_floor(_self, 10, true)
+			local dist2floor = modding.sensor_floor(_self, 10, true)
 			center.y = center.y + (10 - dist2floor)
 			height_timer = 4
 		end
@@ -927,17 +927,17 @@ creatura.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 		if not _self:get_action() then
 			local move_dir = (vec_dist(pos, center) > 56 * speed_x and vec_dir(pos, center)) or nil
 			local pos2 = _self:get_wander_pos_3d(ceil(8 * speed_x), ceil(12 * speed_x), move_dir)
-			creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
+			modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
 		end
 	end
 	self:set_utility(func)
 end)
 
-creatura.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
+modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 	local center = self.nest_position or self.object:get_pos()
 	if not center then return end
 	local center_fly = { x = center.x, y = center.y + 12, z = center.z }
-	local dist2floor = creatura.sensor_floor(self, 10, true)
+	local dist2floor = modding.sensor_floor(self, 10, true)
 	center.y = center.y - dist2floor
 	local is_landed = true
 	local landing = (dist2floor > 4 and true) or false
@@ -966,9 +966,9 @@ creatura.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 					waterdragon.action_land(self)
 					landing = false
 				else
-					dist2floor = creatura.sensor_floor(_self, 10, true)
+					dist2floor = modding.sensor_floor(_self, 10, true)
 					pos2.y = pos2.y - dist2floor
-					creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
+					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
 					_self:animate("fly")
 				end
 				return
@@ -978,23 +978,23 @@ creatura.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 				if random(5) < 2 then
 					local pos2 = _self:get_wander_pos(3, 6)
 					if vec_dist(pos2, center) > 16 then
-						creatura.action_idle(_self, random(2, 5))
+						modding.action_idle(_self, random(2, 5))
 					else
-						creatura.action_move(_self, pos2, 4, "creatura:obstacle_avoidance", 0.5)
+						modding.action_move(_self, pos2, 4, "modding:obstacle_avoidance", 0.5)
 					end
 				else
-					creatura.action_idle(_self, random(2, 5))
+					modding.action_idle(_self, random(2, 5))
 				end
 			else
 				local pos2 = _self:get_wander_pos_3d(ceil(8 * speed_x), ceil(12 * speed_x), vec_dir(pos, center_fly))
-				creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
+				modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
 			end
 		end
 	end
 	self:set_utility(func)
 end)
 
-creatura.register_utility("waterdragon:fly_to_land", function(self)
+modding.register_utility("waterdragon:fly_to_land", function(self)
 	local landed = false
 	local function func(_self)
 		if not _self:get_action() then
@@ -1005,9 +1005,9 @@ creatura.register_utility("waterdragon:fly_to_land", function(self)
 			else
 				local pos2 = _self:get_wander_pos_3d(3, 6)
 				if pos2 then
-					local dist2floor = creatura.sensor_floor(_self, 10, true)
+					local dist2floor = modding.sensor_floor(_self, 10, true)
 					pos2.y = pos2.y - dist2floor
-					creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
+					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
 					_self:animate("fly")
 				end
 			end
@@ -1018,7 +1018,7 @@ end)
 
 -- Scottish Dragon Breaking
 
-creatura.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
+modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
 	local center = self.object:get_pos()
 	if not center then return end
 	local taming = 0
@@ -1034,7 +1034,7 @@ creatura.register_utility("waterdragon:scottish_dragon_breaking", function(self,
 		-- Update Center
 		height_tick = height_tick - 1
 		if height_tick <= 0 then
-			local dist2floor = creatura.sensor_floor(_self, 10, true)
+			local dist2floor = modding.sensor_floor(_self, 10, true)
 			center.y = center.y + (10 - dist2floor)
 			height_tick = 30
 		end
@@ -1216,7 +1216,7 @@ minetest.register_entity("waterdragon:wing_horn", {
 })
 
 -- Основная функция атаки
-creatura.register_utility("waterdragon:attack", function(self, target)
+modding.register_utility("waterdragon:attack", function(self, target)
     local is_landed = true
     local init = false
     local takeoff_init = false
@@ -1254,7 +1254,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
         if not _self:get_action() then
             -- Решение об атаке с земли или воздуха
             if not init then
-                local dist2floor = creatura.sensor_floor(_self, 7, true)
+                local dist2floor = modding.sensor_floor(_self, 7, true)
                 if dist2floor > 6 or waterdragon.is_target_flying(target) then
                     is_landed = false
                 end
@@ -1274,7 +1274,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
                     if waterdragon.is_target_flying(target) then
                         pos2 = {x = pos.x, y = pos.y - 7, z = pos.z}
                     end
-                    creatura.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
+                    modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
                 else
                     waterdragon.action_land(_self)
                     land_init = false
@@ -1316,10 +1316,10 @@ creatura.register_utility("waterdragon:attack", function(self, target)
                 end
             else
                 if is_landed then
-                    waterdragon.action_pursue(_self, target, 2, "creatura:obstacle_avoidance", 0.75, "walk_slow")
+                    waterdragon.action_pursue(_self, target, 2, "modding:obstacle_avoidance", 0.75, "walk_slow")
                 else
                     tgt_pos.y = tgt_pos.y + 14
-                    creatura.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
+                    modding.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
                 end
             end
         end
@@ -1328,7 +1328,7 @@ creatura.register_utility("waterdragon:attack", function(self, target)
 end)
 
 
-creatura.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
+modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
 	local hidden_timer = 1
 	local attack_init = false
 	local function func(_self)
@@ -1355,7 +1355,7 @@ creatura.register_utility("waterdragon:scottish_dragon_attack", function(self, t
 			if attack_init then return true end
 			local dist = vec_dist(pos, tgt_pos)
 			if dist > 14 then
-				creatura.action_move(_self, tgt_pos, 3, "waterdragon:fly_simple", 0.5, "fly")
+				modding.action_move(_self, tgt_pos, 3, "waterdragon:fly_simple", 0.5, "fly")
 			else
 				waterdragon.action_flight_attack(_self, target, 12)
 			end
@@ -1366,7 +1366,7 @@ end)
 
 -- Tamed Behavior --
 
-creatura.register_utility("waterdragon:stay", function(self)
+modding.register_utility("waterdragon:stay", function(self)
 	local function func(_self)
 		local order = _self.order
 		if not order
@@ -1374,13 +1374,13 @@ creatura.register_utility("waterdragon:stay", function(self)
 			return true
 		end
 		if not _self:get_action() then
-			creatura.action_idle(_self, 2, "stand")
+			modding.action_idle(_self, 2, "stand")
 		end
 	end
 	self:set_utility(func)
 end)
 
-creatura.register_utility("waterdragon:follow_player", function(self, player)
+modding.register_utility("waterdragon:follow_player", function(self, player)
 	local function func(_self)
 		local order = _self.order
 		if not order
@@ -1399,20 +1399,20 @@ creatura.register_utility("waterdragon:follow_player", function(self, player)
 			return true
 		end
 		local dist = vec_dist(pos, tgt_pos)
-		local dist_to_ground = creatura.sensor_floor(_self, 8, true)
+		local dist_to_ground = modding.sensor_floor(_self, 8, true)
 		if not _self:get_action() then
 			if dist < clamp(8 * scale, 2, 12) then
 				if dist_to_ground > 2 then
 					waterdragon.action_hover(_self, 2, "hover")
 				else
-					creatura.action_idle(_self, 2, "stand")
+					modding.action_idle(_self, 2, "stand")
 				end
 			else
 				local height_diff = tgt_pos.y - pos.y
 				if ((height_diff > 8 or dist_to_ground > 2) and self.fly_allowed) then
-					creatura.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
+					modding.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
 				else
-					creatura.action_move(_self, tgt_pos, 3, "creatura:context_based_steering", 0.5, "walk")
+					modding.action_move(_self, tgt_pos, 3, "modding:context_based_steering", 0.5, "walk")
 				end
 			end
 		end
@@ -1452,7 +1452,7 @@ waterdragon.dragon_behavior = {
 				end
 			end
 			local scale = self.growth_scale
-			local dist2floor = creatura.sensor_floor(self, 3, true)
+			local dist2floor = modding.sensor_floor(self, 3, true)
 			if not self.owner
 				and dist2floor < 3
 				and target:get_pos()
@@ -1650,9 +1650,9 @@ waterdragon.scottish_dragon_behavior = {
 		utility = "waterdragon:fly_to_land",
 		get_score = function(self)
 			local util = self:get_utility() or ""
-			local attacking_tgt = self._target and creatura.is_alive(self._target)
+			local attacking_tgt = self._target and modding.is_alive(self._target)
 			if attacking_tgt or util == "waterdragon:scottish_dragon_breaking" then return 0 end
-			local dist2floor = creatura.sensor_floor(self, 5, true)
+			local dist2floor = modding.sensor_floor(self, 5, true)
 			if dist2floor > 4 then
 				local is_landed = self.is_landed or self.flight_stamina < 15
 				local is_grounded = (self.owner and not self.fly_allowed) or self.order == "stay"

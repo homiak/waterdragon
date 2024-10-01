@@ -286,7 +286,7 @@ for color in pairs(waterdragon.colors_pure_water) do
 
 	table.insert(dragon_eggs, "waterdragon:egg_pure_water")
 
-	creatura.register_mob("waterdragon:egg_pure_water_dragon", {
+	modding.register_mob("waterdragon:egg_pure_water_dragon", {
 		-- Stats
 		max_health = 30,
 		armor_groups = { immortal = 1 },
@@ -327,7 +327,7 @@ for color in pairs(waterdragon.colors_pure_water) do
 					end
 				end
 			end
-			local name = creatura.get_node_def(pos).name
+			local name = modding.get_node_def(pos).name
 			local progress = self.progress or 0
 			if minetest.get_item_group(name, "water") > 0
 				or (progress > 0 and name == rare_water_block) then
@@ -427,7 +427,7 @@ for color in pairs(waterdragon.colors_rare_water) do
 
 	table.insert(dragon_eggs, "waterdragon:egg_rare_water")
 
-	creatura.register_mob("waterdragon:egg_rare_water_dragon", {
+	modding.register_mob("waterdragon:egg_rare_water_dragon", {
 		-- Stats
 		max_health = 30,
 		armor_groups = { immortal = 1 },
@@ -468,7 +468,7 @@ for color in pairs(waterdragon.colors_rare_water) do
 					end
 				end
 			end
-			local name = creatura.get_node_def(pos).name
+			local name = modding.get_node_def(pos).name
 			local progress = self.progress or 0
 			if minetest.get_item_group(name, "water") > 0
 				or (progress > 0 and name == rare_water_block) then
@@ -624,7 +624,7 @@ local function dragon_horn_place(itemstack, player, pointed_thing)
 	local meta = itemstack:get_meta()
 	local pos = pointed_thing.above
 	local under = pointed_thing.type == "node" and pointed_thing.under
-	local node_def = creatura.get_node_def(under)
+	local node_def = modding.get_node_def(under)
 	if node_def.on_rightclick then
 		return node_def.on_rightclick(under, minetest.get_node(under), player, itemstack)
 	end

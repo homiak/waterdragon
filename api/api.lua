@@ -244,7 +244,7 @@ local function get_pointed_mob(a, b)
 		else
 			pos = a
 		end
-		if creatura.get_node_def(pos).walkable then
+		if modding.get_node_def(pos).walkable then
 			break
 		end
 		local objects = minetest.get_objects_in_area(vec_sub(pos, 6), vec_add(pos, 6))
@@ -436,7 +436,7 @@ end
 waterdragon.generate_texture = generate_texture
 
 function waterdragon.drop_items(self)
-	if not creatura.is_valid(self)
+	if not modding.is_valid(self)
 		or not self.object:get_pos() then
 		return
 	end
@@ -594,7 +594,7 @@ function waterdragon.head_tracking(self)
 		self:move_head(tyaw, dir.y)
 		return
 	elseif self:timer(random(4, 6)) then
-		local players = creatura.get_nearby_players(self, 12 * scale)
+		local players = modding.get_nearby_players(self, 12 * scale)
 		self.head_tracking = #players > 0 and players[random(#players)]
 	end
 	self:move_head(yaw, 0)
@@ -663,7 +663,7 @@ minetest.register_entity("waterdragon:dragon_pure_water", {
 			return
 		end
 		local child_pos = self.child:get_pos()
-		if creatura.get_node_def(child_pos).drawtype == "liquid" then
+		if modding.get_node_def(child_pos).drawtype == "liquid" then
 			self.object:remove()
 			return
 		end
@@ -684,7 +684,7 @@ minetest.register_entity("waterdragon:dragon_pure_water", {
 				self.child:punch(self.object, 0, { fleshy = 2 })
 			end
 			if ent
-				and ent._creatura_mob
+				and ent._modding_mob
 				and ((ent and ent.hp) or 0) <= 0
 				and ent.drops then
 				if #ent.drops
@@ -739,7 +739,7 @@ local function damage_objects(self, pos, radius)
 			or (self.passenger and object == self.passenger) then
 			damage = false
 		elseif ent then
-			local is_mob = ent.logic ~= nil or ent._creatura_mob or ent._cmi_is_mob
+			local is_mob = ent.logic ~= nil or ent._modding_mob or ent._cmi_is_mob
 			damage = is_mob and (ent.hp or ent.health or 0) > 0
 		end
 		if damage then
@@ -946,7 +946,7 @@ function waterdragon.pure_water_breath(self, pos2)
 			if random(5) < 2 then
 				damage_objects(self, pure_water_pos, spread + 2)
 			end
-			local def = creatura.get_node_def(pure_water_pos)
+			local def = modding.get_node_def(pure_water_pos)
 			if def.walkable
 				or def.drawtype == "liquid" then
 				breath_end = pure_water_pos
@@ -1037,12 +1037,12 @@ function waterdragon.rare_water_breath(self, pos2)
 			if random(5) < 2 then
 				damage_objects(self, pure_water_pos, spread + 2)
 			end
-			local def = creatura.get_node_def(pure_water_pos)
+			local def = modding.get_node_def(pure_water_pos)
 			if def.walkable then
 				breath_end = pure_water_pos
 				break
 			end
-			local def = creatura.get_node_def(rare_water_pos)
+			local def = modding.get_node_def(rare_water_pos)
 			if def.walkable then
 				breath_end = rare_water_pos
 				break
@@ -1066,7 +1066,7 @@ end
 waterdragon.wtd_api = {
 	action_flight_to_land = function(self)
 		if not self:get_action() then
-			creatura.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
+			modding.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
 		end
 		if self.touching_ground then
 			waterdragon.action_land(self)
@@ -1892,7 +1892,7 @@ minetest.register_on_mods_loaded(function()
 		if (minetest.registered_entities[name].logic
 				or minetest.registered_entities[name].brainfunc)
 			or minetest.registered_entities[name]._cmi_is_mob
-			or minetest.registered_entities[name]._creatura_mob then
+			or minetest.registered_entities[name]._modding_mob then
 			local old_punch = def.on_punch
 			if not old_punch then
 				old_punch = function() end

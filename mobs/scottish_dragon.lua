@@ -7,7 +7,7 @@ local scottish_spawn_rate = tonumber(minetest.settings:get("scottish_dragon_spaw
 
 local colors = {"blue"}
 
-creatura.register_mob("waterdragon:scottish_dragon", {
+modding.register_mob("waterdragon:scottish_dragon", {
 	-- Stats
 	max_health = 700,
 	max_hunger = 500,
@@ -188,7 +188,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 		if time_from_last_punch < 0.66
 		or (self.passenger and puncher == self.passenger)
 		or (self.rider and puncher == self.rider) then return end
-		creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
 		end
@@ -201,7 +201,7 @@ creatura.register_mob("waterdragon:scottish_dragon", {
 	end
 })
 
-creatura.register_spawn_item("waterdragon:scottish_dragon", {
+modding.register_spawn_item("waterdragon:scottish_dragon", {
 	description = S("Creative Scottish Dragon Egg"),
 	inventory_image = "waterdragon_creative_egg_scottish.png"
 })
@@ -218,7 +218,7 @@ minetest.register_on_mods_loaded(function()
 	end
 end)
 
-creatura.register_mob_spawn("waterdragon:scottish_dragon", {
+modding.register_mob_spawn("waterdragon:scottish_dragon", {
 	chance = scottish_spawn_rate,
 	min_group = 1,
 	max_group = 2,

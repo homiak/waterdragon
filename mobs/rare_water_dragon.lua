@@ -17,7 +17,7 @@ end
 
 local colors = {"rare_water"}
 
-creatura.register_mob("waterdragon:rare_water_dragon", {
+modding.register_mob("waterdragon:rare_water_dragon", {
 	-- Stats
 	max_health = 1600,
 	max_hunger = 500,
@@ -222,7 +222,7 @@ creatura.register_mob("waterdragon:rare_water_dragon", {
 		if time_from_last_punch < 0.66
 		or (self.passenger and puncher == self.passenger)
 		or (self.rider and puncher == self.rider) then return end
-		creatura.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
 		end
@@ -261,7 +261,7 @@ creatura.register_mob("waterdragon:rare_water_dragon", {
 	end
 })
 
-creatura.register_spawn_item("waterdragon:rare_water_dragon", {
+modding.register_spawn_item("waterdragon:rare_water_dragon", {
 	description = S("Creative Rare Water Dragon Egg"),
 	inventory_image = "waterdragon_creative_egg_rare_water.png"
 })

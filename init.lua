@@ -160,7 +160,7 @@ minetest.register_abm({
     action = function(pos)
         local meta = minetest.get_meta(pos)
         local mob = meta:get_string("name")
-        minetest.set_node(pos, {name = "creatura:spawn_node"})
+        minetest.set_node(pos, {name = "modding:spawn_node"})
         if mob ~= "" then
             meta:set_string("mob", mob)
         end

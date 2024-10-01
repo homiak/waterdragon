@@ -3,7 +3,7 @@ max_line_length = 120
 globals = {
 	"minetest",
 	"VoxelArea",
-	"creatura",
+	"modding",
 	"waterdragon",
 	"default",
 	"stairs",

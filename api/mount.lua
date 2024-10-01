@@ -438,8 +438,8 @@ end
 -- Behavior --
 --------------
 
-creatura.register_utility("waterdragon:mount", function(self)
-    local is_landed = creatura.sensor_floor(self, 5, true) < 4
+modding.register_utility("waterdragon:mount", function(self)
+    local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 3
     local first_person_height = 45
@@ -639,8 +639,8 @@ end)
 
 
 
-creatura.register_utility("waterdragon:scottish_dragon_mount", function(self)
-    local is_landed = creatura.sensor_floor(self, 5, true) < 4
+modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
+    local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 2
     local momentum = 0
