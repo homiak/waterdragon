@@ -167,14 +167,40 @@ local sin = math.sin
 local sqrt = math.sqrt
 local cos = math.cos
 local rad = math.rad
-local function diff(a, b) -- Get difference between 2 angles
-	return atan2(sin(b - a), cos(b - a))
+local pi = math.pi
+local atan2 = math.atan2
+local sin = math.sin
+local cos = math.cos
+
+local function diff(a, b)
+    -- Проверяем аргументы на nil и на то, что они числа
+    if type(a) ~= "number" or type(b) ~= "number" then
+        minetest.log("error", "diff called with invalid argument(s): a=" .. tostring(a) .. ", b=" .. tostring(b))
+        return 0  -- или другое подходящее значение по умолчанию
+    end
+
+    return atan2(sin(b - a), cos(b - a))
 end
 
 local function interp_angle(a, b, w)
-	local cs = (1 - w) * cos(a) + w * cos(b)
-	local sn = (1 - w) * sin(a) + w * sin(b)
-	return atan2(sn, cs)
+    -- Проверяем все аргументы на nil
+    if a == nil or b == nil or w == nil then
+        return 0  -- или другое подходящее значение по умолчанию
+    end
+
+    -- Проверяем, что a и b - числа
+    if type(a) ~= "number" or type(b) ~= "number" then
+        return 0  -- или другое подходящее значение по умолчанию
+    end
+
+    -- Проверяем, что w - число и находится в диапазоне [0, 1]
+    if type(w) ~= "number" or w < 0 or w > 1 then
+        return 0  -- или другое подходящее значение по умолчанию
+    end
+
+    local cs = (1 - w) * cos(a) + w * cos(b)
+    local sn = (1 - w) * sin(a) + w * sin(b)
+    return atan2(sn, cs)
 end
 
 local function clamp(val, _min, _max)
