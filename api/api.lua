@@ -2221,11 +2221,28 @@ end
 
 -- Scottish Dragon
 
+-- Добавьте эту функцию где-нибудь в области видимости waterdragon
+function waterdragon.scottish_dragon_break_block(self, pos)
+    if not minetest.settings:get_bool("water_dragon_terrain_destruction", true) then
+        return
+    end
+
+    local node = minetest.get_node(pos)
+    local node_def = minetest.registered_nodes[node.name]
+
+    if node_def and node_def.groups and 
+       (node_def.groups.cracky or node_def.groups.crumbly or node_def.groups.snappy) and
+       not node_def.groups.unbreakable and
+       (not node_def.groups.level or node_def.groups.level < 3) then
+        minetest.remove_node(pos)
+    end
+end
+
+
 function waterdragon.scottish_dragon_step(self, dtime)
 	-- Animation Tracking
 	local current_anim = self._anim
 	local is_flying = current_anim and (current_anim == "fly" or current_anim == "dive")
-	--local is_idle = current_anim and (current_anim == "stand" or current_anim == "hover")
 	if current_anim then
 		local aparms = self.animations[current_anim]
 		if self.anim_frame ~= -1 then
@@ -2242,6 +2259,26 @@ function waterdragon.scottish_dragon_step(self, dtime)
 	self:open_jaw()
 	self:move_tail()
 	waterdragon.rotate_to_pitch(self, is_flying)
+	-- Breaking blocks
+	if self._anim == "fly" or self._anim == "dive" then
+        local pos = self.object:get_pos()
+        local velocity = self.object:get_velocity()
+        
+        if velocity and vector.length(velocity) > 5 then
+            local yaw = self.object:get_yaw()
+            local dir = minetest.yaw_to_dir(yaw)
+            local front_pos = vector.add(pos, vector.multiply(dir, 2))
+            
+            for y = -1, 1 do
+                for x = -1, 1 do
+                    for z = -1, 1 do
+                        local check_pos = vector.add(front_pos, {x=x, y=y, z=z})
+                        waterdragon.scottish_dragon_break_block(self, check_pos)
+                    end
+                end
+            end
+        end
+    end
 	-- Timers
 	if self:timer(1) then
 		if random(16) < 2 then
@@ -2297,7 +2334,6 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
     if self:feed(clicker) then
         return
     end
-    
     local item_name = clicker:get_wielded_item():get_name() or ""
     if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
         if clicker:get_player_control().sneak then
