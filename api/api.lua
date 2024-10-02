@@ -175,7 +175,6 @@ local cos = math.cos
 local function diff(a, b)
     -- Проверяем аргументы на nil и на то, что они числа
     if type(a) ~= "number" or type(b) ~= "number" then
-        minetest.log("error", "diff called with invalid argument(s): a=" .. tostring(a) .. ", b=" .. tostring(b))
         return 0  -- или другое подходящее значение по умолчанию
     end
 
