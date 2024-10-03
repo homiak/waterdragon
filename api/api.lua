@@ -2654,4 +2654,3 @@ function scottish_dragon_mount_behavior(self)
     end
     self:set_utility(func)
 end
-

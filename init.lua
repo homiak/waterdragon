@@ -111,6 +111,7 @@ dofile(path.."/mobs/pure_water_dragon.lua")
 dofile(path.."/mobs/scottish_dragon.lua")
 dofile(path.."/nodes.lua")
 dofile(path.."/craftitems.lua")
+dofile(path.."/wtd_armour.lua")
 dofile(path.."/api/book.lua")
 
 if minetest.get_modpath("3d_armor") then
