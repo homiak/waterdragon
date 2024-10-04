@@ -141,7 +141,7 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
 end
 
 waterdragon.register_mob_armour("scottish", {
-    description = "Scottish Dragon Armour",
+    description = S("Scottish Dragon Armour"),
     inventory_image = "waterdragon_scottish_armour_inv.png",
     texture = "waterdragon_scottish_armour.png",
     mob_name = "waterdragon:scottish_dragon",
@@ -158,7 +158,7 @@ minetest.register_craft({
 })
 
 waterdragon.register_mob_armour("pure_water", {
-    description = "Pure Water Dragon Armour",
+    description = S("Pure Water Dragon Armour"),
     inventory_image = "waterdragon_pure_water_armour_inv.png",
     texture = "waterdragon_pure_water_armour.png",
     mob_name = "waterdragon:pure_water_dragon",
@@ -175,7 +175,7 @@ minetest.register_craft({
 })
 
 waterdragon.register_mob_armour("rare_water", {
-    description = "Rare Water Dragon Armour",
+    description = S("Rare Water Dragon Armour"),
     inventory_image = "waterdragon_rare_water_armour_inv.png",
     texture = "waterdragon_rare_water_armour.png",
     mob_name = "waterdragon:rare_water_dragon",

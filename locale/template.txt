@@ -122,3 +122,6 @@ Your Water Dragon has been teleported to you!=
 Set Name=
 Customize=
 
+Scottish Dragon Armour=
+Rare Water Dragon Armour=
+Pure Water Dragon Armour=
