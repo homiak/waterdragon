@@ -2,12 +2,17 @@
 
 waterdragon = waterdragon or {}
 
-waterdragon.register_mob_armour = function(name, def)
+waterdragon.register_mob_armour = function(name, def, staticdata, self)
     local itemname = "waterdragon:armour_" .. name
+
+
+
+    -- Ensure protection level is within valid range
+    def.protection = math.max(1, math.min(10, def.protection or 1))
 
     -- Register armour item
     minetest.register_craftitem(itemname, {
-        description = def.description or ("Water Dragon Armour: " .. name),
+        description = def.description or ("Water Dragon Armour: " .. name .. " (Protection: " .. def.protection .. ")"),
         inventory_image = def.inventory_image,
         groups = {water_dragon_armour = 1},
         
@@ -16,7 +21,7 @@ waterdragon.register_mob_armour = function(name, def)
                 local obj = pointed_thing.ref
                 local ent = obj:get_luaentity()
                 if ent and ent.name == def.mob_name then
-                    ent.armour = name
+                    ent.armour = {name = name, protection = def.protection}
                     local props = obj:get_properties()
                     local new_textures = table.copy(props.textures)
                     new_textures[1] = def.texture .. "^" .. new_textures[1]
@@ -28,43 +33,10 @@ waterdragon.register_mob_armour = function(name, def)
             end
         end
     })
-
-    -- Register command for setting armour
-    minetest.register_chatcommand("set_wtd_armour", {
-        params = "",
-        description = "Sets armour on the nearest Water Dragon",
-        func = function(name, param)
-            local player = minetest.get_player_by_name(name)
-            if not player then return false, "Player not found" end
-
-            local pos = player:get_pos()
-            local radius = 20
-            local objects = minetest.get_objects_inside_radius(pos, radius)
-            
-            for _, obj in ipairs(objects) do
-                local ent = obj:get_luaentity()
-                if ent and ent.name == def.mob_name then
-                    local stack = player:get_wielded_item()
-                    if stack:get_name() == itemname then
-                        ent.armour = name
-                        local props = obj:get_properties()
-                        local new_textures = table.copy(props.textures)
-                        new_textures[1] = def.texture .. "^" .. new_textures[1]
-                        props.textures = new_textures
-                        obj:set_properties(props)
-                        stack:take_item()
-                        player:set_wielded_item(stack)
-                        return true, "Armour successfully set on " .. def.mob_name
-                    end
-                end
-            end
-            
-            return false, "No suitable Water Dragons found nearby or no suitable armour in hand"
-        end,
-    })
+  
 
     -- Register command for removing armour
-    minetest.register_chatcommand("remove_wtd_armour", {
+    minetest.register_chatcommand("remove_armour", {
         params = "",
         description = "Removes armour from the nearest Water Dragon",
         func = function(name, param)
@@ -83,6 +55,7 @@ waterdragon.register_mob_armour = function(name, def)
                     new_textures[1] = new_textures[1]:gsub("^" .. def.texture .. "%^", "")
                     props.textures = new_textures
                     obj:set_properties(props)
+                    local removed_armour = ent.armour
                     ent.armour = nil
 
                     -- Create and add the armour item to player's inventory
@@ -90,10 +63,10 @@ waterdragon.register_mob_armour = function(name, def)
                     local inv = player:get_inventory()
                     if inv:room_for_item("main", armour_item) then
                         inv:add_item("main", armour_item)
-                        return true, "Armour successfully removed from " .. def.mob_name .. " and added to your inventory"
+                        return true, "Armour successfully removed from " .. def.mob_name .. " (Protection was: " .. removed_armour.protection .. ") and added to your inventory"
                     else
                         minetest.add_item(player:get_pos(), armour_item)
-                        return true, "Armour successfully removed from " .. def.mob_name .. " and dropped near you"
+                        return true, "Armour successfully removed from " .. def.mob_name .. " (Protection was: " .. removed_armour.protection .. ") and dropped near you"
                     end
                 end
             end
@@ -101,11 +74,39 @@ waterdragon.register_mob_armour = function(name, def)
             return false, "No Water Dragons with armour found nearby"
         end,
     })
+
+    -- Register command for checking armour
+    minetest.register_chatcommand("check_wtd_armour", {
+        params = "",
+        description = "Checks armour on the nearest Water Dragon",
+        func = function(name, param)
+            local player = minetest.get_player_by_name(name)
+            if not player then return false, "Player not found" end
+
+            local pos = player:get_pos()
+            local radius = 20
+            local objects = minetest.get_objects_inside_radius(pos, radius)
+            
+            for _, obj in ipairs(objects) do
+                local ent = obj:get_luaentity()
+                if ent and ent.name == def.mob_name then
+                    if ent.armour then
+                        return true, def.mob_name .. " is wearing " .. ent.armour.name .. " armour (Protection: " .. ent.armour.protection .. ")"
+                    else
+                        return true, def.mob_name .. " is not wearing any armour"
+                    end
+                end
+            end
+            
+            return false, "No Water Dragons found nearby"
+        end,
+    })
 end
 
 waterdragon.register_mob_armour("scottish", {
-    description = "Scottish Armour for Water Dragon",
+    description = "Scottish Dragon Armour",
     inventory_image = "waterdragon_scottish_armour_inv.png",
     texture = "waterdragon_scottish_armour.png",
-    mob_name = "waterdragon:scottish_dragon"
+    mob_name = "waterdragon:scottish_dragon",
+    protection = 6  -- Protection level from 1 to 10
 })
