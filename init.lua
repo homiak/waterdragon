@@ -150,7 +150,10 @@ minetest.register_entity("waterdragon:pure_water_eyes", {
 })
 
 minetest.register_node("waterdragon:spawn_node", {
-    drawtype = "airlike"
+    drawtype = "airlike",
+    pointable = false,
+    walkable = false,
+    diggable = false
 })
 
 minetest.register_abm({
