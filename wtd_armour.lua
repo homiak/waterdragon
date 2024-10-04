@@ -75,6 +75,41 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
         end,
     })
 
+    minetest.register_chatcommand("set_armour", {
+        params = "",
+        description = "Sets armour on the nearest Water Dragon",
+        func = function(name, param)
+            local player = minetest.get_player_by_name(name)
+            if not player then return false, "Player not found" end
+
+            local pos = player:get_pos()
+            local radius = 20
+            local objects = minetest.get_objects_inside_radius(pos, radius)
+            
+            for _, obj in ipairs(objects) do
+                local ent = obj:get_luaentity()
+                if ent and ent.name == def.mob_name then
+                    local stack = player:get_wielded_item()
+                    if stack:get_name() == itemname then
+                        ent.armour = {name = name, protection = def.protection}
+                        local props = obj:get_properties()
+                        local new_textures = table.copy(props.textures)
+                        new_textures[1] = def.texture .. "^" .. new_textures[1]
+                        props.textures = new_textures
+                        obj:set_properties(props)
+                        stack:take_item()
+                        player:set_wielded_item(stack)
+                        return true, "Armour successfully set on " .. def.mob_name .. " (Protection: " .. def.protection .. ")"
+                    end
+                end
+            end
+            
+            return false, "No suitable Water Dragons found nearby or no suitable armour in hand"
+        end,
+    })
+
+
+
     -- Register command for checking armour
     minetest.register_chatcommand("check_wtd_armour", {
         params = "",
