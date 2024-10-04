@@ -2,6 +2,8 @@
 
 waterdragon = waterdragon or {}
 
+local S = waterdragon.S
+
 waterdragon.register_mob_armour = function(name, def, staticdata, self)
     local itemname = "waterdragon:armour_" .. name
 
@@ -143,5 +145,48 @@ waterdragon.register_mob_armour("scottish", {
     inventory_image = "waterdragon_scottish_armour_inv.png",
     texture = "waterdragon_scottish_armour.png",
     mob_name = "waterdragon:scottish_dragon",
-    protection = 6  -- Protection level from 1 to 10
+    protection = 8  -- Protection level from 1 to 10
+})
+
+minetest.register_craft({
+	output = "waterdragon:armour_scottish",
+	recipe = {
+		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+	}
+})
+
+waterdragon.register_mob_armour("pure_water", {
+    description = "Pure Water Dragon Armour",
+    inventory_image = "waterdragon_pure_water_armour_inv.png",
+    texture = "waterdragon_pure_water_armour.png",
+    mob_name = "waterdragon:pure_water_dragon",
+    protection = 8 -- Protection level from 1 to 10
+})
+
+minetest.register_craft({
+	output = "waterdragon:armour_pure_water",
+	recipe = {
+		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+	}
+})
+
+waterdragon.register_mob_armour("rare_water", {
+    description = "Rare Water Dragon Armour",
+    inventory_image = "waterdragon_rare_water_armour_inv.png",
+    texture = "waterdragon_rare_water_armour.png",
+    mob_name = "waterdragon:rare_water_dragon",
+    protection = 8  -- Protection level from 1 to 10
+})
+
+minetest.register_craft({
+	output = "waterdragon:armour_rare_water",
+	recipe = {
+		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+	}
 })
