@@ -1,6 +1,6 @@
------------------
+-----------------------
 -- Pure Water Dragon --
------------------
+-----------------------
 
 local S = waterdragon.S
 
@@ -13,6 +13,85 @@ local function is_value_in_table(tbl, val)
 		end
 	end
 	return false
+end
+
+local light_blocks = {}
+
+function waterdragon.register_node(name, def)
+    minetest.register_node(name, def)
+end
+
+waterdragon.register_node("waterdragon:light_source", {
+    description = "Light Source (from Waterdragon mod)",
+    drawtype = "airlike",
+    paramtype = "light",
+    sunlight_propagates = true,
+    walkable = false,
+    pointable = false,
+    diggable = false,
+    buildable_to = true,
+    drop = "",
+    light_source = 14,
+    groups = {not_in_creative_inventory = 1},
+})
+
+local function set_node_light(pos, light_level)
+    local node = minetest.get_node(pos)
+    if node.name == "air" then
+        minetest.set_node(pos, {name = "waterdragon:light_source", param2 = light_level})
+        table.insert(light_blocks, pos)
+    elseif node.name == "waterdragon:light_source" then
+        minetest.set_node(pos, {name = "waterdragon:light_source", param2 = light_level})
+    end
+end
+
+local function remove_light_blocks(keep_radius, center_pos)
+    local new_light_blocks = {}
+    for _, pos in ipairs(light_blocks) do
+        if vector.distance(center_pos, pos) > keep_radius then
+            local node = minetest.get_node(pos)
+            if node.name == "waterdragon:light_source" then
+                minetest.set_node(pos, {name = "air"})
+            end
+        else
+            table.insert(new_light_blocks, pos)
+        end
+    end
+    light_blocks = new_light_blocks
+end
+
+local function update_dragon_lighting(dragon, is_night)
+    local pos = dragon.object:get_pos()
+    local radius = 5
+    local light_level = is_night and 14 or 0
+
+    for x = -radius, radius do
+        for y = -radius, radius do
+            for z = -radius, radius do
+                local block_pos = {x = math.floor(pos.x + x), y = math.floor(pos.y + y), z = math.floor(pos.z + z)}
+                if vector.distance(pos, block_pos) <= radius then
+                    set_node_light(block_pos, light_level)
+                end
+            end
+        end
+    end
+
+    remove_light_blocks(radius, pos)
+end
+
+local function on_dragon_step(self, dtime)
+    local time_of_day = minetest.get_timeofday()
+    local is_night = time_of_day >= 0.5 and time_of_day < 1
+
+    if is_night then
+        self.object:set_properties({glow = 14})
+    else
+        self.object:set_properties({glow = 7})
+    end
+
+    update_dragon_lighting(self, is_night)
+    
+    waterdragon.dragon_step(self, dtime)
 end
 
 local colors = {"pure_water"}
@@ -213,6 +292,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 	end,
 	step_func = function(self, dtime, moveresult)
 		waterdragon.dragon_step(self, dtime, moveresult)
+		on_dragon_step(self, dtime)
 	end,
 	on_rightclick = function(self, clicker)
 		waterdragon.dragon_rightclick(self, clicker)
