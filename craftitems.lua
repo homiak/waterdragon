@@ -1888,3 +1888,86 @@ minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
         return itemstack
     end,
 })
+
+
+-- Dragon Bone Tools --
+
+minetest.register_tool("waterdragon:pick_dragonbone", {
+	description = S("Dragonbone Pickaxe"),
+	inventory_image = "waterdragon_pick_dragonbone.png",
+	wield_scale = { x = 1.5, y = 1.5, z = 1 },
+	tool_capabilities = {
+		full_punch_interval = 0.6,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky = {
+				times = { [1] = 1.1, [2] = 0.8, [3] = 0.6 },
+				uses = 40,
+				maxlevel = 3
+			}
+		},
+		damage_groups = { fleshy = 4 }
+	},
+	sound = { breaks = "default_tool_breaks" },
+	groups = { pickaxe = 1 }
+})
+
+minetest.register_tool("waterdragon:axe_dragonbone", {
+	description = S("Dragonbone Axe"),
+	inventory_image = "waterdragon_axe_dragonbone.png",
+	wield_scale = { x = 1.5, y = 1.5, z = 1 },
+	tool_capabilities = {
+		full_punch_interval = 0.6,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky = {
+				times = { [1] = 1.2, [2] = 0.8, [3] = 0.6 },
+				uses = 40,
+				maxlevel = 3
+			}
+		},
+		damage_groups = { fleshy = 4 }
+	},
+	sound = { breaks = "default_tool_breaks" },
+	groups = { axe = 1 }
+})
+
+minetest.register_tool("waterdragon:sword_dragonbone", {
+	description = S("Dragonbone Sword"),
+	inventory_image = "waterdragon_sword_dragonbone.png",
+	wield_scale = { x = 1.5, y = 1.5, z = 1 },
+	tool_capabilities = {
+		full_punch_interval = 0.6,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky = {
+				times = { [1] = 1.2, [2] = 0.8, [3] = 0.6 },
+				uses = 40,
+				maxlevel = 3
+			}
+		},
+		damage_groups = { fleshy = 4 }
+	},
+	sound = { breaks = "default_tool_breaks" },
+	groups = { sword = 1 }
+})
+
+minetest.register_tool("waterdragon:shovel_dragonbone", {
+	description = S("Dragonbone Shovel"),
+	inventory_image = "waterdragon_shovel_dragonbone.png",
+	wield_scale = { x = 1.5, y = 1.5, z = 1 },
+	tool_capabilities = {
+		full_punch_interval = 0.6,
+		max_drop_level = 3,
+		groupcaps = {
+			cracky = {
+				times = { [1] = 1.2, [2] = 0.8, [3] = 0.6 },
+				uses = 40,
+				maxlevel = 3
+			}
+		},
+		damage_groups = { fleshy = 4 }
+	},
+	sound = { breaks = "default_tool_breaks" },
+	groups = { shovel = 1 }
+})

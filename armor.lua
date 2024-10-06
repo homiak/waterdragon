@@ -75,7 +75,7 @@ armor:register_armor("waterdragon:boots_rare_water_draconic_steel", {
     damage_groups = {cracky=1, snappy=3, choppy=2, crumbly=1, level=30},
 })
 
--- Scottish Dragon Draconic Armour
+-- Scottish Armour
 
 armor:register_armor("waterdragon:helmet_scottish_draconic_steel", {
     description = S("Scottish Water-Forged Draconic Steel Helmet"),
