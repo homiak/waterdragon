@@ -207,19 +207,50 @@ minetest.register_craftitem("waterdragon:draconic_steel_ingot_rare_water", {
 })
 
 minetest.register_craftitem("waterdragon:draconic_tooth_amulet", {
-    description = S("Dragon Tooth Amulet"),
+    description = S("Draconic Tooth Amulet"),
     inventory_image = "waterdragon_draconic_tooth_amulet.png",
-    groups = {armor_amulet = 1},
-    armor_groups = {fleshy = 10},
-    armor_use = 100,
-    wear_represents = "armor_use",
-    on_secondary_use = function(itemstack, user, pointed_thing)
-        return armor:equip(user, itemstack)
-    end,
-    on_place = function(itemstack, user, pointed_thing)
-        return armor:equip(user, itemstack)
+    groups = {amulet = 1},
+    on_use = function(itemstack, user, pointed_thing)
+        local name = user:get_player_name()
+        local inv = user:get_inventory()
+        
+        local current_amulet = inv:get_stack("amulet", 1)
+        if current_amulet:get_name() == "waterdragon:draconic_tooth_amulet" then
+            if inv:room_for_item("main", current_amulet) then
+                inv:add_item("main", current_amulet)
+                inv:set_stack("amulet", 1, ItemStack(""))
+                minetest.chat_send_player(name, "You take off the Dragon Tooth Amulet.")
+            else
+                minetest.chat_send_player(name, "Your inventory is full. Cannot remove the amulet.")
+            end
+        else
+            if inv:room_for_item("amulet", itemstack:peek_item(2)) then
+                inv:add_item("amulet", itemstack:take_item(1))
+                minetest.chat_send_player(name, "You put on the Dragon Tooth Amulet.")
+            else
+                minetest.chat_send_player(name, "You don't have room to wear the amulet.")
+            end
+        end
+        
+        return itemstack
     end,
 })
+
+minetest.register_on_joinplayer(function(player)
+    local inv = player:get_inventory()
+    inv:set_size("amulet", 1)
+end)
+
+minetest.register_globalstep(function(dtime)
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local inv = player:get_inventory()
+        if inv:get_stack("amulet", 1):get_name() == "waterdragon:draconic_tooth_amulet" then
+            player:set_armor_groups({fleshy = 90})
+        else
+            player:set_armor_groups({fleshy = 100})
+        end
+    end
+end)
 
 minetest.register_craft({
     output = "waterdragon:draconic_tooth_amulet",
