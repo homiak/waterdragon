@@ -16,6 +16,7 @@ local water_cavern_spawn_rate = tonumber(minetest.settings:get("water_cavern_spa
 -- Local Variables --
 ---------------------
 
+local S = waterdragon.S
 local random = math.random
 
 local c_wet_stone = minetest.get_content_id("waterdragon:stone_wet")
@@ -708,9 +709,8 @@ minetest.register_on_generated(function(minp, maxp)
 	end
 end)
 
--- Определение блока scottish_dragon_dragonstone_block
 minetest.register_node("waterdragon:scottish_dragon_dragonstone_block", {
-    description = "Scottish Dragon Dragonstone Block",
+    description = S("Scottish Dragon Dragonstone Block"),
     tiles = {"waterdragon_scottish_dragon_forge_bottom.png"},
     groups = {cracky = 2},
     is_ground_content = false,

@@ -206,6 +206,30 @@ minetest.register_craftitem("waterdragon:draconic_steel_ingot_rare_water", {
 	stack_max = 1
 })
 
+minetest.register_craftitem("waterdragon:draconic_tooth_amulet", {
+    description = S("Dragon Tooth Amulet"),
+    inventory_image = "waterdragon_draconic_tooth_amulet.png",
+    groups = {armor_amulet = 1},
+    armor_groups = {fleshy = 10},
+    armor_use = 100,
+    wear_represents = "armor_use",
+    on_secondary_use = function(itemstack, user, pointed_thing)
+        return armor:equip(user, itemstack)
+    end,
+    on_place = function(itemstack, user, pointed_thing)
+        return armor:equip(user, itemstack)
+    end,
+})
+
+minetest.register_craft({
+    output = "waterdragon:draconic_tooth_amulet",
+    recipe = {
+        {"", "waterdragon:draconic_tooth", ""},
+        {"waterdragon:draconic_tooth", "waterdragon:draconic_tooth", "waterdragon:draconic_tooth"},
+        {"", "waterdragon:draconic_tooth", ""},
+    }
+})
+
 ----------
 -- Eggs --
 ----------
@@ -1475,9 +1499,61 @@ craft_shield({
 	material = "waterdragon:draconic_steel_ingot_rare_water"
 })
 
+-- Dragonbone Tools --
+
+minetest.register_craft({
+    output = "waterdragon:shovel_dragonbone",
+    recipe = {
+        {"", "waterdragon:dragon_bone", ""},
+        {"waterdragon:dragon_bone", "waterdragon:dragon_bone", ""},
+        {"", "waterdragon:dragon_bone", ""},
+    }
+})
+
+craft_sword({
+	handle = "waterdragon:dragon_bone",
+	material = "waterdragon:dragon_bone",
+	output = "waterdragon:sword_dragonbone"
+})
+
+craft_pick({
+	handle = "waterdragon:dragon_bone",
+	material = "waterdragon:dragon_bone",
+	output = "waterdragon:pick_dragonbone"
+})
+
+craft_axe({
+	handle = "waterdragon:dragon_bone",
+	material = "waterdragon:dragon_bone",
+	output = "waterdragon:axe_dragonbone"
+})
+
+-- Scottish Dragon Armour --
+
+craft_helmet({
+	output = "waterdragon:helmet_scottish_draconic_steel",
+	material = "waterdragon:scottish_dragon_steel_ingot"
+})
+
+craft_boots({
+	output = "waterdragon:boots_scottish_draconic_steel",
+	material = "waterdragon:scottish_dragon_steel_ingot"
+})
+
+craft_chestplate({
+	output = "waterdragon:chestplate_scottish_draconic_steel",
+	material = "waterdragon:scottish_dragon_steel_ingot"
+})
+
+craft_leggings({
+	output = "waterdragon:leggings_scottish_draconic_steel",
+	material = "waterdragon:scottish_dragon_steel_ingot"
+})
+
+
 -- Draconic Scale Armour --
 
--- Pure Water Scale Armour
+-- Pure Water
 
 craft_helmet({
 	output = "waterdragon:helmet_pure_water_draconic",
