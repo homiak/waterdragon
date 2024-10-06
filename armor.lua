@@ -79,7 +79,7 @@ armor:register_armor("waterdragon:boots_rare_water_draconic_steel", {
 
 armor:register_armor("waterdragon:helmet_scottish_draconic_steel", {
     description = S("Scottish Water-Forged Draconic Steel Helmet"),
-    inventory_image = "waterdragon_inv_helmet_scottish_draconic_steel.png",
+    inventory_image = "waterdragon_scottish_dragon_draconic_helmet.png",
     groups = {armor_head=1, armor_heal=30, armor_use=100,
         physics_speed=0.5, physics_gravity=0.05, physics_jump=0.15, armor_fire=1},
     armor_groups = {fleshy=130},
@@ -87,7 +87,7 @@ armor:register_armor("waterdragon:helmet_scottish_draconic_steel", {
 })
 armor:register_armor("waterdragon:chestplate_scottish_draconic_steel", {
     description = S("Scottish Water-Forged Draconic Steel Chestplate"),
-    inventory_image = "waterdragon_inv_chestplate_scottish_draconic_steel.png",
+    inventory_image = "waterdragon_scottish_dragon_draconic_chestplate.png",
     groups = {armor_torso=1, armor_heal=30, armor_use=100,
         physics_speed=0.5, physics_gravity=0.05, physics_jump=0.15, armor_fire=1},
     armor_groups = {fleshy=130},
@@ -95,7 +95,7 @@ armor:register_armor("waterdragon:chestplate_scottish_draconic_steel", {
 })
 armor:register_armor("waterdragon:leggings_scottish_draconic_steel", {
     description = S("Scottish Water-Forged Draconic Steel Leggings"),
-    inventory_image = "waterdragon_inv_leggings_scottish_draconic_steel.png",
+    inventory_image = "waterdragon_scottish_dragon_draconic_leggings.png",
     groups = {armor_legs=1, armor_heal=30, armor_use=100,
         physics_speed=0.5, physics_gravity=0.05, physics_jump=0.15, armor_fire=1},
     armor_groups = {fleshy=130},
@@ -103,7 +103,7 @@ armor:register_armor("waterdragon:leggings_scottish_draconic_steel", {
 })
 armor:register_armor("waterdragon:boots_scottish_draconic_steel", {
     description = S("Scottish Water-Forged Draconic Steel Boots"),
-    inventory_image = "waterdragon_inv_boots_scottish_draconic_steel.png",
+    inventory_image = "waterdragon_scottish_dragon_draconic_boots.png",
     groups = {armor_feet=1, armor_heal=30, armor_use=100,
         physics_speed=0.5, physics_gravity=0.05, physics_jump=0.15, armor_fire=1},
     armor_groups = {fleshy=130},
