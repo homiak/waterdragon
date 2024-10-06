@@ -71,9 +71,8 @@ local function get_dragon_formspec(self)
 	local fly_allowed = "Flight Allowed"
 	local fly_image = "waterdragon_forms_flight_allowed.png"
 	if not self.fly_allowed then
+		fly_allowed = "Flight Not Allowed"
 		fly_image = "waterdragon_forms_flight_disallowed.png"
-		is_landed = true
-		waterdragon.action_land(self)
 	end
 	local form = {
 		"formspec_version[4]",

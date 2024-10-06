@@ -355,6 +355,7 @@ end
 function waterdragon.is_taming_ability_enabled()
     return taming_ability_enabled
 end
+
 function waterdragon.action_flight_pure_water(self, target, timeout)
 	if not self.fly_allowed then
 		-- Use a walking attack instead
@@ -933,6 +934,10 @@ modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 end)
 
 modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
+	if not self.fly_allowed then
+		-- If the Water Dragon is not allowed to fly
+		return
+	end
 	local center = self.nest_position or self.object:get_pos()
 	if not center then return end
 	local center_fly = { x = center.x, y = center.y + 12, z = center.z }
@@ -1216,6 +1221,10 @@ minetest.register_entity("waterdragon:wing_horn", {
 
 
 modding.register_utility("waterdragon:attack", function(self, target)
+	if not self.fly_allowed then
+		-- If the Water Dragon is not allowed to fly
+		return
+	end
     local is_landed = true
     local init = false
     local takeoff_init = false
@@ -1251,7 +1260,6 @@ modding.register_utility("waterdragon:attack", function(self, target)
         wing_horn_cooldown = wing_horn_cooldown - _self.dtime
 
         if not _self:get_action() then
-            -- Решение об атаке с земли или воздуха
             if not init then
                 local dist2floor = modding.sensor_floor(_self, 7, true)
                 if dist2floor > 6 or waterdragon.is_target_flying(target) then
@@ -1266,7 +1274,6 @@ modding.register_utility("waterdragon:attack", function(self, target)
                 switch_timer = 20
             end
 
-            -- Приземление, если летим в наземном состоянии
             if land_init then
                 if not _self.touching_ground then
                     local pos2 = tgt_pos
@@ -1281,21 +1288,19 @@ modding.register_utility("waterdragon:attack", function(self, target)
                 return
             end
 
-            -- Взлет, если ходим в летающем состоянии
             if takeoff_init and _self.touching_ground then
                 waterdragon.action_takeoff(_self)
                 takeoff_init = false
                 return
             end
 
-            -- Выбор атаки
             local dist = vec_dist(pos, tgt_pos)
             local attack_range = (is_landed and 8) or 16
 
-            if dist <= attack_range then -- Атаки ближнего боя
-                if wing_horn_cooldown <= 0 and math.random() < 0.3 then -- 30% шанс бросить wing_horn
+            if dist <= attack_range then
+                if wing_horn_cooldown <= 0 and math.random() < 0.3 then
                     throw_wing_horn(_self, target)
-                    wing_horn_cooldown = 5 -- Кулдаун в 5 секунд после броска wing_horn
+                    wing_horn_cooldown = 5
                 else
                     if is_landed then
                         if fov_timer < 1 and target:is_player() then
@@ -1328,6 +1333,10 @@ end)
 
 
 modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
+	if not self.fly_allowed then
+		-- If the Water Dragon is not allowed to fly
+		return
+	end
 	local hidden_timer = 1
 	local attack_init = false
 	local function func(_self)
