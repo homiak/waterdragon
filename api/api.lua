@@ -56,7 +56,7 @@ minetest.register_globalstep(function()
 			else
 				local bow_data = bow_timers[player_name]
 				local current_time = minetest.get_us_time()
-				if (current_time - bow_data.start_time) >= 1000000 then -- 1 секунда в микросекундах
+				if (current_time - bow_data.start_time) >= 1000000 then
 					if not has_bowed_to_dragon(player_name, bow_data.dragon) then
 						finish_bow(player_name, bow_data.dragon)
 					end
@@ -79,7 +79,6 @@ end)
 local scottish_bow_players = {}
 local scottish_bow_timers = {}
 
--- Функция для начала поклона
 local function start_scottish_bow(player_name, dragon)
     scottish_bow_timers[player_name] = {
         start_time = minetest.get_us_time(),
@@ -87,18 +86,15 @@ local function start_scottish_bow(player_name, dragon)
     }
 end
 
--- Функция для завершения поклона
 local function finish_scottish_bow(player_name, dragon)
     scottish_bow_players[player_name] = dragon
     minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
 end
 
--- Функция для проверки, поклонился ли игрок дракону
 function has_bowed_to_scottish_dragon(player_name, dragon)
     return scottish_bow_players[player_name] == dragon
 end
 
--- Глобальный шаг для обработки поклона
 minetest.register_globalstep(function(dtime)
     for _, player in ipairs(minetest.get_connected_players()) do
         local player_name = player:get_player_name()
@@ -108,7 +104,7 @@ minetest.register_globalstep(function(dtime)
             if not scottish_bow_timers[player_name] then
                 local pos = player:get_pos()
                 local nearest_dragon = nil
-                local nearest_dist = 15 -- Максимальное расстояние для поклона
+                local nearest_dist = 15
 
                 for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
                     local ent = obj:get_luaentity()
@@ -139,7 +135,6 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
--- Очистка данных при выходе игрока
 minetest.register_on_leaveplayer(function(player)
     local name = player:get_player_name()
     scottish_bow_players[name] = nil

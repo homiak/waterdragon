@@ -178,15 +178,19 @@ local function get_scottish_dragon_formspec(self)
         "tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
         "image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
         "tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
-        "image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]"
+        "image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]",
+        -- Add dropdown for eye color
+        "dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;" .. (self.eye_color_index or 1) .. "]",
+        "label[5.1,0.8;Eye Colour]"
     }
     return table.concat(form, "")
 end
 
+-- Show formspec for Scottish Dragon
 waterdragon.scottish_wtd_api.show_formspec = function(self, player)
-	minetest.show_formspec(player:get_player_name(), "waterdragon:scottish_dragon_forms",
-		get_scottish_dragon_formspec(self))
-	form_objref[player:get_player_name()] = self
+    minetest.show_formspec(player:get_player_name(), "waterdragon:scottish_dragon_forms",
+        get_scottish_dragon_formspec(self))
+    form_objref[player:get_player_name()] = self
 end
 
 
@@ -195,171 +199,92 @@ end
 ----------------
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local name = player:get_player_name()
-	if not form_objref[name] or not form_objref[name].object then
-		return
-	end
-	local ent = form_objref[name]
-	if formname == "waterdragon:wtd_forms" then
-		if fields.btn_wtd_stance then
-			if not ent.object then return end
-			if ent.stance == "neutral" then
-				ent.stance = ent:memorize("stance", "aggressive")
-			elseif ent.stance == "aggressive" then
-				ent.stance = ent:memorize("stance", "passive")
-			elseif ent.stance == "passive" then
-				ent.stance = ent:memorize("stance", "neutral")
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_order then
-			if not ent.object then return end
-			if ent.order == "wander" then
-				ent.order = ent:memorize("order", "follow")
-			elseif ent.order == "follow" then
-				ent.order = ent:memorize("order", "stay")
-			elseif ent.order == "stay" then
-				ent.order = ent:memorize("order", "wander")
-			else
-				ent.order = ent:memorize("order", "stay")
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_fly then
-			if not ent.object then return end
-			if ent.fly_allowed then
-				ent.fly_allowed = ent:memorize("fly_allowed", false)
-			else
-				ent.fly_allowed = ent:memorize("fly_allowed", true)
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_name then
-			minetest.show_formspec(name, "waterdragon:set_name", get_rename_formspec(ent))
-		end
-		if fields.btn_customize then
-			minetest.show_formspec(name, "waterdragon:customize", get_customize_formspec(ent))
-		end
-		if fields.quit or fields.key_enter then
-			form_objref[name] = nil
-		end
-	end
-	if formname == "waterdragon:set_name" and fields.name then
-		if string.len(fields.name) > 64 then
-			fields.name = string.sub(fields.name, 1, 64)
-		end
-		ent.nametag = ent:memorize("nametag", fields.name)
-		activate_nametag(form_objref[name])
-		if fields.quit or fields.key_enter then
-			form_objref[name] = nil
-		end
-	end
-	if formname == "waterdragon:scottish_dragon_forms" then
-
-		if fields.btn_wtd_stance then
-			if not ent.object then return end
-			if ent.stance == "neutral" then
-				ent.stance = ent:memorize("stance", "aggressive")
-			elseif ent.stance == "aggressive" then
-				ent.stance = ent:memorize("stance", "passive")
-			elseif ent.stance == "passive" then
-				ent.stance = ent:memorize("stance", "neutral")
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_order then
-			if not ent.object then return end
-			if ent.order == "wander" then
-				ent.order = ent:memorize("order", "follow")
-			elseif ent.order == "follow" then
-				ent.order = ent:memorize("order", "stay")
-			elseif ent.order == "stay" then
-				ent.order = ent:memorize("order", "wander")
-			else
-				ent.order = ent:memorize("order", "stay")
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_fly then
-			if not ent.object then return end
-			if ent.fly_allowed then
-				ent.fly_allowed = ent:memorize("fly_allowed", false)
-			else
-				ent.fly_allowed = ent:memorize("fly_allowed", true)
-			end
-			ent:show_formspec(player)
-		end
-		if fields.btn_wtd_name then
-			minetest.show_formspec(name, "waterdragon:set_name", get_rename_formspec(ent))
-		end
-		if fields.quit or fields.key_enter then
-			form_objref[name] = nil
-		end
-	end
-	if formname == "waterdragon:customize" then
-		local type = "rare_water"
-		if ent.name == "waterdragon:pure_water_dragon" then
-			type = "pure_water"
-		end
-		local wings = {
-			rare_water = {
-				["Red"] = "#d20000",
-				["Orange"] = "#d92e00",
-				["Yellow"] = "#edad00",
-				["Dark Blue"] = "#07084f",
-				["Cyan"] = "#2deded"
-			},
-			pure_water = {
-				["Red"] = "#d20000",
-				["Orange"] = "#d92e00",
-				["Yellow"] = "#edad00",
-				["Dark Blue"] = "#07084f",
-				["Cyan"] = "#2deded"
-			}
-		}
-		local eyes = {
-			rare_water = {
-				["Blue"] = "blue",
-				["Red"] = "red",
-				["Orange"] = "orange",
-				["Yellow"] = "yellow"
-			},
-			pure_water = {
-				["Red"] = "red",
-				["Orange"] = "orange",
-				["Blue"] = "blue",
-				["Yellow"] = "yellow"
-			}
-		}
-		local body = {
-			rare_water = {
-				["rare_water"] = 1,
-			},
-			pure_water = {
-				["pure_water"] = 1,
-			}
-		}
-		if fields.drp_wing
-			and wings[type][fields.drp_wing] then
-			ent.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. wings[type][fields.drp_wing] .. ")"
-			ent:memorize("wing_overlay", ent.wing_overlay)
-			waterdragon.generate_texture(ent, true)
-		end
-		if fields.drp_eyes
-			and eyes[type][fields.drp_eyes] then
-			ent.eye_color = eyes[type][fields.drp_eyes]
-			ent:memorize("eye_color", ent.eye_color)
-		end
-		if fields.drp_body
-			and body[type][fields.drp_body] then
-			ent.texture_no = body[type][fields.drp_body]
-			waterdragon.set_color_string(ent)
-			waterdragon.generate_texture(ent, true)
-		end
-		ent:update_emission(true)
-		minetest.show_formspec(name, "waterdragon:customize", get_customize_formspec(ent))
-		if fields.quit or fields.key_enter then
-			form_objref[name] = nil
-		end
-	end
+    local name = player:get_player_name()
+    if not form_objref[name] or not form_objref[name].object then
+        return
+    end
+    local ent = form_objref[name]
+    if formname == "waterdragon:scottish_dragon_forms" then
+        if fields.btn_wtd_stance then
+            if not ent.object then return end
+            if ent.stance == "neutral" then
+                ent.stance = ent:memorize("stance", "aggressive")
+            elseif ent.stance == "aggressive" then
+                ent.stance = ent:memorize("stance", "passive")
+            elseif ent.stance == "passive" then
+                ent.stance = ent:memorize("stance", "neutral")
+            end
+            ent:show_formspec(player)
+        end
+        if fields.btn_wtd_order then
+            if not ent.object then return end
+            if ent.order == "wander" then
+                ent.order = ent:memorize("order", "follow")
+            elseif ent.order == "follow" then
+                ent.order = ent:memorize("order", "stay")
+            elseif ent.order == "stay" then
+                ent.order = ent:memorize("order", "wander")
+            else
+                ent.order = ent:memorize("order", "stay")
+            end
+            ent:show_formspec(player)
+        end
+        if fields.btn_wtd_fly then
+            if not ent.object then return end
+            if ent.fly_allowed then
+                ent.fly_allowed = ent:memorize("fly_allowed", false)
+            else
+                ent.fly_allowed = ent:memorize("fly_allowed", true)
+            end
+            ent:show_formspec(player)
+        end
+        if fields.btn_wtd_name then
+            minetest.show_formspec(name, "waterdragon:set_name", get_rename_formspec(ent))
+        end
+        if fields.drp_eyes then
+            local eyes = {
+                ["Blue"] = "blue",
+                ["Red"] = "red",
+                ["Orange"] = "orange",
+                ["Yellow"] = "yellow"
+            }
+            if eyes[fields.drp_eyes] then
+                ent.eye_color = eyes[fields.drp_eyes]
+                ent.eye_color_index = get_color_index(fields.drp_eyes)
+                ent:memorize("eye_color", ent.eye_color)
+                ent:memorize("eye_color_index", ent.eye_color_index)
+                generate_scottish_texture(ent, true)
+            end
+            ent:show_formspec(player)
+        end
+        if fields.quit or fields.key_enter then
+            form_objref[name] = nil
+        end
+    end
 end)
+
+
+function get_color_index(color)
+    local colors = {"Blue", "Red", "Orange", "Yellow"}
+    for i, c in ipairs(colors) do
+        if c == color then
+            return i
+        end
+    end
+    return 1  -- Default to first color if not found
+end
+
+
+function generate_scottish_texture(self, force)
+    local def = minetest.registered_entities[self.name]
+    local textures = {
+        def.textures[self.texture_no]
+    }
+
+    -- Add eye texture
+    local eye_texture = "waterdragon_scottish_eyes_" .. (self.eye_color or "blue") .. ".png"
+    textures[1] = textures[1] .. "^" .. eye_texture
+
+    self:set_texture(1, textures)
+end
+
