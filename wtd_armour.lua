@@ -4,15 +4,22 @@ waterdragon = waterdragon or {}
 
 local S = waterdragon.S
 
-waterdragon.register_mob_armour = function(name, def, staticdata, self)
+waterdragon.get_armour_texture = function(armour_name)
+    local armour_defs = {
+        scottish = "waterdragon_scottish_armour.png",
+        pure_water = "waterdragon_pure_water_armour.png",
+        rare_water = "waterdragon_rare_water_armour.png",
+    }
+    return armour_defs[armour_name] or ""
+end
+
+
+
+waterdragon.register_mob_armour = function(name, def)
     local itemname = "waterdragon:armour_" .. name
 
-
-
-    -- Ensure protection level is within valid range
     def.protection = math.max(1, math.min(10, def.protection or 1))
 
-    -- Register armour item
     minetest.register_craftitem(itemname, {
         description = def.description or ("Water Dragon Armour: " .. name .. " (Protection: " .. def.protection .. ")"),
         inventory_image = def.inventory_image,
@@ -23,11 +30,13 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
                 local obj = pointed_thing.ref
                 local ent = obj:get_luaentity()
                 if ent and ent.name == def.mob_name then
-                    ent.armour = {name = name, protection = def.protection}
+                    ent.armour = {
+                        name = name,
+                        protection = def.protection,
+                        texture = def.dragon_armour_texture
+                    }
                     local props = obj:get_properties()
-                    local new_textures = table.copy(props.textures)
-                    new_textures[1] = def.texture .. "^" .. new_textures[1]
-                    props.textures = new_textures
+                    props.textures[1] = def.dragon_armour_texture
                     obj:set_properties(props)
                     itemstack:take_item()
                     return itemstack
@@ -35,9 +44,7 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
             end
         end
     })
-  
 
-    -- Register command for removing armour
     minetest.register_chatcommand("remove_armour", {
         params = "",
         description = "Removes armour from the nearest Water Dragon",
@@ -54,13 +61,12 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
                 if ent and ent.name == def.mob_name and ent.armour then
                     local props = obj:get_properties()
                     local new_textures = table.copy(props.textures)
-                    new_textures[1] = new_textures[1]:gsub("^" .. def.texture .. "%^", "")
+                    new_textures[1] = new_textures[1]:gsub("^" .. def.dragon_armour_texture .. "%^", "")
                     props.textures = new_textures
                     obj:set_properties(props)
                     local removed_armour = ent.armour
                     ent.armour = nil
 
-                    -- Create and add the armour item to player's inventory
                     local armour_item = ItemStack(itemname)
                     local inv = player:get_inventory()
                     if inv:room_for_item("main", armour_item) then
@@ -93,11 +99,9 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
                 if ent and ent.name == def.mob_name then
                     local stack = player:get_wielded_item()
                     if stack:get_name() == itemname then
-                        ent.armour = {name = name, protection = def.protection}
+                        ent.armour = {name = name, protection = def.protection, texture = def.dragon_armour_texture}
                         local props = obj:get_properties()
-                        local new_textures = table.copy(props.textures)
-                        new_textures[1] = def.texture .. "^" .. new_textures[1]
-                        props.textures = new_textures
+                        props.textures[1] = def.dragon_armour_texture
                         obj:set_properties(props)
                         stack:take_item()
                         player:set_wielded_item(stack)
@@ -110,9 +114,6 @@ waterdragon.register_mob_armour = function(name, def, staticdata, self)
         end,
     })
 
-
-
-    -- Register command for checking armour
     minetest.register_chatcommand("check_wtd_armour", {
         params = "",
         description = "Checks armour on the nearest Water Dragon",
@@ -143,7 +144,7 @@ end
 waterdragon.register_mob_armour("scottish", {
     description = S("Scottish Dragon Armour"),
     inventory_image = "waterdragon_scottish_armour_inv.png",
-    texture = "waterdragon_scottish_armour.png",
+    dragon_armour_texture = "waterdragon_scottish_armour.png",
     mob_name = "waterdragon:scottish_dragon",
     protection = 8  -- Protection level from 1 to 10
 })
@@ -160,7 +161,7 @@ minetest.register_craft({
 waterdragon.register_mob_armour("pure_water", {
     description = S("Pure Water Dragon Armour"),
     inventory_image = "waterdragon_pure_water_armour_inv.png",
-    texture = "waterdragon_pure_water_armour.png",
+    dragon_armour_texture = "waterdragon_pure_water_armour.png",
     mob_name = "waterdragon:pure_water_dragon",
     protection = 8 -- Protection level from 1 to 10
 })
@@ -177,7 +178,7 @@ minetest.register_craft({
 waterdragon.register_mob_armour("rare_water", {
     description = S("Rare Water Dragon Armour"),
     inventory_image = "waterdragon_rare_water_armour_inv.png",
-    texture = "waterdragon_rare_water_armour.png",
+    dragon_armour_texture = "waterdragon_rare_water_armour.png",
     mob_name = "waterdragon:rare_water_dragon",
     protection = 8  -- Protection level from 1 to 10
 })

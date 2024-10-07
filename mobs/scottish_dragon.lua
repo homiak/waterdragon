@@ -165,8 +165,32 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	activate_func = function(self)
 		waterdragon.scottish_dragon_activate(self)
 	end,
+	on_activate = function(self, staticdata, dtime_s)
+		if staticdata ~= "" then
+			local data = minetest.deserialize(staticdata)
+			if data and data.armour then
+				self.armour = data.armour
+			end
+		end
+	
+		if self.armour and self.armour.texture then
+			local props = self.object:get_properties()
+			props.textures[1] = self.armour.texture
+			self.object:set_properties(props)
+		end
+	
+		if self.dragon_activate then
+			self.dragon_activate(self)
+		end
+	end,
 	step_func = function(self, dtime)
 		waterdragon.scottish_dragon_step(self, dtime)
+	end,
+	get_staticdata = function(self)
+		local data = {
+			armour = self.armour
+		}
+		return minetest.serialize(data)
 	end,
 	death_func = function(self)
         if self:get_utility() ~= "waterdragon:die" then
@@ -183,8 +207,16 @@ modding.register_mob("waterdragon:scottish_dragon", {
         end
     end,
 	on_rightclick = function(self, clicker)
-		waterdragon.scottish_dragon_rightclick(self, clicker)
-	end,
+        waterdragon.dragon_rightclick(self, clicker)
+        local item = clicker:get_wielded_item()
+        local item_name = item:get_name()
+        if minetest.get_item_group(item_name, "water_dragon_armour") > 0 then
+            local armour_def = minetest.registered_items[item_name]
+            if armour_def and armour_def.on_use then
+                return armour_def.on_use(item, clicker, {type="object", ref=self.object})
+            end
+        end
+    end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if time_from_last_punch < 0.66
 		or (self.passenger and puncher == self.passenger)
