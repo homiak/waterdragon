@@ -257,6 +257,72 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			form_objref[name] = nil
 		end
 	end
+    if formname == "waterdragon:customize" then
+		local type = "rare_water"
+		if ent.name == "waterdragon:pure_water_dragon" then
+			type = "pure_water"
+		end
+		local wings = {
+			rare_water = {
+				["Red"] = "#d20000",
+				["Orange"] = "#d92e00",
+				["Yellow"] = "#edad00",
+				["Dark Blue"] = "#07084f",
+				["Cyan"] = "#2deded"
+			},
+			pure_water = {
+				["Red"] = "#d20000",
+				["Orange"] = "#d92e00",
+				["Yellow"] = "#edad00",
+				["Dark Blue"] = "#07084f",
+				["Cyan"] = "#2deded"
+			}
+		}
+		local eyes = {
+			rare_water = {
+				["Blue"] = "blue",
+				["Red"] = "red",
+				["Orange"] = "orange",
+				["Yellow"] = "yellow"
+			},
+			pure_water = {
+				["Red"] = "red",
+				["Orange"] = "orange",
+				["Blue"] = "blue",
+				["Yellow"] = "yellow"
+			}
+		}
+		local body = {
+			rare_water = {
+				["rare_water"] = 1,
+			},
+			pure_water = {
+				["pure_water"] = 1,
+			}
+		}
+		if fields.drp_wing
+			and wings[type][fields.drp_wing] then
+			ent.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. wings[type][fields.drp_wing] .. ")"
+			ent:memorize("wing_overlay", ent.wing_overlay)
+			waterdragon.generate_texture(ent, true)
+		end
+		if fields.drp_eyes
+			and eyes[type][fields.drp_eyes] then
+			ent.eye_color = eyes[type][fields.drp_eyes]
+			ent:memorize("eye_color", ent.eye_color)
+		end
+		if fields.drp_body
+			and body[type][fields.drp_body] then
+			ent.texture_no = body[type][fields.drp_body]
+			waterdragon.set_color_string(ent)
+			waterdragon.generate_texture(ent, true)
+		end
+		ent:update_emission(true)
+		minetest.show_formspec(name, "waterdragon:customize", get_customize_formspec(ent))
+		if fields.quit or fields.key_enter then
+			form_objref[name] = nil
+		end
+    end
     if formname == "waterdragon:scottish_dragon_forms" then
         if fields.btn_wtd_stance then
             if not ent.object then return end
@@ -308,7 +374,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 ent:memorize("eye_color", ent.eye_color)
                 ent:memorize("eye_color_index", ent.eye_color_index)
                 generate_scottish_texture(ent, true)
-                glow = 14
             end
             ent:show_formspec(player)
         end
@@ -339,6 +404,7 @@ function generate_scottish_texture(self, force)
 
     -- Add eye texture
     local eye_texture = "waterdragon_scottish_eyes_" .. (self.eye_color or "blue") .. ".png"
+    glow = 14
     textures[1] = textures[1] .. "^" .. eye_texture
     glow = 14
 
