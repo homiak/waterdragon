@@ -15,23 +15,6 @@ local function is_value_in_table(tbl, val)
 	return false
 end
 
-function get_random_colour_overlay()
-    local color_variations = {
-        {r = 50, g = 50, b = 255, a = 100},
-        {r = 100, g = 100, b = 255, a = 150},
-        {r = 0, g = 100, b = 200, a = 120},
-        {r = 150, g = 200, b = 255, a = 180},
-        {r = 0, g = 50, b = 150, a = 90},
-    }
-    
-    local chosen_color = color_variations[math.random(#color_variations)]
-    return string.format("^[colorize:#%02X%02X%02X%02X", 
-        chosen_color.r, chosen_color.g, chosen_color.b, chosen_color.a)
-end
-
-function apply_colour_variation(texture)
-    return texture .. get_random_colour_overlay()
-end
 
 local colors = {"rare_water"}
 
@@ -58,10 +41,10 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     backface_culling = false,
     use_texture_alpha = false,
     textures = {
-        apply_colour_variation("waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png")
+        "waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png"
     },
     child_textures = {
-        apply_colour_variation("waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png"),
+        "waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png",
     },
     animations = {
         stand = {range = {x = 1, y = 59}, speed = 8, frame_blend = 0.3, loop = true},
