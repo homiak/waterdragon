@@ -15,6 +15,24 @@ local function is_value_in_table(tbl, val)
 	return false
 end
 
+function dragon_stay_behavior(self)
+    if self.order ~= "stay" then return end
+
+    local vel = self.object:get_velocity()
+    local pos = self.object:get_pos()
+    local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+
+    if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
+        self.object:set_velocity({x=0, y=0, z=0})
+        self:set_forward_velocity(0)
+        self:set_vertical_velocity(0)
+        self.object:set_acceleration({x=0, y=0, z=0})
+        self:animate("hover")
+    else
+        self.object:set_acceleration({x=0, y=-9.81, z=0})
+    end
+end
+
 
 local colors = {"rare_water"}
 
@@ -103,6 +121,7 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     end,
     step_func = function(self, dtime, moveresult)
         waterdragon.dragon_step(self, dtime, moveresult)
+        dragon_stay_behavior(self)
     end,
     on_rightclick = function(self, clicker)
         waterdragon.dragon_rightclick(self, clicker)

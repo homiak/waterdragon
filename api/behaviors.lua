@@ -1375,17 +1375,30 @@ end)
 -- Tamed Behavior --
 
 modding.register_utility("waterdragon:stay", function(self)
-	local function func(_self)
-		local order = _self.order
-		if not order
-			or order ~= "stay" then
-			return true
-		end
-		if not _self:get_action() then
-			modding.action_idle(_self, 2, "stand")
-		end
-	end
-	self:set_utility(func)
+    local function func(_self)
+        local order = _self.order
+        if not order or order ~= "stay" then
+            return true
+        end
+        
+        local vel = _self.object:get_velocity()
+        local pos = _self.object:get_pos()
+        local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+        
+        if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
+            _self.object:set_velocity({x=0, y=0, z=0})
+            _self.object:set_acceleration({x=0, y=0, z=0})
+            if not _self:get_action() then
+                modding.action_idle(_self, 2, "hover")
+            end
+        else
+            _self.object:set_acceleration({x=0, y=-9.81, z=0})
+            if not _self:get_action() then
+                modding.action_idle(_self, 2, "stand")
+            end
+        end
+    end
+    self:set_utility(func)
 end)
 
 modding.register_utility("waterdragon:follow_player", function(self, player)
@@ -1505,6 +1518,19 @@ waterdragon.dragon_behavior = {
 			local order = self.order
 			if order == "stay" then
 				return 1, { self }
+			end
+			if self.order == "stay" then
+				local vel = self.object:get_velocity()
+				local pos = self.object:get_pos()
+				local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+		
+				if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
+					self.object:set_velocity({x=0, y=0, z=0})
+					self.object:set_acceleration({x=0, y=0, z=0})
+					self:animate("hover")
+				else
+					self.object:set_acceleration({x=0, y=-9.81, z=0})
+				end
 			end
 			return 0
 		end
