@@ -1594,15 +1594,7 @@ waterdragon.scottish_dragon_behavior = {
 			return 0
 		end,
 	},
-	{ -- Mounted
-        utility = scottish_dragon_mount_behavior,
-        get_score = function(self)
-            if self.rider then
-                return 1, { self }
-            end
-            return 0
-        end
-    },
+	
 	{ -- Stay (Order)
 		utility = "waterdragon:stay",
 		get_score = function(self)

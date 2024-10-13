@@ -123,7 +123,7 @@ minetest.register_globalstep(function(dtime)
             else
                 local bow_data = scottish_bow_timers[player_name]
                 local current_time = minetest.get_us_time()
-                if (current_time - bow_data.start_time) >= 1000000 then -- 1 секунда в микросекундах
+                if (current_time - bow_data.start_time) >= 1000000 then
                     if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
                         finish_scottish_bow(player_name, bow_data.dragon)
                     end
@@ -168,28 +168,25 @@ local sin = math.sin
 local cos = math.cos
 
 local function diff(a, b)
-    -- Проверяем аргументы на nil и на то, что они числа
     if type(a) ~= "number" or type(b) ~= "number" then
-        return 0  -- или другое подходящее значение по умолчанию
+        return 0
     end
 
     return atan2(sin(b - a), cos(b - a))
 end
 
 local function interp_angle(a, b, w)
-    -- Проверяем все аргументы на nil
     if a == nil or b == nil or w == nil then
-        return 0  -- или другое подходящее значение по умолчанию
+        return 0
     end
 
-    -- Проверяем, что a и b - числа
     if type(a) ~= "number" or type(b) ~= "number" then
-        return 0  -- или другое подходящее значение по умолчанию
+        return 0
     end
 
-    -- Проверяем, что w - число и находится в диапазоне [0, 1]
+    
     if type(w) ~= "number" or w < 0 or w > 1 then
-        return 0  -- или другое подходящее значение по умолчанию
+        return 0
     end
 
     local cs = (1 - w) * cos(a) + w * cos(b)
@@ -225,7 +222,7 @@ local yaw2dir = minetest.yaw_to_dir
 -- Settings --
 --------------
 
-local terrain_destruction = minetest.settings:get_bool("water_dragon_terrain_destruction", false)
+local terrain_destruction = minetest.settings:get_bool("water_dragon_terrain_destruction", true)
 
 ---------------------
 -- Local Utilities --
@@ -1710,7 +1707,7 @@ end)
 -- Commands --
 --------------
 
-minetest.register_privilege("dragon_uisge", {
+minetest.register_privilege("Dragon Uisge", {
 	description = "Allows Player to force Water Dragons",
 	give_to_singleplayer = false,
 	give_to_admin = false
@@ -2323,12 +2320,13 @@ end
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_rightclick(self, clicker)
-	if self.hp <= 0 then return end
+    if self.hp <= 0 then return end
     local name = clicker:get_player_name()
 
     if self:feed(clicker) then
         return
     end
+    
     local item_name = clicker:get_wielded_item():get_name() or ""
     if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
         if clicker:get_player_control().sneak then
@@ -2388,8 +2386,6 @@ function waterdragon.dragon_rightclick(self, clicker)
 			self.object:set_attach(clicker, "",
 				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
 		end
-	elseif not self.owner or name ~= self.owner then
-		minetest.chat_send_player(name, S("Hold Shift for 1 second near the Water Dragon to bow to it"))
 	end
 	if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
 		waterdragon.send_passenger_request(self, clicker)
@@ -2531,39 +2527,6 @@ minetest.register_abm({
 	end,
 })
 
-function waterdragon.scottish_dragon_rightclick(self, clicker)
-    if self.hp <= 0 then return end
-    local name = clicker:get_player_name()
-
-    if self:feed(clicker) then
-        return
-    end
-    
-    local item_name = clicker:get_wielded_item():get_name() or ""
-    if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
-        if clicker:get_player_control().sneak then
-            self:show_formspec(clicker)
-        else
-            waterdragon.attach_player(self, clicker)
-            if not has_bowed_to_scottish_dragon(name, self) then
-                minetest.after(1, function()  -- Небольшая задержка перед взлетом
-                    if self.object:get_luaentity() then  -- Проверяем, существует ли еще дракон
-                        waterdragon.action_takeoff(self, 20)  -- Взлетаем на высоту 20 блоков
-                        minetest.after(5, function()  -- Ждем 5 секунд перед сбрасыванием
-                            if self.object:get_luaentity() then
-                                throw_rider(self)
-                            end
-                        end)
-                    end
-                end)
-                minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
-            end
-        end
-    elseif not self.owner or name ~= self.owner then
-        minetest.chat_send_player(name, S("This Scottish Dragon belongs to someone else."))
-    end
-end
-
 -- Функция для сброса наездника
 function throw_rider(self)
     if self.rider then
@@ -2605,47 +2568,4 @@ function throw_rider(self)
             end
         end)
     end
-end
-
-
-
-
-function scottish_dragon_mount_behavior(self)
-    local function func(_self)
-        if not _self.rider then
-            return true
-        end
-        
-        local rider = _self.rider
-        local player_name = rider:get_player_name()
-
-        if not has_bowed_to_scottish_dragon(player_name, _self) then
-            return
-        end
-
-        local controls = rider:get_player_control()
-        
-        if controls.jump then
-            _self:set_animation("fly")
-            _self:set_velocity({x=0, y=2, z=0})
-        elseif controls.sneak then
-            waterdragon.detach_player(self, player)
-            _self:set_velocity({x=0, y=-2, z=0})
-        elseif controls.up then
-            _self:set_animation("fly")
-            local yaw = _self.object:get_yaw()
-            local velo = vector.multiply(minetest.yaw_to_dir(yaw), 15)
-            _self:set_velocity(velo)
-        else
-            _self:set_animation("hover")
-            _self:set_velocity({x=0, y=0, z=0})
-        end
-
-        if controls.left then
-            _self.object:set_yaw(_self.object:get_yaw() + 0.05)
-        elseif controls.right then
-            _self.object:set_yaw(_self.object:get_yaw() - 0.05)
-        end
-    end
-    self:set_utility(func)
 end
