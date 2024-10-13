@@ -766,11 +766,10 @@ local function damage_objects(self, pos, radius)
 		if ent and ent.name == "__builtin:item" then
 			local stack = ItemStack(ent.itemstring)
 			if stack
-				and stack:get_count() > 98
-				and stack:get_name():match("stone")
-				and minetest.get_item_group(stack:get_name(), "cracky") > 0 then
-				local dragonstone_no = floor(stack:get_count() / 99)
-				local leftover_no = stack:get_count() - 99 * dragonstone_no
+				and stack:get_count() > 2
+				and stack:get_name():match("stone") or stack:get_name():match("cobble") then
+				local dragonstone_no = floor(stack:get_count() / 2)
+				local leftover_no = stack:get_count() - 2 * dragonstone_no
 				if self.name == "waterdragon:rare_water_dragon" then
 					minetest.add_item(object:get_pos(), "waterdragon:dragonstone_block_rare_water " .. dragonstone_no)
 				end

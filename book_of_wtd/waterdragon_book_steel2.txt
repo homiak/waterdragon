@@ -6,4 +6,7 @@ go-to blueprint requires
 Dragonstone Blocks for the 
 frame and core, as well as 
 Dragonstone Bricks for the 
-outer shell.
+outer shell. Dragonstone Blocks 
+are created by dropping a stack
+of stone or cobble and using
+a Water Dragon's breath on it
