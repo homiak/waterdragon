@@ -152,6 +152,14 @@ local book_pages = {
 			size = {x = 1, y = 1},
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		},
+		{ -- Next Page
+			element_type = "image_button",
+			offset = {x = 15, y = 9},
+			size = {x = 1, y = 1},
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
+			unlock_key = "draconic_steel"
+		},
+		
 	},
 
 	-- Chapter 2
@@ -240,11 +248,11 @@ local book_pages = {
 			offset = {x = 11.5, y = 0.5},
 			text = "Rare Water Forge:"
 		},
-		{ -- rare_water Forge Instructions
+		{ -- Rare Water Forge Instructions
 			element_type = "image",
 			offset = {x = 10.5, y = 2.5},
 			size = {x = 4.5, y = 2.5},
-			text = "waterdragon_book_img_rare_water_forge_demo.png"
+			text = "waterdragon_book_img_forge_demo.png"
 		},
 		{ -- Last Page
 			element_type = "image_button",
