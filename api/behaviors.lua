@@ -25,7 +25,6 @@ local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, to
     end
 end
 
--- Применяем новую функцию on_punch к водяным драконам
 minetest.register_on_mods_loaded(function()
     local dragon_types = {"waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon"}
     for _, dragon_type in ipairs(dragon_types) do
@@ -34,7 +33,6 @@ minetest.register_on_mods_loaded(function()
             entity_def.original_on_punch = entity_def.on_punch
             entity_def.on_punch = new_water_dragon_on_punch
             
-            -- Модифицируем функцию on_step для выполнения отложенного slam attack
             local original_on_step = entity_def.on_step
             entity_def.on_step = function(self, dtime)
                 if original_on_step then
@@ -52,18 +50,14 @@ minetest.register_on_mods_loaded(function()
     end
 end)
 
--- Новая функция on_punch для шотландского дракона
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-	-- Сохраняем оригинальное поведение
+
 	modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-	-- Добавляем новое поведение
-	if self.hp > 0 and not self.rider then -- Убедимся, что дракон все еще жив
-		-- Шанс 100% на выполнение slam attack
+	if self.hp > 0 and not self.rider then
 		if math.random() < 1 then
-			-- Отложим выполнение slam attack на короткое время
 			minetest.after(1, function()
-				if self.object:get_pos() then -- Убедимся, что дракон все еще существует
+				if self.object:get_pos() then
 					waterdragon.action_punch(self)
 				end
 			end)
@@ -71,7 +65,6 @@ local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch,
 	end
 end
 
--- Применяем новую функцию on_punch к шотландскому дракону
 minetest.register_on_mods_loaded(function()
 	local dragon_type = "waterdragon:scottish_dragon"
 	local entity_def = minetest.registered_entities[dragon_type]

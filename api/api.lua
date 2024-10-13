@@ -2213,7 +2213,6 @@ end
 
 -- Scottish Dragon
 
--- Добавьте эту функцию где-нибудь в области видимости waterdragon
 function waterdragon.scottish_dragon_break_block(self, pos)
     if not minetest.settings:get_bool("water_dragon_terrain_destruction", true) then
         return
