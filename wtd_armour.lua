@@ -13,6 +13,55 @@ waterdragon.get_armour_texture = function(armour_name)
     return armour_defs[armour_name] or ""
 end
 
+local player_armor_state = {}
+
+minetest.register_on_leaveplayer(function(player)
+    local name = player:get_player_name()
+    local pos = player:get_pos()
+    local radius = 20
+    local objects = minetest.get_objects_inside_radius(pos, radius)
+    
+    for _, obj in ipairs(objects) do
+        local ent = obj:get_luaentity()
+        if ent and ent.name:find("waterdragon:") and ent.armour then
+            player_armor_state[name] = {
+                dragon_name = ent.name,
+                armor_name = ent.armour.name,
+                protection = ent.armour.protection,
+                texture = ent.armour.texture
+            }
+            break
+        end
+    end
+end)
+
+minetest.register_on_joinplayer(function(player)
+    local name = player:get_player_name()
+    if player_armor_state[name] then
+        minetest.after(1, function()
+            local pos = player:get_pos()
+            local radius = 20
+            local objects = minetest.get_objects_inside_radius(pos, radius)
+            
+            for _, obj in ipairs(objects) do
+                local ent = obj:get_luaentity()
+                if ent and ent.name == player_armor_state[name].dragon_name then
+                    ent.armour = {
+                        name = player_armor_state[name].armor_name,
+                        protection = player_armor_state[name].protection,
+                        texture = player_armor_state[name].texture
+                    }
+                    local props = obj:get_properties()
+                    props.textures[1] = player_armor_state[name].texture
+                    obj:set_properties(props)
+                    minetest.chat_send_player(name, "Your Water Dragon's armor has been restored.")
+                    player_armor_state[name] = nil
+                    break
+                end
+            end
+        end)
+    end
+end)
 
 
 waterdragon.register_mob_armour = function(name, def)
