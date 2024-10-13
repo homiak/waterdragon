@@ -2346,8 +2346,10 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
                 minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
             end
         end
-    elseif not self.owner or name ~= self.owner then
+    elseif name ~= self.owner then
         minetest.chat_send_player(name, S("This Scottish Dragon belongs to someone else."))
+	elseif name ~= self.owner then
+        minetest.chat_send_player(name, S("This is a wild Scottish Dragon"))
     end
 end
 

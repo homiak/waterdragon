@@ -152,8 +152,7 @@ end
 check_time()
 
 local moveable = modding.is_pos_moveable
-
-local function is_target_flying(target)
+function is_target_flying(target)
 	if not target or not target:get_pos() then return end
 	local pos = target:get_pos()
 	if not pos then return end
@@ -1016,96 +1015,106 @@ end)
 -- Scottish Dragon Breaking
 
 modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
-	local center = self.object:get_pos()
-	if not center then return end
-	local taming = 0
-	local feed_timer = 10
-	local height_tick = 0
-	local function func(_self)
-		if not player
-			or not player:get_pos() then
-			return true
-		end
-		local pos = _self.object:get_pos()
-		if not pos then return end
-		-- Update Center
-		height_tick = height_tick - 1
-		if height_tick <= 0 then
-			local dist2floor = modding.sensor_floor(_self, 10, true)
-			center.y = center.y + (10 - dist2floor)
-			height_tick = 30
-		end
-		-- Player Interaction
-		if player:get_player_control().sneak then
-			waterdragon.detach_player(_self, player)
-			return true
-		end
-		feed_timer = feed_timer - _self.dtime
-		if feed_timer <= 0 then
-			local inv = player:get_inventory()
-			local stack = inv:get_stack("main", 1)
-			local _, item_name = _self:follow_item(stack)
-			if item_name then
-				stack:take_item(1)
-				inv:set_stack("main", 1, stack)
-				taming = taming + 10
-				local move_dir = vec_normal(_self.object:get_velocity())
-				local part_pos = vec_add(pos, vec_multi(move_dir, 12))
-				local def = minetest.registered_items[item_name]
-				local texture = def.inventory_image
-				if not texture or texture == "" then
-					texture = def.wield_image
-				end
-				minetest.add_particlespawner({
-					amount = 8,
-					time = 0.1,
-					minpos = part_pos,
-					maxpos = part_pos,
-					minvel = { x = -1, y = 1, z = -1 },
-					maxvel = { x = 1, y = 2, z = 1 },
-					minacc = { x = 0, y = -5, z = 0 },
-					maxacc = { x = 0, y = -9, z = 0 },
-					minexptime = 1,
-					maxexptime = 1,
-					minsize = 4,
-					maxsize = 6,
-					collisiondetection = true,
-					vertical = false,
-					texture = texture,
-				})
-				minetest.chat_send_player(player:get_player_name(),
-					"The Scottish Dragon ate some " .. def.description .. "! Taming is at " .. taming .. "%")
-			else
-				waterdragon.detach_player(_self, player)
-				return true
-			end
-			feed_timer = 10
-		end
-		if taming >= 100 then
-			minetest.chat_send_player(player:get_player_name(), "The Scottish Dragon has been tamed!")
-			_self.owner = _self:memorize("owner", player:get_player_name())
-			return true
-		end
-		if not _self:get_action() then
-			if _self.touching_ground then
-				if not can_takeoff(_self, pos) then
-					waterdragon.detach_player(_self, player)
-					return true
-				end
-				waterdragon.action_takeoff(_self)
-			else
-				local move_dir = (vec_dist(pos, center) > 16 and vec_dir(pos, center)) or nil
-				local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
-				waterdragon.action_fly(_self, pos2, 3, "waterdragon:fly_simple", 0.6)
-				if pos.y - pos2.y > 1 then
-					_self:animate("dive")
-				else
-					_self:animate("fly")
-				end
-			end
-		end
-	end
-	self:set_utility(func)
+    local center = self.object:get_pos()
+    if not center then return end
+    local taming = 0
+    local feed_timer = 10
+    local height_tick = 0
+
+    local function func(_self)
+        if not player or not player:get_pos() then
+            return true
+        end
+
+        local pos = _self.object:get_pos()
+        if not pos then return end
+
+        -- Update Center
+        height_tick = height_tick - 1
+        if height_tick <= 0 then
+            local dist2floor = modding.sensor_floor(_self, 10, true)
+            center.y = center.y + (10 - dist2floor)
+            height_tick = 30
+        end
+
+        -- Player Interaction
+        if player:get_player_control().sneak then
+            waterdragon.detach_player(_self, player)
+            return true
+        end
+
+        feed_timer = feed_timer - _self.dtime
+        if feed_timer <= 0 then
+            local wielded_item = player:get_wielded_item()
+            local item_name = wielded_item:get_name()
+            local item_def = minetest.registered_items[item_name]
+            
+            if item_def and item_def.groups and item_def.groups.meat then
+                wielded_item:take_item(1)
+                player:set_wielded_item(wielded_item)
+                taming = taming + 10
+
+                local move_dir = vec_normal(_self.object:get_velocity())
+                local part_pos = vec_add(pos, vec_multi(move_dir, 12))
+                local texture = item_def.inventory_image
+                if not texture or texture == "" then
+                    texture = item_def.wield_image
+                end
+
+                minetest.add_particlespawner({
+                    amount = 8,
+                    time = 0.1,
+                    minpos = part_pos,
+                    maxpos = part_pos,
+                    minvel = {x = -1, y = 1, z = -1},
+                    maxvel = {x = 1, y = 2, z = 1},
+                    minacc = {x = 0, y = -5, z = 0},
+                    maxacc = {x = 0, y = -9, z = 0},
+                    minexptime = 1,
+                    maxexptime = 1,
+                    minsize = 4,
+                    maxsize = 6,
+                    collisiondetection = true,
+                    vertical = false,
+                    texture = texture,
+                })
+
+                minetest.chat_send_player(player:get_player_name(),
+                    "The Scottish Dragon ate some " .. item_def.description .. "! Taming is at " .. taming .. "%")
+            else
+                minetest.chat_send_player(player:get_player_name(),
+                    "The Scottish Dragon needs meat to be tamed!")
+            end
+            feed_timer = 10
+        end
+
+        if taming >= 100 then
+            minetest.chat_send_player(player:get_player_name(), "The Scottish Dragon has been tamed!")
+            _self.owner = _self:memorize("owner", player:get_player_name())
+            return true
+        end
+
+        if not _self:get_action() then
+            if _self.touching_ground then
+                if not can_takeoff(_self, pos) then
+                    waterdragon.detach_player(_self, player)
+                    return true
+                end
+                waterdragon.action_takeoff(_self)
+            else
+                local move_dir = (vec_dist(pos, center) > 16 and vec_dir(pos, center)) or nil
+                local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
+                waterdragon.action_fly(_self, pos2, 3, "waterdragon:fly_simple", 0.6)
+                if pos.y - pos2.y > 1 then
+                    _self:animate("dive")
+                else
+                    _self:animate("fly")
+                end
+            end
+        end
+    end
+
+    self:set_utility(func)
 end)
 
 
