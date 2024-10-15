@@ -540,6 +540,14 @@ modding.register_utility("waterdragon:mount", function(self)
                 else
                     waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "waterdragon:fly_simple", 0.5)
                 end
+				if control.sneak
+        or player:get_player_name() ~= _self.owner then
+            waterdragon.detach_player(_self, player)
+            if pssngr then
+                waterdragon.detach_player(_self, _self.passenger)
+            end
+            return true
+        end
             end
             return
         end
