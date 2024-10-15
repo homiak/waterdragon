@@ -483,7 +483,6 @@ function waterdragon.set_utility(self, utility_name, ...)
     end
 end
 
--- Now update the mount utility to use this new function
 modding.register_utility("waterdragon:mount", function(self)
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
@@ -656,10 +655,17 @@ modding.register_utility("waterdragon:mount", function(self)
                             _self:set_vertical_velocity(0)
                         end
                     end
-                    if _self.touching_ground then
-                        is_landed = true
-                        waterdragon.action_land(_self)
-                    end
+					
+					if not is_landed then
+						if _self.touching_ground then
+							is_landed = true
+							_self:set_gravity(-9.8)
+							_self:set_vertical_velocity(0)
+							_self:set_forward_velocity(0)
+							waterdragon.action_land(_self)
+							return
+						end
+					end
                 end
             end
 
