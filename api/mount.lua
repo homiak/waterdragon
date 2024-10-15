@@ -438,6 +438,52 @@ end
 -- Behavior --
 --------------
 
+local autopilot_active = {}
+
+minetest.register_chatcommand("autopilot", {
+    description = "Toggle autopilot mode for your Water Dragon",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then return false, "Player not found" end
+
+        local dragon
+        for _, obj in pairs(minetest.get_objects_inside_radius(player:get_pos(), 10)) do
+            local ent = obj:get_luaentity()
+            if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
+                if ent.owner == name and ent.rider and ent.rider:get_player_name() == name then
+                    dragon = ent
+                    break
+                end
+            end
+        end
+
+        if not dragon then
+            return false, "No owned and ridden Water Dragon found nearby"
+        end
+
+        autopilot_active[name] = not autopilot_active[name]
+        local status = autopilot_active[name] and "activated" or "deactivated"
+        return true, "Autopilot " .. status .. " for your Water Dragon"
+    end
+})
+
+function waterdragon.set_utility(self, utility_name, ...)
+    if type(modding.registered_utilities[utility_name]) == "function" then
+        modding.registered_utilities[utility_name](self, ...)
+    end
+end
+
+-- Now update the mount utility to use this new function
+-- Add this function to your waterdragon module or in a suitable place in your code
+function waterdragon.set_utility(self, utility_name, ...)
+    if type(modding.registered_utilities[utility_name]) == "function" then
+        modding.registered_utilities[utility_name](self, ...)
+    else
+        minetest.log("error", "Attempt to set non-existent utility: " .. utility_name)
+    end
+end
+
+-- Now update the mount utility to use this new function
 modding.register_utility("waterdragon:mount", function(self)
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
@@ -471,6 +517,33 @@ modding.register_utility("waterdragon:mount", function(self)
             })
         end
 
+        if autopilot_active[player_name] then
+            local target = _self._target
+            if target and target:get_pos() then
+                -- Dragon wants to fight
+				local target_pos = target:get_pos()
+                local self_pos = _self.object:get_pos()
+                local dir = vector.direction(self_pos, target_pos)
+                local distance = vector.distance(self_pos, target_pos)
+                if distance > 5 then
+					_self:set_forward_velocity(24)
+					_self:tilt_to(minetest.dir_to_yaw(dir), 2)
+					_self:animate("fly")
+				else
+                    -- Use the new set_utility function to set the attack utility
+                    waterdragon.set_utility(_self, "waterdragon:attack", target)
+                end
+            else
+                -- No target, move in the direction the player is looking
+                if _self.touching_ground then
+                    waterdragon.action_takeoff(_self, 20)
+                else
+                    waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "waterdragon:fly_simple", 0.5)
+                end
+            end
+            return
+        end
+
         if not _self:get_action() then
             if control.aux1 then
                 if waterdragon.aux_key_setting[player_name] == "pov" then
@@ -482,7 +555,7 @@ modding.register_utility("waterdragon:mount", function(self)
                             })
                             player:set_eye_offset({
                                 x = 0,
-                                y = 450 * scale, -- no
+                                y = 450 * scale,
                                 z = 20 * scale
                             }, {x = 0, y = 0, z = 0})
                             player:hud_set_flags({wielditem = false})
@@ -497,7 +570,7 @@ modding.register_utility("waterdragon:mount", function(self)
                             })
                             player:set_eye_offset({
                                 x = 115 * scale,
-                                y = 170 * scale, -- Set eye offset (3)
+                                y = 170 * scale,
                                 z = -290 * scale
                             }, {x = 0, y = 0, z = 0})
                             player:hud_set_flags({wielditem = false})
@@ -511,9 +584,9 @@ modding.register_utility("waterdragon:mount", function(self)
                                 }
                             })
                             player:set_eye_offset({
-								x = 0,
-								y = 115 * scale,
-								z = -280 * scale
+                                x = 0,
+                                y = 115 * scale,
+                                z = -280 * scale
                             }, {x = 0, y = 0, z = 0})
                             player:hud_set_flags({wielditem = false})
                         end
@@ -542,7 +615,6 @@ modding.register_utility("waterdragon:mount", function(self)
                     anim = "walk"
                 end
                 if control.jump then
-					
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
@@ -552,16 +624,13 @@ modding.register_utility("waterdragon:mount", function(self)
                 _self:set_gravity(0)
                 anim = "hover"
 
-                -- Check for low stamina
                 if _self.flight_stamina < 100 then
                     is_landed = true
                     minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
                 else
                     if control.up then
-						
                         anim = "fly"
                         if _self.pitch_fly then
-							
                             _self:set_vertical_velocity(12 * look_dir.y)
                         end
                         _self:set_forward_velocity(24)
@@ -572,7 +641,6 @@ modding.register_utility("waterdragon:mount", function(self)
                     _self:tilt_to(look_yaw, 2)
                     if not _self.pitch_fly then
                         if control.jump then
-							
                             _self:set_vertical_velocity(12)
                         elseif control.down then
                             _self:set_vertical_velocity(-12)
@@ -612,7 +680,7 @@ modding.register_utility("waterdragon:mount", function(self)
                     end
                     player:set_eye_offset({
                         x = 0,
-                        y = 125 * scale, -- Set eye offset
+                        y = 125 * scale,
                         z = 30 * scale
                     }, {x = 0, y = 0, z = 0})
                 end
@@ -632,203 +700,6 @@ modding.register_utility("waterdragon:mount", function(self)
         if pssngr
         and pssngr:get_player_control().sneak then
             waterdragon.detach_player(_self, pssngr)
-        end
-    end
-    self:set_utility(func)
-end)
-
-
-
-modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
-    local is_landed = modding.sensor_floor(self, 5, true) < 4
-    local view_held = false
-    local view_point = 2
-    local momentum = 0
-    local attack_cooldown = 0
-    self:halt()
-    local func = function(_self)
-        local player = _self.rider
-        if not player
-        or not player:get_look_horizontal() then
-            return true
-        end
-
-        local player_name = player:get_player_name()
-        local control = player:get_player_control()
-
-        local look_dir = player:get_look_dir()
-        local look_yaw = minetest.dir_to_yaw(look_dir)
-
-        local player_data = waterdragon.mounted_player_data[player_name]
-
-        if not player_data then return true end
-
-        local player_props = player:get_properties()
-
-        if player_props.visual_size.x ~= 0 then
-            player:set_properties({
-                visual_size = {x = 0, y = 0, z = 0},
-            })
-        end
-
-        if control.aux1 then
-            if not view_held then
-                if view_point == 2 then
-                    view_point = 1
-                    player_data.fake_player:set_properties({
-                        visual_size = {x = 0, y = 0, z = 0},
-                    })
-                    player:hud_set_flags({wielditem = false})
-                elseif view_point == 1 then
-                    view_point = 2
-                    local dragon_size = _self.object:get_properties().visual_size
-                    player_data.fake_player:set_properties({
-                        visual_size = {
-                            x = 1 / dragon_size.x,
-                            y = 1 / dragon_size.y
-                        }
-                    })
-                    player:hud_set_flags({wielditem = false})
-                end
-                view_held = true
-            end
-        else
-            view_held = false
-        end
-
-        if not _self:get_action() then
-
-            local anim
-
-            if is_landed then
-                _self:set_gravity(-9.8)
-                anim = "stand"
-                if control.up then
-                    _self:set_forward_velocity(12)
-                    _self:turn_to(look_yaw, 4)
-                    anim = "walk"
-                end
-                if control.jump then
-                    
-                    is_landed = false
-                    waterdragon.action_takeoff(_self)
-                end
-                if control.LMB then
-                    waterdragon.action_punch(_self)
-                end
-            else
-                _self:set_gravity(0)
-                anim = "hover"
-                if control.up then
-                    anim = "fly"
-                    _self:set_weighted_velocity(32, look_dir)
-                    if look_dir.y < -0.33 then
-                        if momentum < 28 then
-                            momentum = momentum + (_self.dtime * 20) * abs(look_dir.y)
-                        end
-                    elseif momentum > 0 then
-                        momentum = momentum - _self.dtime * 15
-                        if momentum < 0 then momentum = 0 end
-                    end
-                else
-                    _self:set_vertical_velocity(0)
-                    _self:set_forward_velocity(0)
-                end
-                _self:tilt_to(look_yaw, 4)
-                if _self.touching_ground then
-                    is_landed = true
-                    waterdragon.action_land(_self)
-                end
-
-                if control.LMB and attack_cooldown <= 0 then
-                    local start_pos = _self.object:get_pos()
-                    start_pos.y = start_pos.y + 1.5
-                    local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))
-                    
-                    -- Воспроизведение звука при каждой попытке атаки
-                    local pos = _self.object:get_pos()
-                    if pos then
-                        minetest.sound_play("waterdragon_scottish_dragon_bite", {
-                            pos = pos,
-                            max_hear_distance = 10,
-                            gain = 1.0,
-                        }, true)  -- true для надежного воспроизведения
-                    end
-
-                    anim = "fly_punch"
-                    attack_cooldown = 1  -- Устанавливаем кулдаун атаки
-                    
-                    local ray = minetest.raycast(start_pos, end_pos, true, false)
-                    for pointed_thing in ray do
-                        if pointed_thing.type == "object" then
-                            local obj = pointed_thing.ref
-                            if obj ~= player and obj ~= _self.object then
-                                _self:punch_target(obj)
-                                break
-                            end
-                        end
-                    end
-                end
-            end
-
-            if anim == "fly"
-            and momentum > 0 then
-                _self:set_weighted_velocity(32 + momentum, look_dir)
-                anim = "dive"
-            end
-
-            if anim then
-                _self:animate(anim)
-            end
-        end
-
-        attack_cooldown = math.max(0, attack_cooldown - _self.dtime)
-
-        if view_point == 2 then
-            local goal_y = 0 - 60 * look_dir.y
-            local goal_z = -120 + 60 * abs(look_dir.y)
-            if _self._anim == "dive" then
-                local accel_offset = 60 + momentum
-                goal_y = 40 - accel_offset * look_dir.y
-                goal_z = -160 + accel_offset * abs(look_dir.y)
-            end
-            local offset = player:get_eye_offset()
-            if abs(goal_y - offset.y) > 0.1
-            or abs(goal_z - offset.z) > 0.1 then
-                local lerp_w = _self.dtime * 2
-                player:set_eye_offset({
-                    x = 0,
-                    y = offset.y + (goal_y - offset.y) * lerp_w,
-                    z = offset.z + (goal_z - offset.z) * lerp_w},
-                {x = 0, y = 0, z = 0})
-            end
-        else
-            local goal_y = 25
-            local goal_z = 10
-            if _self._anim == "fly" then
-                goal_y = goal_y + 15 * look_dir.y
-                goal_z = goal_z - 20 * look_dir.y
-            elseif _self._anim == "dive" then
-                local accel_offset = momentum * 0.5
-                goal_y = goal_y + accel_offset * look_dir.y
-                goal_z = goal_z - accel_offset * look_dir.y
-            end
-            local offset = player:get_eye_offset()
-            if abs(goal_y - offset.y) > 0.1
-            or abs(goal_z - offset.z) > 0.1 then
-                local lerp_w = _self.dtime * 4
-                player:set_eye_offset({
-                    x = 0,
-                    y = offset.y + (goal_y - offset.y) * lerp_w,
-                    z = offset.z + (goal_z - offset.z) * lerp_w},
-                {x = 0, y = 0, z = 0})
-            end
-        end
-
-        if control.sneak
-        or player:get_player_name() ~= _self.owner then
-            waterdragon.detach_player(_self, player)
-            return true
         end
     end
     self:set_utility(func)
