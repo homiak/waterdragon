@@ -224,6 +224,9 @@ end
 -- Movement Methods --
 
 modding.register_movement_method("waterdragon:fly_pathfind", function(self)
+	if not self.fly_allowed then
+		return
+	end
 	local path = {}
 	local steer_to
 	local steer_timer = 0.01
@@ -266,6 +269,9 @@ modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 end)
 
 modding.register_movement_method("waterdragon:fly_simple", function(self)
+	if not self.fly_allowed then
+		return
+	end
 	local steer_to
 	local steer_timer = 0.25
 	local width = self.width
