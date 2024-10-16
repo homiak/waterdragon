@@ -570,7 +570,7 @@ function waterdragon.action_hover_pure_water(self, target, time)
 	self:set_action(func)
 end
 
-local function can_takeoff(self, pos)
+function can_takeoff(self, pos)
 	local height = self.height
 	local pos2 = {
 		x = pos.x,

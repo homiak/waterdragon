@@ -2438,24 +2438,7 @@ local function create_healing_water(pos, radius)
 					local node = minetest.get_node(water_pos)
 					if node.name == "default:water_source" then
 						minetest.set_node(water_pos, { name = "waterdragon:healing_water" })
-						minetest.add_particlespawner({
-							amount = 0.00001,
-							time = 0,
-							minpos = vector.subtract(pos, radius),
-							maxpos = vector.add(pos, radius),
-							minvel = { x = -0.1, y = -0, z = -0.1 },
-							maxvel = { x = 0.1, y = -0.02, z = 0.1 },
-							minacc = { x = 0, y = -0.01, z = 0 },
-							maxacc = { x = 0, y = -0.02, z = 0 },
-							minexptime = 1,
-							maxexptime = 2,
-							minsize = 2,
-							maxsize = 3,
-							collisiondetection = true,
-							collision_removal = true,
-							texture = "bubble.png^[colorize:#00FFFF:127",
-							glow = 7,
-						})
+						
 						table.insert(healing_water_positions, water_pos)
 					end
 				end
@@ -2527,15 +2510,12 @@ minetest.register_abm({
 	end,
 })
 
--- Функция для сброса наездника
 function throw_rider(self)
     if self.rider then
         local rider = self.rider
         waterdragon.detach_player(self, rider)
         local dragon_pos = self.object:get_pos()
         local throw_dir
-        
-        -- Попытка получить направление взгляда дракона
         if self.object:get_yaw() then
             local yaw = self.object:get_yaw()
             throw_dir = {
@@ -2544,13 +2524,11 @@ function throw_rider(self)
                 z = math.cos(yaw)
             }
         else
-            -- Если не удалось получить направление взгляда, используем случайное направление
             throw_dir = {
                 x = math.random() - 0.5,
                 y = 0,
                 z = math.random() - 0.5
             }
-            -- Нормализуем вектор
             local length = math.sqrt(throw_dir.x^2 + throw_dir.z^2)
             throw_dir.x = throw_dir.x / length
             throw_dir.z = throw_dir.z / length
