@@ -24,7 +24,7 @@ local function finish_bow(player_name, dragon)
 	minetest.chat_send_player(player_name, S("You bow to the Water Dragon"))
 end
 
-local function has_bowed_to_dragon(player_name, dragon)
+function has_bowed_to_dragon(player_name, dragon)
 	return bow_players[player_name] and bow_players[player_name][dragon.wtd_id]
 end
 

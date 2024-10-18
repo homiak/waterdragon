@@ -141,6 +141,39 @@ modding.register_mob("waterdragon:rare_water_dragon", {
             self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
         end
         self.alert_timer = self:memorize("alert_timer", 15)
+        local puncher_name = puncher:get_player_name() or puncher:get_luaentity().name
+        local current_time = minetest.get_gametime()
+        
+        -- Initialize punch tracking
+        if not self.punch_data then
+            self.punch_data = { count = 0, last_punch_time = 0, attacker = nil }
+        end
+        
+        -- If the puncher is the same and it's within 30 seconds, increment the punch count
+        if self.punch_data.attacker == puncher_name and (current_time - self.punch_data.last_punch_time) <= 30 then
+            self.punch_data.count = self.punch_data.count + 1
+        else
+            -- Reset counter if it's a new attacker or more than 30 seconds have passed
+            self.punch_data.count = 1
+            self.punch_data.attacker = puncher_name
+        end
+        
+        -- Update the time of the last punch
+        self.punch_data.last_punch_time = current_time
+        
+        -- If punched 6 times within 30 seconds, attack the puncher
+        if self.punch_data.count >= 6 then
+            -- Reset the counter
+            self.punch_data.count = 0
+        
+            -- Make the dragon attack the puncher
+            self.attack_target = puncher
+            local tgt_pos = puncher:get_pos()
+            self:breath_attack(tgt_pos)
+            waterdragon.action_slam(self)
+            waterdragon.action_hover_pure_water(self, puncher, 100)
+            waterdragon.action_flight_pure_water(self, puncher, 100000)
+        end
     end,
     deactivate_func = function(self)
         if not waterdragon.waterdragons[self.wtd_id] then return end
