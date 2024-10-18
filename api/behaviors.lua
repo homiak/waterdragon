@@ -7,22 +7,35 @@ local S = waterdragon.S
 -- Slam
 
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-
     if self.original_on_punch then
         self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
     end
 
     if self.object:get_hp() > 0 and not self.rider then
-        if self.is_landed then
-            minetest.after(0.5, function()
-                if self.object:get_pos() and not self.rider and self.is_landed then
-                    waterdragon.action_slam(self)
-                end
-            end)
-        else
-            self.pending_slam = true
+        -- Initialize slam_count if it doesn't exist
+        self.slam_count = self.slam_count or 0
+
+        if self.slam_count < 3 then
+            if self.is_landed then
+                minetest.after(0.5, function()
+                    if self.object:get_pos() and not self.rider and self.is_landed then
+                        waterdragon.action_slam(self)
+                        self.slam_count = self.slam_count + 1
+                    end
+                end)
+            else
+                self.pending_slam = true
+            end
         end
     end
+end
+
+function reset_slam_count(self)
+    minetest.after(30, function()
+        if self.object:get_pos() then
+            self.slam_count = 0
+        end
+    end)
 end
 
 minetest.register_on_mods_loaded(function()
@@ -41,8 +54,17 @@ minetest.register_on_mods_loaded(function()
                 
                 if self.pending_slam and self.is_landed and not self.rider then
                     self.pending_slam = false
-                    waterdragon.action_slam(self)
+                    if self.slam_count < 3 then
+                        waterdragon.action_slam(self)
+                        self.slam_count = self.slam_count + 1
+                    end
                 end
+            end
+            
+            local original_on_activate = entity_def.on_activate or function() end
+            entity_def.on_activate = function(self, staticdata, dtime_s)
+                original_on_activate(self, staticdata, dtime_s)
+                self.slam_count = 0
             end
             
             minetest.register_entity(":" .. dragon_type, entity_def)

@@ -624,8 +624,10 @@ modding.register_utility("waterdragon:mount", function(self)
                 anim = "hover"
 
                 if _self.flight_stamina < 100 then
-                    is_landed = true
+                    anim = "fly"
+                    _self:set_vertical_velocity(-2000)
                     minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
+
                 else
                     if control.up then
                         anim = "fly"
