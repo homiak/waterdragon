@@ -31,7 +31,7 @@ local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, to
 end
 
 function reset_slam_count(self)
-    minetest.after(30, function()
+    minetest.after(10, function()
         if self.object:get_pos() then
             self.slam_count = 0
         end
@@ -73,27 +73,46 @@ minetest.register_on_mods_loaded(function()
 end)
 
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
+    modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-	modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+    if self.hp > 0 and not self.rider then
+        -- Initialize punch_count if it doesn't exist
+        self.punch_count = self.punch_count or 0
 
-	if self.hp > 0 and not self.rider then
-		if math.random() < 1 then
-			minetest.after(1, function()
-				if self.object:get_pos() then
-					waterdragon.action_punch(self)
-				end
-			end)
-		end
-	end
+        if self.punch_count < 3 then
+            if math.random() < 1 then
+                minetest.after(1, function()
+                    if self.object:get_pos() then
+                        waterdragon.action_punch(self)
+                        self.punch_count = self.punch_count + 1
+                        
+                        -- Reset punch count after 30 seconds
+                        minetest.after(10, function()
+                            if self.object:get_pos() then
+                                self.punch_count = 0
+                            end
+                        end)
+                    end
+                end)
+            end
+        end
+    end
 end
 
 minetest.register_on_mods_loaded(function()
-	local dragon_type = "waterdragon:scottish_dragon"
-	local entity_def = minetest.registered_entities[dragon_type]
-	if entity_def then
-		entity_def.on_punch = new_scottish_dragon_on_punch
-		minetest.register_entity(":" .. dragon_type, entity_def)
-	end
+    local dragon_type = "waterdragon:scottish_dragon"
+    local entity_def = minetest.registered_entities[dragon_type]
+    if entity_def then
+        entity_def.on_punch = new_scottish_dragon_on_punch
+        
+        local original_on_activate = entity_def.on_activate or function() end
+        entity_def.on_activate = function(self, staticdata, dtime_s)
+            original_on_activate(self, staticdata, dtime_s)
+            self.punch_count = 0
+        end
+
+        minetest.register_entity(":" .. dragon_type, entity_def)
+    end
 end)
 
 waterdragon.pure_water_dragon_targets = {}
