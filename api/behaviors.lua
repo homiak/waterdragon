@@ -11,7 +11,7 @@ local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, to
         self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
     end
 
-    if self.object:get_hp() > 0 and not self.rider then
+    if self.object:get_hp() > 0 and not self.rider and not self._target  and not self.is_flying then
         -- Initialize slam_count if it doesn't exist
         self.slam_count = self.slam_count or 0
 
@@ -75,7 +75,7 @@ end)
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
     modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-    if self.hp > 0 and not self.rider then
+    if self.hp > 0 and not self.rider and not self._target  and not self.is_flying then
         -- Initialize punch_count if it doesn't exist
         self.punch_count = self.punch_count or 0
 
