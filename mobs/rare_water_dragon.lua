@@ -260,7 +260,7 @@ function rescue_pegasus(rescuer, pegasus)
     local max_height = start_pos.y + 50
     local rescue_pos = {
         x = start_pos.x + math.random(-20, 20),
-        y = start_pos.y,  -- Начальная высота
+        y = start_pos.y,
         z = start_pos.z + math.random(-20, 20)
     }
     local original_properties = pegasus.object:get_properties()
