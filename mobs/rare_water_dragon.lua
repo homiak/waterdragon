@@ -205,24 +205,10 @@ modding.register_mob("waterdragon:rare_water_dragon", {
 		if self.dragon_activate then
 			self.dragon_activate(self)
 		end
-        if staticdata ~= "" then
-            local data = minetest.deserialize(staticdata)
-            if data and data.color_overlay then
-                local props = self.object:get_properties()
-                props.textures[1] = "waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png" .. data.color_overlay
-                self.object:set_properties(props)
-            else
-                local props = self.object:get_properties()
-                props.textures[1] = apply_color_variation(props.textures[1])
-                self.object:set_properties(props)
-                self.color_overlay = get_random_color_overlay()
-            end
-        end
 	end,
     get_staticdata = function(self)
 		local data = {
 			armour = self.armour,
-            color_overlay = self.color_overlay
 		}
 		return minetest.serialize(data)
 	end,
