@@ -256,34 +256,49 @@ function rescue_pegasus(rescuer, pegasus)
     if not pegasus.needs_rescue then return end
 
 
+    local start_pos = pegasus.object:get_pos()
+    local max_height = start_pos.y + 50
     local rescue_pos = {
-        x = pegasus.object:get_pos().x,
-        y = pegasus.object:get_pos().y + 100,
-        z = pegasus.object:get_pos().z
+        x = start_pos.x + math.random(-20, 20),
+        y = start_pos.y,  -- Начальная высота
+        z = start_pos.z + math.random(-20, 20)
     }
-
-    -- Сохраняем оригинальный размер Пегаса
     local original_properties = pegasus.object:get_properties()
     
-    -- Уменьшаем размер Пегаса для посадки на Дракона
     pegasus.object:set_properties({
-        visual_size = {x = 0.3, y = 0.3, z = 0.3},
-        collisionbox = {-0.195, 0, -0.195, 0.195, 0.585, 0.195}
+        visual_size = {x = 0.4, y = 0.4, z = 0.4},
+        collisionbox = {-0.26, 0, -0.26, 0.26, 0.78, 0.26}
     })
+    pegasus.object:set_attach(rescuer, "", {x=0, y=1.5, z=-2}, {x=0, y=0, z=0})
 
-    pegasus.object:set_attach(rescuer, "", {x=0, y=5, z=0}, {x=0, y=0, z=0})
-
-    -- Проверяем наличие функции action_fly в прототипе waterdragon
     if waterdragon and waterdragon.action_fly then
-        waterdragon.action_fly(rescuer:get_luaentity(), rescue_pos, 10, "waterdragon:fly_simple", 1, "fly")
-
-        minetest.after(11, function()
+        local flight_duration = 20
+        local descent_start = 15
+        local function smooth_flight(t)
+            if t < descent_start then
+                return math.min(max_height, start_pos.y + (max_height - start_pos.y) * (t / descent_start))
+            else
+                local descent_progress = (t - descent_start) / (flight_duration - descent_start)
+                return max_height - (max_height - rescue_pos.y) * descent_progress
+            end
+        end
+        for t = 1, flight_duration do
+            minetest.after(t, function()
+                local current_pos = rescuer:get_pos()
+                local progress = t / flight_duration
+                local new_pos = {
+                    x = start_pos.x + (rescue_pos.x - start_pos.x) * progress,
+                    y = smooth_flight(t),
+                    z = start_pos.z + (rescue_pos.z - start_pos.z) * progress
+                }
+                waterdragon.action_fly(rescuer:get_luaentity(), new_pos, 1, "waterdragon:fly_simple", 1, "fly")
+            end)
+        end
+        minetest.after(flight_duration + 1, function()
             pegasus.object:set_detach()
             pegasus.object:set_properties(original_properties)
             
-            local land_pos = vector.add(rescue_pos, {x = math.random(-5, 5), y = 0, z = math.random(-5, 5)})
-            pegasus.object:set_pos(land_pos)
-            
+            pegasus.object:set_pos(rescue_pos)
         end)
     else
         pegasus.object:set_detach()
@@ -302,3 +317,6 @@ minetest.register_globalstep(function(dtime)
         _G.rescue_pegasus = rescue_pegasus
     end
 end)
+
+
+

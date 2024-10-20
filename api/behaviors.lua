@@ -47,7 +47,7 @@ minetest.register_on_mods_loaded(function()
             entity_def.on_punch = new_water_dragon_on_punch
             
             local original_on_step = entity_def.on_step
-            entity_def.on_step = function(self, dtime)
+            on_step = function(self, dtime)
                 if original_on_step then
                     original_on_step(self, dtime)
                 end
