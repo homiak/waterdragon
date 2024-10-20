@@ -252,3 +252,53 @@ end
 
 minetest.register_craftitem("waterdragon:spawn_rare_water_dragon", spawn_egg_def)
 
+function rescue_pegasus(rescuer, pegasus)
+    if not pegasus.needs_rescue then return end
+
+
+    local rescue_pos = {
+        x = pegasus.object:get_pos().x,
+        y = pegasus.object:get_pos().y + 100,
+        z = pegasus.object:get_pos().z
+    }
+
+    -- Сохраняем оригинальный размер Пегаса
+    local original_properties = pegasus.object:get_properties()
+    
+    -- Уменьшаем размер Пегаса для посадки на Дракона
+    pegasus.object:set_properties({
+        visual_size = {x = 0.3, y = 0.3, z = 0.3},
+        collisionbox = {-0.195, 0, -0.195, 0.195, 0.585, 0.195}
+    })
+
+    pegasus.object:set_attach(rescuer, "", {x=0, y=5, z=0}, {x=0, y=0, z=0})
+
+    -- Проверяем наличие функции action_fly в прототипе waterdragon
+    if waterdragon and waterdragon.action_fly then
+        waterdragon.action_fly(rescuer:get_luaentity(), rescue_pos, 10, "waterdragon:fly_simple", 1, "fly")
+
+        minetest.after(11, function()
+            pegasus.object:set_detach()
+            pegasus.object:set_properties(original_properties)
+            
+            local land_pos = vector.add(rescue_pos, {x = math.random(-5, 5), y = 0, z = math.random(-5, 5)})
+            pegasus.object:set_pos(land_pos)
+            
+        end)
+    else
+        pegasus.object:set_detach()
+        pegasus.object:set_properties(original_properties)
+    end
+
+    pegasus.needs_rescue = false
+    pegasus.attack_count = 0
+end
+
+
+
+minetest.register_globalstep(function(dtime)
+    if not _G.pegasus_rescue_initialized then
+        _G.pegasus_rescue_initialized = true
+        _G.rescue_pegasus = rescue_pegasus
+    end
+end)
