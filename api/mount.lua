@@ -617,6 +617,9 @@ modding.register_utility("waterdragon:mount", function(self)
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
+                if control.RMB then
+                    waterdragon.action_slam(_self)
+                end
             elseif is_landing then
                 anim = "fly_to_land"
             else
