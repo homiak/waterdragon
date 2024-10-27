@@ -83,7 +83,7 @@ local function get_dragon_formspec(self)
 		"label[6.8,0.8;" .. correct_name(self.name) .. " (" .. correct_name(self.gender) .. ")]",
 		"label[7,1.5;" .. current_age .. " " .. S("Year(s) Old") .. "]",
 		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or S("Set Name")) .. "]",
-		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
+		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]",
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
@@ -119,7 +119,7 @@ function get_customize_formspec(self)
 			"dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;1]",
 			"label[5.1,0.8;Eye Colour]",
 			"model[1.5,1.7;10,7;mob_mesh;" ..
-			self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]"
+			self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
 		}
 	elseif self.name == "waterdragon:rare_water_dragon" then
 		form = {
@@ -130,7 +130,7 @@ function get_customize_formspec(self)
 			"dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;1]",
 			"label[5.1,0.8;Eye Colour]",
 			"model[1.5,1.7;10,7;mob_mesh;" ..
-			self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]"
+			self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
 		}
 	end
 	return table.concat(form, "")
