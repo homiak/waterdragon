@@ -164,6 +164,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	utility_stack = waterdragon.scottish_dragon_behavior,
 	activate_func = function(self)
 		waterdragon.scottish_dragon_activate(self)
+		apply_name_bonuses(self)
 	end,
 	on_activate = function(self, staticdata, dtime_s)
 		if staticdata ~= "" then

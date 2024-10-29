@@ -289,6 +289,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 	utility_stack = waterdragon.dragon_behavior,
 	activate_func = function(self)
 		waterdragon.dragon_activate(self)
+		apply_name_bonuses(self)
 	end,
 	step_func = function(self, dtime, moveresult)
 		waterdragon.dragon_step(self, dtime, moveresult)
