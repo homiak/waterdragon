@@ -2330,6 +2330,7 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
         if clicker:get_player_control().sneak then
             self:show_formspec(clicker)
         else
+           
             waterdragon.attach_player(self, clicker)
 			minetest.chat_send_player(name, "You currently can't mount the Scottish Dragon")
             if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
@@ -2346,9 +2347,9 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
                 minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
             end
         end
-    elseif name ~= self.owner then
+    elseif name ~= self.owner and self.owner then
         minetest.chat_send_player(name, S("This Scottish Dragon belongs to someone else."))
-	elseif not self.owner then
+    elseif not self.owner then
         minetest.chat_send_player(name, S("This is a wild Scottish Dragon"))
     end
 end
