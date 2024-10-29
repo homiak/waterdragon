@@ -1446,6 +1446,7 @@ modding.register_utility("waterdragon:stay", function(self)
         local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
         
         if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
+			if self.rider then return end
             _self.object:set_velocity({x=0, y=0, z=0})
             _self.object:set_acceleration({x=0, y=0, z=0})
             if not _self:get_action() then

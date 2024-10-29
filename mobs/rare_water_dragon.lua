@@ -92,7 +92,7 @@ local special_dragon_names = {
     },
     ["Leviathan"] = {
         health_bonus = 180,
-        damage_bonus = 9,
+        damage_bonus = 4,
         speed_bonus = 8,
         effect = "powerful"
     },
@@ -234,7 +234,7 @@ local function apply_name_bonuses(self)
                 if modifiers.effect == "powerful" then
                     minetest.chat_send_player(owner, "Your Dragon " .. self.nametag .. " feels powerful!")
                 elseif modifiers.effect == "cute" then
-                    minetest.chat_send_player(owner, "Your Dragon " .. self.nametag .. " is adorable but very weak! You can better give him a more powerfull name")
+                    minetest.chat_send_player(owner, "Your Dragon " .. self.nametag .. " is adorable but very weak! You can better give him a more powerful name such as Kilgara or Avalon")
                 end
             end
         end)
@@ -251,7 +251,7 @@ end
 
 function dragon_stay_behavior(self)
     if self.order ~= "stay" then return end
-
+    if self.rider then return end
     local vel = self.object:get_velocity()
     local pos = self.object:get_pos()
     local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
