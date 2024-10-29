@@ -2332,7 +2332,6 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
         else
            
             waterdragon.attach_player(self, clicker)
-			minetest.chat_send_player(name, "You currently can't mount the Scottish Dragon")
             if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
                 minetest.after(1, function()
                     if self.object:get_luaentity() then
