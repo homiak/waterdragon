@@ -7,112 +7,112 @@ local S = waterdragon.S
 -- Slam
 
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    if self.original_on_punch then
-        self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    end
+	if self.original_on_punch then
+		self.original_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
+	end
 
-    if self.object:get_hp() > 0 and not self.rider and not self._target  and not self.is_flying then
-        -- Initialize slam_count if it doesn't exist
-        self.slam_count = self.slam_count or 0
+	if self.object:get_hp() > 0 and not self.rider and not self._target and not self.is_flying then
+		-- Initialize slam_count if it doesn't exist
+		self.slam_count = self.slam_count or 0
 
-        if self.slam_count < 3 then
-            if self.is_landed then
-                minetest.after(0.5, function()
-                    if self.object:get_pos() and not self.rider and self.is_landed then
-                        waterdragon.action_slam(self)
-                        self.slam_count = self.slam_count + 1
-                    end
-                end)
-            else
-                self.pending_slam = true
-            end
-        end
-    end
+		if self.slam_count < 3 then
+			if self.is_landed then
+				minetest.after(0.5, function()
+					if self.object:get_pos() and not self.rider and self.is_landed then
+						waterdragon.action_slam(self)
+						self.slam_count = self.slam_count + 1
+					end
+				end)
+			else
+				self.pending_slam = true
+			end
+		end
+	end
 end
 
 function reset_slam_count(self)
-    minetest.after(10, function()
-        if self.object:get_pos() then
-            self.slam_count = 0
-        end
-    end)
+	minetest.after(10, function()
+		if self.object:get_pos() then
+			self.slam_count = 0
+		end
+	end)
 end
 
 minetest.register_on_mods_loaded(function()
-    local dragon_types = {"waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon"}
-    for _, dragon_type in ipairs(dragon_types) do
-        local entity_def = minetest.registered_entities[dragon_type]
-        if entity_def then
-            entity_def.original_on_punch = entity_def.on_punch
-            entity_def.on_punch = new_water_dragon_on_punch
-            
-            local original_on_step = entity_def.on_step
-            on_step = function(self, dtime)
-                if original_on_step then
-                    original_on_step(self, dtime)
-                end
-                
-                if self.pending_slam and self.is_landed and not self.rider then
-                    self.pending_slam = false
-                    if self.slam_count < 3 then
-                        waterdragon.action_slam(self)
-                        self.slam_count = self.slam_count + 1
-                    end
-                end
-            end
-            
-            local original_on_activate = entity_def.on_activate or function() end
-            entity_def.on_activate = function(self, staticdata, dtime_s)
-                original_on_activate(self, staticdata, dtime_s)
-                self.slam_count = 0
-            end
-            
-            minetest.register_entity(":" .. dragon_type, entity_def)
-        end
-    end
+	local dragon_types = { "waterdragon:pure_water_dragon", "waterdragon:rare_water_dragon" }
+	for _, dragon_type in ipairs(dragon_types) do
+		local entity_def = minetest.registered_entities[dragon_type]
+		if entity_def then
+			entity_def.original_on_punch = entity_def.on_punch
+			entity_def.on_punch = new_water_dragon_on_punch
+
+			local original_on_step = entity_def.on_step
+			on_step = function(self, dtime)
+				if original_on_step then
+					original_on_step(self, dtime)
+				end
+
+				if self.pending_slam and self.is_landed and not self.rider then
+					self.pending_slam = false
+					if self.slam_count < 3 then
+						waterdragon.action_slam(self)
+						self.slam_count = self.slam_count + 1
+					end
+				end
+			end
+
+			local original_on_activate = entity_def.on_activate or function() end
+			entity_def.on_activate = function(self, staticdata, dtime_s)
+				original_on_activate(self, staticdata, dtime_s)
+				self.slam_count = 0
+			end
+
+			minetest.register_entity(":" .. dragon_type, entity_def)
+		end
+	end
 end)
 
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-    modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
-    if self.hp > 0 and not self.rider and not self._target  and not self.is_flying then
-        -- Initialize punch_count if it doesn't exist
-        self.punch_count = self.punch_count or 0
+	if self.hp > 0 and not self.rider and not self._target and not self.is_flying then
+		-- Initialize punch_count if it doesn't exist
+		self.punch_count = self.punch_count or 0
 
-        if self.punch_count < 3 then
-            if math.random() < 1 then
-                minetest.after(1, function()
-                    if self.object:get_pos() then
-                        waterdragon.action_punch(self)
-                        self.punch_count = self.punch_count + 1
-                        
-                        -- Reset punch count after 30 seconds
-                        minetest.after(10, function()
-                            if self.object:get_pos() then
-                                self.punch_count = 0
-                            end
-                        end)
-                    end
-                end)
-            end
-        end
-    end
+		if self.punch_count < 3 then
+			if math.random() < 1 then
+				minetest.after(1, function()
+					if self.object:get_pos() then
+						waterdragon.action_punch(self)
+						self.punch_count = self.punch_count + 1
+
+						-- Reset punch count after 30 seconds
+						minetest.after(10, function()
+							if self.object:get_pos() then
+								self.punch_count = 0
+							end
+						end)
+					end
+				end)
+			end
+		end
+	end
 end
 
 minetest.register_on_mods_loaded(function()
-    local dragon_type = "waterdragon:scottish_dragon"
-    local entity_def = minetest.registered_entities[dragon_type]
-    if entity_def then
-        entity_def.on_punch = new_scottish_dragon_on_punch
-        
-        local original_on_activate = entity_def.on_activate or function() end
-        entity_def.on_activate = function(self, staticdata, dtime_s)
-            original_on_activate(self, staticdata, dtime_s)
-            self.punch_count = 0
-        end
+	local dragon_type = "waterdragon:scottish_dragon"
+	local entity_def = minetest.registered_entities[dragon_type]
+	if entity_def then
+		entity_def.on_punch = new_scottish_dragon_on_punch
 
-        minetest.register_entity(":" .. dragon_type, entity_def)
-    end
+		local original_on_activate = entity_def.on_activate or function() end
+		entity_def.on_activate = function(self, staticdata, dtime_s)
+			original_on_activate(self, staticdata, dtime_s)
+			self.punch_count = 0
+		end
+
+		minetest.register_entity(":" .. dragon_type, entity_def)
+	end
 end)
 
 waterdragon.pure_water_dragon_targets = {}
@@ -348,51 +348,51 @@ local TAMER_NAME = "Scottii"
 local taming_ability_enabled = false
 
 local function waterdragon_action_tame_by_scottii(player, wtd)
-    if not wtd.owner then
-        wtd.owner = player:get_player_name()
-    end
+	if not wtd.owner then
+		wtd.owner = player:get_player_name()
+	end
 end
 
 minetest.register_globalstep(function(dtime)
-    if not taming_ability_enabled then
-        return
-    end
-    
-    local player = minetest.get_player_by_name(TAMER_NAME)
-    if player then
-        local player_pos = player:get_pos()
-        local objs = minetest.get_objects_inside_radius(player_pos, 10)
+	if not taming_ability_enabled then
+		return
+	end
 
-        for _, obj in ipairs(objs) do
-            local entity = obj:get_luaentity()
-            if entity and entity.name and string.match(entity.name, "^waterdragon:") then
-                waterdragon_action_tame_by_scottii(player, entity)
-            end
-        end
-    end
+	local player = minetest.get_player_by_name(TAMER_NAME)
+	if player then
+		local player_pos = player:get_pos()
+		local objs = minetest.get_objects_inside_radius(player_pos, 10)
+
+		for _, obj in ipairs(objs) do
+			local entity = obj:get_luaentity()
+			if entity and entity.name and string.match(entity.name, "^waterdragon:") then
+				waterdragon_action_tame_by_scottii(player, entity)
+			end
+		end
+	end
 end)
 
 local function toggle_taming_ability(name)
-    taming_ability_enabled = not taming_ability_enabled
-    local status = taming_ability_enabled and " already " or " airedy "
-    minetest.chat_send_player(name, "You" .. status ..  "can interact with the Water Dragons")
+	taming_ability_enabled = not taming_ability_enabled
+	local status = taming_ability_enabled and " already " or " airedy "
+	minetest.chat_send_player(name, "You" .. status .. "can interact with the Water Dragons")
 end
 
 for color, hex in pairs(waterdragon.colors_pure_water) do
-    minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
-        description = S("Pure Water Dragon Scales"),
-        inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
-        on_use = function(itemstack, user)
-            local name = user:get_player_name()
-            toggle_taming_ability(name)
-            return itemstack
-        end,
-        groups = { wtd_scales = 1 }
-    })
+	minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
+		description = S("Pure Water Dragon Scales"),
+		inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,
+		on_use = function(itemstack, user)
+			local name = user:get_player_name()
+			toggle_taming_ability(name)
+			return itemstack
+		end,
+		groups = { wtd_scales = 1 }
+	})
 end
 
 function waterdragon.is_taming_ability_enabled()
-    return taming_ability_enabled
+	return taming_ability_enabled
 end
 
 function waterdragon.action_flight_pure_water(self, target, timeout)
@@ -1061,106 +1061,138 @@ end)
 
 -- Scottish Dragon Breaking
 
-modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
-    local center = self.object:get_pos()
-    if not center then return end
-    local taming = 0
-    local feed_timer = 10
-    local height_tick = 0
+function scottish_dragon_flying(self)
+    local flight_timer = 0  -- Таймер для смены направления
 
-    local function func(_self)
-        if not player or not player:get_pos() then
-            return true
-        end
-
-        local pos = _self.object:get_pos()
-        if not pos then return end
-
-        -- Update Center
-        height_tick = height_tick - 1
-        if height_tick <= 0 then
-            local dist2floor = modding.sensor_floor(_self, 10, true)
-            center.y = center.y + (10 - dist2floor)
-            height_tick = 30
-        end
-
-        -- Player Interaction
-        if player:get_player_control().sneak then
-            waterdragon.detach_player(_self, player)
-            return true
-        end
-
-        feed_timer = feed_timer - _self.dtime
-        if feed_timer <= 0 then
-            local wielded_item = player:get_wielded_item()
-            if minetest.get_item_group(wielded_item:get_name(), "meat") > 0 then
-                wielded_item:take_item(1)
-                player:set_wielded_item(wielded_item)
-                taming = taming + 10
-
-                -- Particle effects for feeding
-                local move_dir = vector.normalize(_self.object:get_velocity())
-                local part_pos = vector.add(pos, vector.multiply(move_dir, 12))
-                local def = minetest.registered_items[wielded_item:get_name()]
-                local texture = def.inventory_image
-                if not texture or texture == "" then
-                    texture = def.wield_image
-                end
-
-                minetest.add_particlespawner({
-                    amount = 8,
-                    time = 0.1,
-                    minpos = part_pos,
-                    maxpos = part_pos,
-                    minvel = {x = -1, y = 1, z = -1},
-                    maxvel = {x = 1, y = 2, z = 1},
-                    minacc = {x = 0, y = -5, z = 0},
-                    maxacc = {x = 0, y = -9, z = 0},
-                    minexptime = 1,
-                    maxexptime = 1,
-                    minsize = 4,
-                    maxsize = 6,
-                    collisiondetection = true,
-                    vertical = false,
-                    texture = texture,
-                })
-
-                minetest.chat_send_player(player:get_player_name(), 
-                    "The Scottish Dragon ate some " .. def.description .. "! Taming is at " .. taming .. "%")
-            else
-                minetest.chat_send_player(player:get_player_name(),
-                    "The Scottish Dragon needs meat to be tamed!")
-            end
-            feed_timer = 10
-        end
-
-        if taming >= 100 then
-            minetest.chat_send_player(player:get_player_name(), "The Scottish Dragon has been tamed!")
-            _self.owner = _self:memorize("owner", player:get_player_name())
-            return true
-        end
-
-        if not _self:get_action() then
-            if _self.touching_ground then
-                if not can_takeoff(_self, pos) then
-                    waterdragon.detach_player(_self, player)
-                    return true
-                end
-                waterdragon.action_takeoff(_self)
-            else
-                local move_dir = (vector.distance(pos, center) > 16 and vector.direction(pos, center)) or nil
-                local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
-                _self:move_to(pos2, "waterdragon:fly_simple", 0.6)
-                if pos.y - pos2.y > 1 then
-                    _self:animate("dive")
-                else
-                    _self:animate("fly")
-                end
-            end
-        end
+    -- Функция, задающая случайное направление полета
+    local function random_direction()
+        local angle = math.rad(math.random(0, 360))
+        return {x = math.cos(angle), y = math.random(-0.2, 0.2), z = math.sin(angle)}
     end
 
-    self:set_utility(func)
+    -- Основной цикл полета
+    minetest.register_globalstep(function(dtime)
+        -- Проверка, что дракон существует
+        if not self.object or not self.object:get_pos() then return end
+
+        flight_timer = flight_timer + dtime
+        if flight_timer >= 3 then  -- Каждые 3 секунды меняем направление
+            local new_dir = random_direction()
+            local speed = 5  -- Скорость полета, можно настроить
+
+            -- Установка скорости и направления
+            self.object:set_velocity({
+                x = new_dir.x * speed,
+                y = new_dir.y * speed,
+                z = new_dir.z * speed
+            })
+            self:animate("fly")  -- Включение анимации полета
+
+            flight_timer = 0  -- Сброс таймера
+        end
+    end)
+end
+
+
+modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
+	local center = self.object:get_pos()
+	if not center then return end
+	local taming = 0
+	local feed_timer = 10
+	local height_tick = 0
+
+	local function func(_self)
+		if not player or not player:get_pos() then
+			return true
+		end
+		scottish_dragon_flying(self)
+		local pos = _self.object:get_pos()
+		if not pos then return end
+
+		-- Update Center
+		height_tick = height_tick - 1
+		if height_tick <= 0 then
+			local dist2floor = modding.sensor_floor(_self, 10, true)
+			center.y = center.y + (10 - dist2floor)
+			height_tick = 30
+		end
+
+		-- Player Interaction
+		if player:get_player_control().sneak then
+			waterdragon.detach_player(_self, player)
+			return true
+		end
+
+		feed_timer = feed_timer - _self.dtime
+		if feed_timer <= 0 then
+			local wielded_item = player:get_wielded_item()
+			if minetest.get_item_group(wielded_item:get_name(), "meat") > 0 then
+				wielded_item:take_item(1)
+				player:set_wielded_item(wielded_item)
+				taming = taming + 10
+
+				-- Particle effects for feeding
+				local move_dir = vector.normalize(_self.object:get_velocity())
+				local part_pos = vector.add(pos, vector.multiply(move_dir, 12))
+				local def = minetest.registered_items[wielded_item:get_name()]
+				local texture = def.inventory_image
+				if not texture or texture == "" then
+					texture = def.wield_image
+				end
+
+				minetest.add_particlespawner({
+					amount = 8,
+					time = 0.1,
+					minpos = part_pos,
+					maxpos = part_pos,
+					minvel = { x = -1, y = 1, z = -1 },
+					maxvel = { x = 1, y = 2, z = 1 },
+					minacc = { x = 0, y = -5, z = 0 },
+					maxacc = { x = 0, y = -9, z = 0 },
+					minexptime = 1,
+					maxexptime = 1,
+					minsize = 4,
+					maxsize = 6,
+					collisiondetection = true,
+					vertical = false,
+					texture = texture,
+				})
+				minetest.chat_send_player(player:get_player_name(),
+					"The Scottish Dragon ate some " .. def.description .. "! Taming is at " .. taming .. "%")
+			else
+				minetest.chat_send_player(player:get_player_name(),
+					"The Scottish Dragon needs meat to be tamed!")
+			end
+			feed_timer = 10
+		end
+
+		if taming >= 100 then
+			minetest.chat_send_player(player:get_player_name(), "The Scottish Dragon has been tamed!")
+			_self.owner = _self:memorize("owner", player:get_player_name())
+			return true
+		end
+
+		if not _self:get_action() then
+			if _self.touching_ground then
+				if not can_takeoff(_self, pos) then
+					waterdragon.detach_player(_self, player)
+					return true
+				end
+				waterdragon.action_takeoff(_self)
+			else
+				local move_dir = (vector.distance(pos, center) > 16 and vector.direction(pos, center)) or nil
+				local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
+				_self:move_to(pos2, "waterdragon:fly_simple", 0.6)
+				if pos.y - pos2.y > 1 then
+					_self:animate("dive")
+				else
+					_self:animate("fly")
+				end
+			end
+		end
+	end
+
+	self:set_utility(func)
 end)
 
 
@@ -1168,103 +1200,102 @@ end)
 
 
 local function vec_dist(a, b)
-    local x, y, z = a.x - b.x, a.y - b.y, a.z - b.z
-    return math.sqrt(x * x + y * y + z * z)
+	local x, y, z = a.x - b.x, a.y - b.y, a.z - b.z
+	return math.sqrt(x * x + y * y + z * z)
 end
 
 local function vec_dir(a, b)
-    local x, y, z = b.x - a.x, b.y - a.y, b.z - a.z
-    local length = vec_dist(a, b)
-    if length == 0 then
-        return {x = 0, y = 0, z = 0}
-    end
-    return {x = x / length, y = y / length, z = z / length}
+	local x, y, z = b.x - a.x, b.y - a.y, b.z - a.z
+	local length = vec_dist(a, b)
+	if length == 0 then
+		return { x = 0, y = 0, z = 0 }
+	end
+	return { x = x / length, y = y / length, z = z / length }
 end
 
 local function dir2yaw(dir)
-    return math.atan2(dir.z, dir.x)
+	return math.atan2(dir.z, dir.x)
 end
 
 local function diff(a, b)
-    return math.atan2(math.sin(b - a), math.cos(b - a))
+	return math.atan2(math.sin(b - a), math.cos(b - a))
 end
 
 
 local function throw_wing_horn(self, target)
-    local pos = self.object:get_pos()
-    if not pos then return end
-    local tgt_pos = target:get_pos()
-    if not tgt_pos then return end
-    local dir = vec_dir(pos, tgt_pos)
-    local obj = minetest.add_entity(pos, "waterdragon:wing_horn")
-    if obj then
-        local ent = obj:get_luaentity()
-        if ent then
-            ent.owner = self.object
-        end
-        obj:set_velocity({x = dir.x * 15, y = dir.y * 15, z = dir.z * 15})
-        obj:set_acceleration({x = 0, y = -9.8, z = 0})
-        minetest.after(10, function()
-            if obj and obj:get_luaentity() then
-                obj:remove()
-            end
-        end)
-    end
+	local pos = self.object:get_pos()
+	if not pos then return end
+	local tgt_pos = target:get_pos()
+	if not tgt_pos then return end
+	local dir = vec_dir(pos, tgt_pos)
+	local obj = minetest.add_entity(pos, "waterdragon:wing_horn")
+	if obj then
+		local ent = obj:get_luaentity()
+		if ent then
+			ent.owner = self.object
+		end
+		obj:set_velocity({ x = dir.x * 15, y = dir.y * 15, z = dir.z * 15 })
+		obj:set_acceleration({ x = 0, y = -9.8, z = 0 })
+		minetest.after(10, function()
+			if obj and obj:get_luaentity() then
+				obj:remove()
+			end
+		end)
+	end
 end
 
 function waterdragon.is_target_flying(target)
-    if not target then
-        return false
-    end
-    
-    local pos = target:get_pos()
-    if not pos then
-        return false
-    end
-    
+	if not target then
+		return false
+	end
 
-    for i = 0, 4 do
-        local check_pos = {x = pos.x, y = pos.y - i, z = pos.z}
-        local node = minetest.get_node_or_nil(check_pos)
-        if not node then
-            return false
-        end
-        
-        local node_def = minetest.registered_nodes[node.name]
-        if node_def and (node_def.walkable or (node_def.drawtype == "liquid" and node_def.liquidtype ~= "none")) then
-            return i > 1
-        end
-    end
-    
-    return true
+	local pos = target:get_pos()
+	if not pos then
+		return false
+	end
+
+
+	for i = 0, 4 do
+		local check_pos = { x = pos.x, y = pos.y - i, z = pos.z }
+		local node = minetest.get_node_or_nil(check_pos)
+		if not node then
+			return false
+		end
+
+		local node_def = minetest.registered_nodes[node.name]
+		if node_def and (node_def.walkable or (node_def.drawtype == "liquid" and node_def.liquidtype ~= "none")) then
+			return i > 1
+		end
+	end
+
+	return true
 end
 
-
 minetest.register_entity("waterdragon:wing_horn", {
-    initial_properties = {
-        visual = "sprite",
-        textures = {"waterdragon_wing_horn.png"},
-        physical = true,
-        collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
-    },
-    owner = nil,
-    on_step = function(self, dtime)
-        if not self.object:get_pos() then return end
-        local pos = self.object:get_pos()
-        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
-            if obj ~= self.object and obj ~= self.owner then
-                if obj:is_player() then
-                    obj:set_hp(0)
-                    self.object:remove()
-                    return
-                elseif obj:get_luaentity() and obj:get_luaentity().health then
-                    obj:get_luaentity().health = 0
-                    self.object:remove()
-                    return
-                end
-            end
-        end
-    end
+	initial_properties = {
+		visual = "sprite",
+		textures = { "waterdragon_wing_horn.png" },
+		physical = true,
+		collisionbox = { -0.2, -0.2, -0.2, 0.2, 0.2, 0.2 },
+	},
+	owner = nil,
+	on_step = function(self, dtime)
+		if not self.object:get_pos() then return end
+		local pos = self.object:get_pos()
+		for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+			if obj ~= self.object and obj ~= self.owner then
+				if obj:is_player() then
+					obj:set_hp(0)
+					self.object:remove()
+					return
+				elseif obj:get_luaentity() and obj:get_luaentity().health then
+					obj:get_luaentity().health = 0
+					self.object:remove()
+					return
+				end
+			end
+		end
+	end
 })
 
 
@@ -1273,21 +1304,21 @@ modding.register_utility("waterdragon:attack", function(self, target)
 		-- If the Water Dragon is not allowed to fly
 		return
 	end
-    local is_landed = true
-    local init = false
-    local takeoff_init = false
-    local land_init = false
-    local fov_timer = 0
-    local switch_timer = 20
-    local wing_horn_cooldown = 0
+	local is_landed = true
+	local init = false
+	local takeoff_init = false
+	local land_init = false
+	local fov_timer = 0
+	local switch_timer = 20
+	local wing_horn_cooldown = 0
 
-    local function func(_self)
-        if not _self.fly_allowed then
-            return
-        end
+	local function func(_self)
+		if not _self.fly_allowed then
+			return
+		end
 		if self.flight_stamina < 100 then
-            return
-        end
+			return
+		end
 
 		local target_alive, _, tgt_pos = _self:get_target(target)
 		if not target_alive then
@@ -1300,94 +1331,94 @@ modding.register_utility("waterdragon:attack", function(self, target)
 			return true
 		end
 
-        local target_alive, _, tgt_pos = _self:get_target(target)
-        if not target_alive then
-            _self._target = nil
-            return true
-        end
+		local target_alive, _, tgt_pos = _self:get_target(target)
+		if not target_alive then
+			_self._target = nil
+			return true
+		end
 
-        local pos = _self.object:get_pos()
-        local yaw = _self.object:get_yaw()
-        if not pos then return end
+		local pos = _self.object:get_pos()
+		local yaw = _self.object:get_yaw()
+		if not pos then return end
 
-        local yaw2tgt = dir2yaw(vec_dir(pos, tgt_pos))
-        if math.abs(diff(yaw, yaw2tgt)) > 0.3 then
-            fov_timer = fov_timer + _self.dtime
-        end
+		local yaw2tgt = dir2yaw(vec_dir(pos, tgt_pos))
+		if math.abs(diff(yaw, yaw2tgt)) > 0.3 then
+			fov_timer = fov_timer + _self.dtime
+		end
 
-        switch_timer = switch_timer - _self.dtime
-        wing_horn_cooldown = wing_horn_cooldown - _self.dtime
+		switch_timer = switch_timer - _self.dtime
+		wing_horn_cooldown = wing_horn_cooldown - _self.dtime
 
-        if not _self:get_action() then
-            if not init then
-                local dist2floor = modding.sensor_floor(_self, 7, true)
-                if dist2floor > 6 or waterdragon.is_target_flying(target) then
-                    is_landed = false
-                end
-                init = true
-            elseif switch_timer <= 0 then
-                local switch_chance = (is_landed and 6) or 3
-                is_landed = math.random(switch_chance) > 1
-                takeoff_init = not is_landed
-                land_init = is_landed
-                switch_timer = 20
-            end
+		if not _self:get_action() then
+			if not init then
+				local dist2floor = modding.sensor_floor(_self, 7, true)
+				if dist2floor > 6 or waterdragon.is_target_flying(target) then
+					is_landed = false
+				end
+				init = true
+			elseif switch_timer <= 0 then
+				local switch_chance = (is_landed and 6) or 3
+				is_landed = math.random(switch_chance) > 1
+				takeoff_init = not is_landed
+				land_init = is_landed
+				switch_timer = 20
+			end
 
-            if land_init then
-                if not _self.touching_ground then
-                    local pos2 = tgt_pos
-                    if waterdragon.is_target_flying(target) then
-                        pos2 = {x = pos.x, y = pos.y - 7, z = pos.z}
-                    end
-                    modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
-                else
-                    waterdragon.action_land(_self)
-                    land_init = false
-                end
-                return
-            end
+			if land_init then
+				if not _self.touching_ground then
+					local pos2 = tgt_pos
+					if waterdragon.is_target_flying(target) then
+						pos2 = { x = pos.x, y = pos.y - 7, z = pos.z }
+					end
+					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
+				else
+					waterdragon.action_land(_self)
+					land_init = false
+				end
+				return
+			end
 
-            if takeoff_init and _self.touching_ground then
-                waterdragon.action_takeoff(_self)
-                takeoff_init = false
-                return
-            end
+			if takeoff_init and _self.touching_ground then
+				waterdragon.action_takeoff(_self)
+				takeoff_init = false
+				return
+			end
 
-            local dist = vec_dist(pos, tgt_pos)
-            local attack_range = (is_landed and 8) or 16
+			local dist = vec_dist(pos, tgt_pos)
+			local attack_range = (is_landed and 8) or 16
 
-            if dist <= attack_range then
-                if wing_horn_cooldown <= 0 and math.random() < 0.3 then
-                    throw_wing_horn(_self, target)
-                    wing_horn_cooldown = 5
-                else
-                    if is_landed then
-                        if fov_timer < 1 and target:is_player() then
-                            waterdragon.action_repel(_self, target)
-                        else
-                            waterdragon.action_slam(_self, target)
-                            is_landed = false
-                            fov_timer = 0
-                        end
-                    else
-                        if math.random(3) < 2 then
-                            waterdragon.action_flight_pure_water(_self, target, 12)
-                        else
-                            waterdragon.action_hover_pure_water(_self, target, 3)
-                        end
-                    end
-                end
-            else
-                if is_landed then
-                    waterdragon.action_pursue(_self, target, 2, "modding:obstacle_avoidance", 0.75, "walk_slow")
-                else
-                    tgt_pos.y = tgt_pos.y + 14
-                    modding.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
-                end
-            end
-        end
-    end
-    self:set_utility(func)
+			if dist <= attack_range then
+				if wing_horn_cooldown <= 0 and math.random() < 0.3 then
+					throw_wing_horn(_self, target)
+					wing_horn_cooldown = 5
+				else
+					if is_landed then
+						if fov_timer < 1 and target:is_player() then
+							waterdragon.action_repel(_self, target)
+						else
+							waterdragon.action_slam(_self, target)
+							is_landed = false
+							fov_timer = 0
+						end
+					else
+						if math.random(3) < 2 then
+							waterdragon.action_flight_pure_water(_self, target, 12)
+						else
+							waterdragon.action_hover_pure_water(_self, target, 3)
+						end
+					end
+				end
+			else
+				if is_landed then
+					waterdragon.action_pursue(_self, target, 2, "modding:obstacle_avoidance", 0.75, "walk_slow")
+				else
+					tgt_pos.y = tgt_pos.y + 14
+					modding.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
+				end
+			end
+		end
+	end
+	self:set_utility(func)
 end)
 
 
@@ -1434,31 +1465,31 @@ end)
 -- Tamed Behavior --
 
 modding.register_utility("waterdragon:stay", function(self)
-    local function func(_self)
-        local order = _self.order
-        if not order or order ~= "stay" then
-            return true
-        end
-        
-        local vel = _self.object:get_velocity()
-        local pos = _self.object:get_pos()
-        local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
-        
-        if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
+	local function func(_self)
+		local order = _self.order
+		if not order or order ~= "stay" then
+			return true
+		end
+
+		local vel = _self.object:get_velocity()
+		local pos = _self.object:get_pos()
+		local node_below = minetest.get_node({ x = pos.x, y = pos.y - 1, z = pos.z })
+
+		if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
 			if self.rider then return end
-            _self.object:set_velocity({x=0, y=0, z=0})
-            _self.object:set_acceleration({x=0, y=0, z=0})
-            if not _self:get_action() then
-                modding.action_idle(_self, 2, "hover")
-            end
-        else
-            _self.object:set_acceleration({x=0, y=-9.81, z=0})
-            if not _self:get_action() then
-                modding.action_idle(_self, 2, "stand")
-            end
-        end
-    end
-    self:set_utility(func)
+			_self.object:set_velocity({ x = 0, y = 0, z = 0 })
+			_self.object:set_acceleration({ x = 0, y = 0, z = 0 })
+			if not _self:get_action() then
+				modding.action_idle(_self, 2, "hover")
+			end
+		else
+			_self.object:set_acceleration({ x = 0, y = -9.81, z = 0 })
+			if not _self:get_action() then
+				modding.action_idle(_self, 2, "stand")
+			end
+		end
+	end
+	self:set_utility(func)
 end)
 
 modding.register_utility("waterdragon:follow_player", function(self, player)
@@ -1582,14 +1613,14 @@ waterdragon.dragon_behavior = {
 			if self.order == "stay" then
 				local vel = self.object:get_velocity()
 				local pos = self.object:get_pos()
-				local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
-		
+				local node_below = minetest.get_node({ x = pos.x, y = pos.y - 1, z = pos.z })
+
 				if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
-					self.object:set_velocity({x=0, y=0, z=0})
-					self.object:set_acceleration({x=0, y=0, z=0})
+					self.object:set_velocity({ x = 0, y = 0, z = 0 })
+					self.object:set_acceleration({ x = 0, y = 0, z = 0 })
 					self:animate("hover")
 				else
-					self.object:set_acceleration({x=0, y=-9.81, z=0})
+					self.object:set_acceleration({ x = 0, y = -9.81, z = 0 })
 				end
 			end
 			return 0
@@ -1654,7 +1685,7 @@ waterdragon.scottish_dragon_behavior = {
 			return 0
 		end,
 	},
-	
+
 	{ -- Stay (Order)
 		utility = "waterdragon:stay",
 		get_score = function(self)
