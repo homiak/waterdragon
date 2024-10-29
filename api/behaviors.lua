@@ -1151,7 +1151,7 @@ modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, 
             else
                 local move_dir = (vec_dist(pos, center) > 16 and vec_dir(pos, center)) or nil
                 local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
-                waterdragon.action_fly(_self, pos2, 3, "waterdragon:fly_simple", 0.6)
+				_self:move_to(pos2, method or "waterdragon:fly_simple", speed_factor)
                 if pos.y - pos2.y > 1 then
                     _self:animate("dive")
                 else

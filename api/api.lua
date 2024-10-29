@@ -2330,9 +2330,9 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
         if clicker:get_player_control().sneak then
             self:show_formspec(clicker)
         else
-            -- waterdragon.attach_player(self, clicker)
+            waterdragon.attach_player(self, clicker)
 			minetest.chat_send_player(name, "You currently can't mount the Scottish Dragon")
-            if not has_bowed_to_scottish_dragon(name, self) and self.rider then
+            if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
                 minetest.after(1, function()
                     if self.object:get_luaentity() then
                         waterdragon.action_takeoff(self, 20)
@@ -2512,7 +2512,7 @@ minetest.register_abm({
 })
 
 function throw_rider(self)
-    if self.rider then
+    if self.rider and self.owner then
         local rider = self.rider
         waterdragon.detach_player(self, rider)
         local dragon_pos = self.object:get_pos()
