@@ -852,7 +852,6 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     end
 
                     anim = "fly_punch"
-                    attack_cooldown = 1
 
                     local ray = minetest.raycast(start_pos, end_pos, true, false)
                     for pointed_thing in ray do
