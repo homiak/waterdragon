@@ -138,12 +138,12 @@ waterdragon.register_mob_armour = function(name, def)
         func = function(name, param)
             local player = minetest.get_player_by_name(name)
             if not player then return false, "Player not found" end
-
+            
             local pos = player:get_pos()
             local radius = 20
             local objects = minetest.get_objects_inside_radius(pos, radius)
-            
             for _, obj in ipairs(objects) do
+                obj.armour = false
                 local ent = obj:get_luaentity()
                 if ent and ent.name == def.mob_name then
                     local stack = player:get_wielded_item()
@@ -154,6 +154,9 @@ waterdragon.register_mob_armour = function(name, def)
                         obj:set_properties(props)
                         stack:take_item()
                         player:set_wielded_item(stack)
+                        local armour = obj.armour or false
+                        obj.armour = true
+                        obj.armour = obj:memorize("water_dragon_armour", armour)
                         return true, "Armour successfully set on " .. def.mob_name .. " (Protection: " .. def.protection .. ")"
                     end
                 end
