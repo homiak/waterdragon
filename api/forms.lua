@@ -159,15 +159,12 @@ local function get_scottish_dragon_formspec(self)
         fly_allowed = "Flight Not Allowed"
         fly_image = "waterdragon_forms_flight_disallowed.png"
     end
-    -- Identifier
-    local scottish_id = self.scottish_id or waterdragon.get_scottish_dragon_identifier()
     local form = {
         "formspec_version[4]",
         "size[16,10]",
         "bgcolor[#0000ff;false]",
         "background[0,0;16,10;waterdragon_forms_bg_b.png]",
         "label[6.8,0.8;" .. correct_name(self.name) .. "]",
-        "label[6.8,1.3;" .. scottish_id .. "]",
         "button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or "Set Name") .. "]",
         "model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
         "image[1.1,1.3;1,1;" .. health_ind .. "]",

@@ -169,7 +169,7 @@ function waterdragon.attach_player(self, player)
     -- Set Players Eye Offset
     player:set_eye_offset({
         x = 0,
-        y = 115 * scale,     -- Set eye offset
+        y = 115 * scale,        -- Set eye offset
         z = -280 * scale
     }, { x = 0, y = 0, z = 0 }) -- 3rd person eye offset is limited to 15 on each axis (Fix this, devs.)
     player:set_look_horizontal(self.object:get_yaw() or 0)
@@ -222,7 +222,7 @@ function waterdragon.attach_passenger(self, player)
     -- Set players eye offset
     player:set_eye_offset({
         x = 0,
-        y = 115 * scale,     -- Set eye offset
+        y = 115 * scale,        -- Set eye offset
         z = -280 * scale
     }, { x = 0, y = 0, z = 0 }) -- 3rd person eye offset is limited to 15 on each axis (Fix this, devs.)
     player:set_look_horizontal(self.object:get_yaw() or 0)
@@ -444,7 +444,7 @@ minetest.register_chatcommand("autopilot", {
     description = "Toggle autopilot mode for your Water Dragon",
     func = function(name)
         local player = minetest.get_player_by_name(name)
-        if not player then return false, "Player not found" end
+        if not player then return false, S("Player not found") end
 
         local dragon
         for _, obj in pairs(minetest.get_objects_inside_radius(player:get_pos(), 10)) do
@@ -641,7 +641,9 @@ modding.register_utility("waterdragon:mount", function(self)
                 anim = "hover"
 
                 if _self.flight_stamina < 100 then
-                    autopilot_active[player_name] = false
+                    if autopilot_active[player_name] then
+                        autopilot_active[player_name] = false
+                    end
                     anim = "fly"
                     _self:set_vertical_velocity(-20)
                     minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
@@ -865,8 +867,6 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     end
                 end
             end
-
-
 
             if anim == "fly"
                 and momentum > 0 then

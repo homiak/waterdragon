@@ -373,20 +373,6 @@ function waterdragon.generate_id()
 	return idst
 end
 
-function waterdragon.generate_scottish_id()
-	local idst = ""
-	for _ = 0, 5 do idst = idst .. (random(0, 9)) end
-	if waterdragon.scottish_dragons[idst] then
-		local fail_safe = 20
-		while waterdragon.scottish_dragons[idst]
-			and fail_safe > 0 do
-			for _ = 0, 5 do idst = idst .. (random(0, 9)) end
-			fail_safe = fail_safe - 1
-		end
-	end
-	return idst
-end
-
 -------------------
 -- Mob Functions --
 -------------------
@@ -2069,10 +2055,6 @@ function waterdragon.scottish_dragon_activate(self)
 	self.fly_allowed = self:recall("fly_allowed") or false
 	self.hunger = self:recall("hunger") or self.max_hunger
 	activate_nametag(self)
-	if self.scottish_id == 1 then
-		self.scottish_id = waterdragon.generate_scottish_id()
-		self:memorize("scottish_id", self.scottish_id)
-	end
 	-- Movement Data
 	self.is_landed = self:recall("is_landed") or false
 	-- World Data

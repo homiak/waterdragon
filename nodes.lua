@@ -706,9 +706,3 @@ waterdragon.on_scottish_dragon_fly = function(pos, scottish_id)
         end
     end
 end
-
-function waterdragon.get_scottish_dragon_identifier()
-    local adjectives = {"Brave", "Fierce", "Mighty", "Noble", "Proud", "Stalwart", "Valiant"}
-    local nouns = {"Highlander", "Clansman", "Warrior", "Chieftain", "Laird", "Piper", "Scotsman"}
-    return adjectives[random(#adjectives)] .. " " .. nouns[random(#nouns)]
-end
