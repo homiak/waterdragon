@@ -672,7 +672,7 @@ modding.register_utility("waterdragon:mount", function(self)
                     end
 
                     if not is_landed then
-                        if _self.touching_ground then
+                        if _self.touching_ground and not control.jump then
                             is_landed = true
                             _self:set_gravity(-9.8)
                             _self:set_vertical_velocity(0)
@@ -832,7 +832,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     _self:set_forward_velocity(0)
                 end
                 _self:tilt_to(look_yaw, 4)
-                if _self.touching_ground then
+                if _self.touching_ground and not control.jump then
                     is_landed = true
                     waterdragon.action_land(_self)
                 end
