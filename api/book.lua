@@ -18,22 +18,22 @@ local book_pages = {
 		{ -- Main Page
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1.5},
+			offset = { x = 0, y = 1.5 },
 			file = "waterdragon_book_home.txt"
 		},
 		{ -- Water Dragon Image
 			element_type = "image",
 			font_size = 24,
-			offset = {x = 8.19, y = 1.19},
-			size = {x = 8.5, y = 8.5},
+			offset = { x = 8.19, y = 1.19 },
+			size = { x = 8.5, y = 8.5 },
 			text = "waterdragon_book_img_water_dragon_3.png"
 		},
 		{ -- Next Page
 			unlock_key = "waterdragons",
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 	},
@@ -42,57 +42,57 @@ local book_pages = {
 		{ -- Main Page
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1.5},
+			offset = { x = 0, y = 1.5 },
 			file = "waterdragon_book_dragon1.txt"
 		},
 		{ -- Water Dragon Image
 			element_type = "image",
 			font_size = 24,
-			offset = {x = 8, y = 1.2},
-			size = {x = 8, y = 8},
+			offset = { x = 8, y = 1.2 },
+			size = { x = 8, y = 8 },
 			text = "waterdragon_book_img_water_dragon.png"
 		},
 		{ -- Next Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
 	{ -- Water Dragons Page 2
 		{ -- Water Dragon Image
-		element_type = "image",
-		font_size = 24,
-		offset = {x = 0, y = 1.3},
-		size = {x = 8, y = 8},
-		text = "waterdragon_book_img_water_dragon_2.png"
+			element_type = "image",
+			font_size = 24,
+			offset = { x = 0, y = 1.3 },
+			size = { x = 8, y = 8 },
+			text = "waterdragon_book_img_water_dragon_2.png"
 		},
 		{ -- Combat Text
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 8, y = 1.5},
+			offset = { x = 8, y = 1.5 },
 			file = "waterdragon_book_dragon2.txt"
 		},
 		{ -- Next Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
@@ -100,34 +100,34 @@ local book_pages = {
 		{ -- Hatching Text
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1.5},
+			offset = { x = 0, y = 1.5 },
 			file = "waterdragon_book_dragon3.txt"
 		},
 		{ -- Water Dragon Text
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 8, y = 1.5},
+			offset = { x = 8, y = 1.5 },
 			file = "waterdragon_book_dragon4.txt"
 		},
 		{ -- Next Page
 			element_type = "image_button",
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		},
 		{ -- Last Page
 			unlock_key = "draconic_steel",
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
@@ -135,31 +135,31 @@ local book_pages = {
 		{ -- Scottish Dragon Text
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1.5},
+			offset = { x = 0, y = 1.5 },
 			file = "waterdragon_book_dragon5.txt"
 		},
 		{ -- Water Dragon Image
 			element_type = "image",
 			font_size = 24,
-			offset = {x = 8.5, y = 2},
-			size = {x = 7.5, y = 6.5},
+			offset = { x = 8.5, y = 2 },
+			size = { x = 7.5, y = 6.5 },
 			text = "waterdragon_wtd.png"
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		},
 		{ -- Next Page
 			element_type = "image_button",
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
 			unlock_key = "draconic_steel"
 		},
-		
+
 	},
 
 	-- Chapter 2
@@ -168,58 +168,58 @@ local book_pages = {
 			unlock_key = "draconic_steel",
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1.5},
+			offset = { x = 0, y = 1.5 },
 			file = "waterdragon_book_steel1.txt"
 		},
 		{ -- Page 2
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 8, y = 1.5},
+			offset = { x = 8, y = 1.5 },
 			file = "waterdragon_book_steel2.txt"
 		},
 		{ -- Next Page
 			element_type = "image_button",
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-{ -- Steel Page 2
+	{ -- Steel Page 2
 		{ -- Forge Instructions
 			element_type = "image",
-			offset = {x = 1.5, y = 0.5},
-			size = {x = 5, y = 10},
+			offset = { x = 1.5, y = 0.5 },
+			size = { x = 5, y = 10 },
 			text = "waterdragon_book_img_forge_instructions.png"
-		},	
+		},
 		{ -- Forge Label
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 2, y = 0.5},
+			offset = { x = 2, y = 0.5 },
 			text = "Constructing a Forge:"
 		},
 		{ -- Page 2
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 8, y = 0.5},
+			offset = { x = 8, y = 0.5 },
 			file = "waterdragon_book_steel3.txt"
 		},
 		{ -- Next Page
 			element_type = "image_button",
-			offset = {x = 15, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
 		},
 		{ -- Last Page
 			element_type = "image_button",
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
@@ -227,37 +227,37 @@ local book_pages = {
 		{ -- Main Page
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 0, y = 1},
+			offset = { x = 0, y = 1 },
 			file = "waterdragon_book_steel4.txt"
 		},
 		{ -- Forge Label
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 11.5, y = 5.5},
+			offset = { x = 11.5, y = 5.5 },
 			text = "Pure Water Forge:"
 		},
 		{ -- Pure Water Forge Instructions
 			element_type = "image",
-			offset = {x = 10.5, y = 6.5},
-			size = {x = 4.5, y = 2.5},
+			offset = { x = 10.5, y = 6.5 },
+			size = { x = 4.5, y = 2.5 },
 			text = "waterdragon_book_img_forge_demo.png"
 		},
 		{ -- Forge Label
 			element_type = "label",
 			font_size = 24,
-			offset = {x = 11.5, y = 0.5},
+			offset = { x = 11.5, y = 0.5 },
 			text = "Rare Water Forge:"
 		},
 		{ -- Rare Water Forge Instructions
 			element_type = "image",
-			offset = {x = 10.5, y = 2.5},
-			size = {x = 4.5, y = 2.5},
+			offset = { x = 10.5, y = 2.5 },
+			size = { x = 4.5, y = 2.5 },
 			text = "waterdragon_book_img_forge_demo.png"
 		},
 		{ -- Last Page
 			element_type = "image_button",
-			offset = {x = 1, y = 9},
-			size = {x = 1, y = 1},
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	}
@@ -268,34 +268,34 @@ local book_pages = {
 ---------
 
 function waterdragon.contains_book(inventory)
-    return inventory and inventory:contains_item("main", ItemStack("waterdragon:book_waterdragon"))
+	return inventory and inventory:contains_item("main", ItemStack("waterdragon:book_waterdragon"))
 end
 
 local function contains_item(inventory, item)
-    return inventory and inventory:contains_item("main", ItemStack(item))
+	return inventory and inventory:contains_item("main", ItemStack(item))
 end
 
 function waterdragon.get_book(inventory)
-    local list = inventory:get_list("main")
-    for i = 1, inventory:get_size("main") do
-        local stack = list[i]
-        if stack:get_name()
-        and stack:get_name() == "waterdragon:book_waterdragon" then
-            return stack, i
-        end
-    end
+	local list = inventory:get_list("main")
+	for i = 1, inventory:get_size("main") do
+		local stack = list[i]
+		if stack:get_name()
+			and stack:get_name() == "waterdragon:book_waterdragon" then
+			return stack, i
+		end
+	end
 end
 
 function waterdragon.add_page(inv, chapter)
-    local book, list_i = waterdragon.get_book(inv)
-    local chapters = minetest.deserialize(book:get_meta():get_string("chapters")) or {}
-    if #chapters > 0 then
-        for i = 1, #chapters do
+	local book, list_i = waterdragon.get_book(inv)
+	local chapters = minetest.deserialize(book:get_meta():get_string("chapters")) or {}
+	if #chapters > 0 then
+		for i = 1, #chapters do
 			if chapters[i] == chapter then
 				return
 			end
-        end
-    end
+		end
+	end
 	table.insert(chapters, chapter)
 	book:get_meta():set_string("chapters", minetest.serialize(chapters))
 	inv:set_stack("main", list_i, book)
@@ -322,7 +322,7 @@ local function prepare_element(def, meta, playername)
 				local total_offset = (offset_x + (0.35 - 0.35 * font_size_x)) .. "," .. offset_y
 				form = form ..
 					"hypertext[" .. total_offset .. ";8,9;text;<global color=#000000 size="
-						.. font_size .. " halign=center>" .. full_text .. "]"
+					.. font_size .. " halign=center>" .. full_text .. "]"
 				file:close()
 			end
 		else
@@ -336,7 +336,7 @@ local function prepare_element(def, meta, playername)
 		if def.unlock_key and #chapters > 0 then
 			for _, chapter in ipairs(chapters) do
 				if chapter
-				and chapter == def.unlock_key then
+					and chapter == def.unlock_key then
 					render = true
 					break
 				end
@@ -412,12 +412,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if formname == "waterdragon:book_page_" .. i then
 			page_no = i
 			if fields.btn_next
-			and book_pages[i + 1] then
+				and book_pages[i + 1] then
 				minetest.show_formspec(plyr_name,
 					"waterdragon:book_page_" .. i + 1, getPage(i + 1, meta, plyr_name))
 				return true
 			elseif fields.btn_last
-			and book_pages[i - 1] then
+				and book_pages[i - 1] then
 				minetest.show_formspec(plyr_name,
 					"waterdragon:book_page_" .. i - 1, getPage(i - 1, meta, plyr_name))
 				return true
@@ -433,7 +433,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		return true
 	end
 	if fields.drp_font_scale
-	and page_no then
+		and page_no then
 		waterdragon.book_font_size[plyr_name] = fields.drp_font_scale
 		minetest.show_formspec(plyr_name, "waterdragon:book_page_" .. page_no, getPage(page_no, meta, plyr_name))
 		return true
@@ -441,16 +441,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 minetest.register_globalstep(function()
-    for _, player in pairs(minetest.get_connected_players()) do
-        local name = player:get_player_name()
-        local inv = minetest.get_inventory({type = "player", name = name})
-        if waterdragon.contains_book(inv) then
+	for _, player in pairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		local inv = minetest.get_inventory({ type = "player", name = name })
+		if waterdragon.contains_book(inv) then
 			if contains_item(inv, "waterdragon:dragonstone_block_pure_water")
-			or contains_item(inv, "waterdragon:dragonstone_block_rare_water") then
+				or contains_item(inv, "waterdragon:dragonstone_block_rare_water") then
 				waterdragon.add_page(inv, "draconic_steel")
 			end
-        end
-    end
+		end
+	end
 end)
 
 

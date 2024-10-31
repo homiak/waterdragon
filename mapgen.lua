@@ -40,7 +40,7 @@ end
 local np_nest = {
 	offset = 0,
 	scale = 1,
-	spread = {x=30, y=30, z=30},
+	spread = { x = 30, y = 30, z = 30 },
 	seed = -40901,
 	octaves = 3,
 	persist = 0.67
@@ -68,8 +68,8 @@ local function get_nearest_player(pos)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local player_pos = player:get_pos()
 		if player_pos
-		and (not dist
-		or dist > vector.distance(pos, player_pos)) then
+			and (not dist
+				or dist > vector.distance(pos, player_pos)) then
 			dist = vector.distance(pos, player_pos)
 			closest_player = player
 		end
@@ -128,21 +128,23 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 		if data[vi] ~= c_air then -- if node solid
 			break
 		elseif data[vi] == c_air
-		and data[area:index(center_x, y - 1, center_z)] ~= c_air
-		and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
+			and data[area:index(center_x, y - 1, center_z)] ~= c_air
+			and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
 			surface = y
 			break
 		end
 	end
 
 	if not surface
-	or surface - 6 < min_y then return end
+		or surface - 6 < min_y then
+		return
+	end
 
 	center_y = surface
 
 	local sidelen = max_x - min_x + 1
-	local chulens = {x = sidelen, y = sidelen, z = sidelen}
-	local minposxyz = {x = min_x, y = min_y, z = min_z}
+	local chulens = { x = sidelen, y = sidelen, z = sidelen }
+	local minposxyz = { x = min_x, y = min_y, z = min_z }
 
 	local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
 
@@ -154,27 +156,28 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 				local noise = (nvals_nest[nixyz] + 1) * 7.88
 				local height = math.abs(y - center_y)
 				local dist_slope = (noise - height) * 0.77
-				local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - dist_slope
+				local distance = vector.distance({ x = x, y = y, z = z }, { x = center_x, y = center_y, z = center_z }) -
+				dist_slope
 				-- Create Nest
 				if distance < 15 - (height * 0.66)
-				and distance > 4 + ((y - center_y) * 2) then
+					and distance > 4 + ((y - center_y) * 2) then
 					data[vi] = c_wet_stone
 				elseif distance < 15 - (height * 0.66)
-				and distance < 4 + ((y - center_y) * 2)
-				and data[vi] ~= c_wet_stone then
+					and distance < 4 + ((y - center_y) * 2)
+					and data[vi] ~= c_wet_stone then
 					data[vi] = c_air
 				end
 				-- Create platform to stop floating Nests
 				if distance < 15 - (height * 0.33)
-				and distance > 4 + ((y - center_y) * 1.5)
-				and y < center_y then
+					and distance > 4 + ((y - center_y) * 1.5)
+					and y < center_y then
 					data[vi] = c_wet_stone
 				end
 				-- Create wet Soil around nest
 				if distance > 13 - (height * 0.66)
-				and distance < 19 - (height * 0.66)
-				and data[vi] ~= c_air
-				and random(8) < 2 then
+					and distance < 19 - (height * 0.66)
+					and data[vi] ~= c_air
+					and random(8) < 2 then
 					data[vi] = c_soil_wet
 				end
 				local bi = area:index(x, y - 1, z)
@@ -184,7 +187,7 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 					loot_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(loot_chance) < 2 then
 						data[vi] = c_gold
 					elseif random(24) < 2 then
@@ -197,7 +200,7 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 					egg_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(egg_chance) < 2 then
 						data[vi] = c_steel
 					elseif random(24) < 2 then
@@ -206,8 +209,8 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 				end
 				-- Create stone pillars
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air
-				and random(80) < 2 then
+					and data[vi] == c_air
+					and random(80) < 2 then
 					local pillar_height = random(4, 6)
 					for i = -1, pillar_height do
 						local pil_i = area:index(x, y + i, z)
@@ -221,14 +224,14 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({x = center_x, y = center_y, z = center_z}, {name = "modding:spawn_node"})
-		local meta = minetest.get_meta({x = center_x, y = center_y, z = center_z})
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:pure_water_dragon")
 		meta:set_string("gender", gender)
 		local _, closest_player = get_nearest_player(pos)
 		if closest_player then
 			local name = closest_player:get_player_name()
-			local inv = minetest.get_inventory({type = "player", name = name})
+			local inv = minetest.get_inventory({ type = "player", name = name })
 			if waterdragon.contains_book(inv) then
 				waterdragon.add_page(inv, "waterdragons")
 			end
@@ -266,21 +269,23 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 		if data[vi] ~= c_air then -- if node solid
 			break
 		elseif data[vi] == c_air
-		and data[area:index(center_x, y - 1, center_z)] ~= c_air
-		and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
+			and data[area:index(center_x, y - 1, center_z)] ~= c_air
+			and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
 			surface = y
 			break
 		end
 	end
 
 	if not surface
-	or surface - 6 < min_y then return end
+		or surface - 6 < min_y then
+		return
+	end
 
 	center_y = surface
 
 	local sidelen = max_x - min_x + 1
-	local chulens = {x = sidelen, y = sidelen, z = sidelen}
-	local minposxyz = {x = min_x, y = min_y, z = min_z}
+	local chulens = { x = sidelen, y = sidelen, z = sidelen }
+	local minposxyz = { x = min_x, y = min_y, z = min_z }
 
 	local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
 
@@ -292,27 +297,28 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 				local noise = (nvals_nest[nixyz] + 1) * 7.88
 				local height = math.abs(y - center_y)
 				local dist_slope = (noise - height) * 0.77
-				local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - dist_slope
+				local distance = vector.distance({ x = x, y = y, z = z }, { x = center_x, y = center_y, z = center_z }) -
+				dist_slope
 				-- Create Nest
 				if distance < 15 - (height * 0.66)
-				and distance > 4 + ((y - center_y) * 2) then
+					and distance > 4 + ((y - center_y) * 2) then
 					data[vi] = c_wet_stone
 				elseif distance < 15 - (height * 0.66)
-				and distance < 4 + ((y - center_y) * 2)
-				and data[vi] ~= c_wet_stone then
+					and distance < 4 + ((y - center_y) * 2)
+					and data[vi] ~= c_wet_stone then
 					data[vi] = c_air
 				end
 				-- Create platform to stop floating Nests
 				if distance < 15 - (height * 0.33)
-				and distance > 4 + ((y - center_y) * 1.5)
-				and y < center_y then
+					and distance > 4 + ((y - center_y) * 1.5)
+					and y < center_y then
 					data[vi] = c_wet_stone
 				end
 				-- Create Wet Soil around nest
 				if distance > 13 - (height * 0.66)
-				and distance < 19 - (height * 0.66)
-				and data[vi] ~= c_air
-				and random(8) < 2 then
+					and distance < 19 - (height * 0.66)
+					and data[vi] ~= c_air
+					and random(8) < 2 then
 					data[vi] = c_soil_wet
 				end
 				local bi = area:index(x, y - 1, z)
@@ -322,7 +328,7 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 					loot_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(loot_chance) < 2 then
 						data[vi] = c_steel
 					elseif random(24) < 2 then
@@ -335,7 +341,7 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 					egg_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(egg_chance) < 2 then
 						data[vi] = c_steel
 					elseif random(24) < 2 then
@@ -344,8 +350,8 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 				end
 				-- Create stone pillars
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air
-				and random(80) < 2 then
+					and data[vi] == c_air
+					and random(80) < 2 then
 					local pillar_height = random(4, 6)
 					for i = -1, pillar_height do
 						local pil_i = area:index(x, y + i, z)
@@ -359,14 +365,14 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({x = center_x, y = center_y, z = center_z}, {name = "modding:spawn_node"})
-		local meta = minetest.get_meta({x = center_x, y = center_y, z = center_z})
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:rare_water_dragon")
 		meta:set_string("gender", gender)
 		local _, closest_player = get_nearest_player(pos)
 		if closest_player then
 			local name = closest_player:get_player_name()
-			local inv = minetest.get_inventory({type = "player", name = name})
+			local inv = minetest.get_inventory({ type = "player", name = name })
 			if waterdragon.contains_book(inv) then
 				waterdragon.add_page(inv, "waterdragons")
 			end
@@ -401,8 +407,8 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 	}
 
 	local sidelen = max_x - min_x + 1
-	local chulens = {x = sidelen, y = sidelen, z = sidelen}
-	local minposxyz = {x = min_x, y = min_y, z = min_z}
+	local chulens = { x = sidelen, y = sidelen, z = sidelen }
+	local minposxyz = { x = min_x, y = min_y, z = min_z }
 
 	local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
 
@@ -413,7 +419,8 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 			for x = min_x, max_x do
 				local noise = (nvals_nest[nixyz] + 1) * 3.33
 				local height = math.abs(y - center_y)
-				local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - noise
+				local distance = vector.distance({ x = x, y = y, z = z }, { x = center_x, y = center_y, z = center_z }) -
+				noise
 				-- Create Nest
 				if distance < 33 + (4 - ((height * 0.15) * (height * 0.4))) then
 					data[vi] = c_wet_stone
@@ -424,8 +431,8 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 				-- Create Stalactites
 				local bi = area:index(x, y - 1, z)
 				if y > center_y
-				and data[vi] == c_wet_stone
-				and data[bi] == c_air then
+					and data[vi] == c_wet_stone
+					and data[bi] == c_air then
 					if random(18) == 1 then
 						local len = random(3, 6)
 						for i = 1, len do
@@ -439,7 +446,7 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 					loot_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(loot_chance) < 2 then
 						data[vi] = c_gold
 					elseif random(24) < 2 then
@@ -453,14 +460,14 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({x = center_x, y = center_y, z = center_z}, {name = "modding:spawn_node"})
-		local meta = minetest.get_meta({x = center_x, y = center_y, z = center_z})
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:pure_water_dragon")
 		meta:set_string("gender", gender)
 		local _, closest_player = get_nearest_player(pos)
 		if closest_player then
 			local name = closest_player:get_player_name()
-			local inv = minetest.get_inventory({type = "player", name = name})
+			local inv = minetest.get_inventory({ type = "player", name = name })
 			if waterdragon.contains_book(inv) then
 				waterdragon.add_page(inv, "waterdragons")
 			end
@@ -495,8 +502,8 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 	}
 
 	local sidelen = max_x - min_x + 1
-	local chulens = {x = sidelen, y = sidelen, z = sidelen}
-	local minposxyz = {x = min_x, y = min_y, z = min_z}
+	local chulens = { x = sidelen, y = sidelen, z = sidelen }
+	local minposxyz = { x = min_x, y = min_y, z = min_z }
 
 	local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
 
@@ -507,7 +514,8 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 			for x = min_x, max_x do
 				local noise = (nvals_nest[nixyz] + 1) * 3.33
 				local height = math.abs(y - center_y)
-				local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - noise
+				local distance = vector.distance({ x = x, y = y, z = z }, { x = center_x, y = center_y, z = center_z }) -
+				noise
 				-- Create Nest
 				if distance < 33 + (4 - ((height * 0.15) * (height * 0.4))) then
 					data[vi] = c_wet_stone
@@ -518,8 +526,8 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 				-- Create Stalactites
 				local bi = area:index(x, y - 1, z)
 				if y > center_y
-				and data[vi] == c_wet_stone
-				and data[bi] == c_air then
+					and data[vi] == c_wet_stone
+					and data[bi] == c_air then
 					if random(18) < 3 then
 						local len = random(3, 6)
 						for i = 1, len do
@@ -533,7 +541,7 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 					loot_chance = 12
 				end
 				if data[bi] == c_wet_stone
-				and data[vi] == c_air then
+					and data[vi] == c_air then
 					if random(loot_chance) < 2 then
 						data[vi] = c_steel
 					elseif random(24) < 2 then
@@ -547,14 +555,14 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({x = center_x, y = center_y, z = center_z}, {name = "modding:spawn_node"})
-		local meta = minetest.get_meta({x = center_x, y = center_y, z = center_z})
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:rare_water_dragon")
 		meta:set_string("gender", gender)
 		local _, closest_player = get_nearest_player(pos)
 		if closest_player then
 			local name = closest_player:get_player_name()
-			local inv = minetest.get_inventory({type = "player", name = name})
+			local inv = minetest.get_inventory({ type = "player", name = name })
 			if waterdragon.contains_book(inv) then
 				waterdragon.add_page(inv, "waterdragons")
 			end
@@ -582,8 +590,8 @@ end)
 
 local function average(tbl)
 	local sum = 0
-	for _,v in pairs(tbl) do -- Get the sum of all numbers in t
-	  sum = sum + v
+	for _, v in pairs(tbl) do -- Get the sum of all numbers in t
+		sum = sum + v
 	end
 	return sum / #tbl
 end
@@ -597,15 +605,14 @@ minetest.register_on_generated(function(minp, maxp)
 	local center_y = math.floor((min_y + max_y) / 2)
 	local center_z = math.floor((min_z + max_z) / 2)
 
-	local pos = {x = center_x, y = center_y, z = center_z}
+	local pos = { x = center_x, y = center_y, z = center_z }
 
 	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
+	local area = VoxelArea:new { MinEdge = emin, MaxEdge = emax }
 	local data = vm:get_data()
 
 	if water_nest_spawning
-	and random(water_nest_spawn_rate) < 2 then
-
+		and random(water_nest_spawn_rate) < 2 then
 		local heights = {}
 
 		for z = min_z + 8, max_z - 7, 8 do
@@ -623,7 +630,7 @@ minetest.register_on_generated(function(minp, maxp)
 
 		if water_scottish_nest_spawn_rate and math.random(water_scottish_nest_spawn_rate) < 2 then
 			local heights = {}
-	
+
 			for z = min_z + 8, max_z - 7, 8 do
 				for x = min_x + 8, max_x - 7, 8 do
 					for y = min_y, max_y do
@@ -636,22 +643,22 @@ minetest.register_on_generated(function(minp, maxp)
 					end
 				end
 			end
-	
+
 			local avg_height = average(heights)
-	
+
 			if avg_height > 4 then
 				pos.y = avg_height
-	
+
 				local heightmap = minetest.get_mapgen_object("heightmap")
-	
+
 				if heightmap and #heightmap > 0 then
 					pos.y = heightmap[math.floor(#heightmap / 2)]
 				end
-	
+
 				if is_scottish_biome(pos) then
 					generate_scottish_dragon_nest(minp, maxp, area, data)
 					vm:set_data(data)
-					vm:set_lighting({day = 0, night = 0})
+					vm:set_lighting({ day = 0, night = 0 })
 					vm:calc_lighting()
 					vm:update_liquids()
 					vm:write_to_map()
@@ -662,46 +669,45 @@ minetest.register_on_generated(function(minp, maxp)
 		local avg_height = average(heights)
 
 		if avg_height > 4 then
-
 			pos.y = avg_height
 
 			local heightmap = minetest.get_mapgen_object("heightmap")
 
 			if heightmap
-			and #heightmap > 0 then
+				and #heightmap > 0 then
 				pos.y = heightmap[math.floor(#heightmap / 2)]
 			end
 
 			if is_cold_biome(pos) then
 				generate_rare_water_dragon_nest(minp, maxp, area, data)
 				vm:set_data(data)
-				vm:set_lighting({day = 0, night = 0})
+				vm:set_lighting({ day = 0, night = 0 })
 				vm:calc_lighting()
 				vm:update_liquids()
 				vm:write_to_map()
 			elseif is_warm_biome(pos) then
 				generate_pure_water_dragon_nest(minp, maxp, area, data)
 				vm:set_data(data)
-				vm:set_lighting({day = 0, night = 0})
+				vm:set_lighting({ day = 0, night = 0 })
 				vm:calc_lighting()
 				vm:update_liquids()
 				vm:write_to_map()
 			end
 		end
 	elseif water_cavern_spawning
-	and random(water_cavern_spawn_rate) < 2
-	and max_y < 0 then
+		and random(water_cavern_spawn_rate) < 2
+		and max_y < 0 then
 		if is_cold_biome(pos) then
 			generate_rare_water_dragon_cavern(minp, maxp, area, data)
 			vm:set_data(data)
-			vm:set_lighting({day = 0, night = 0})
+			vm:set_lighting({ day = 0, night = 0 })
 			vm:calc_lighting()
 			vm:update_liquids()
 			vm:write_to_map()
 		elseif is_warm_biome(pos) then
 			generate_pure_water_dragon_cavern(minp, maxp, area, data)
 			vm:set_data(data)
-			vm:set_lighting({day = 0, night = 0})
+			vm:set_lighting({ day = 0, night = 0 })
 			vm:calc_lighting()
 			vm:update_liquids()
 			vm:write_to_map()
@@ -710,87 +716,89 @@ minetest.register_on_generated(function(minp, maxp)
 end)
 
 minetest.register_node("waterdragon:scottish_dragon_dragonstone_block", {
-    description = S("Scottish Dragon Dragonstone Block"),
-    tiles = {"waterdragon_scottish_dragon_forge_bottom.png"},
-    groups = {cracky = 2},
-    is_ground_content = false,
-    sounds = default.node_sound_stone_defaults(),
+	description = S("Scottish Dragon Dragonstone Block"),
+	tiles = { "waterdragon_scottish_dragon_forge_bottom.png" },
+	groups = { cracky = 2 },
+	is_ground_content = false,
+	sounds = default.node_sound_stone_defaults(),
 })
 
 function generate_scottish_dragon_nest(minp, maxp, area, data)
+	local min_y = minp.y
+	local max_y = maxp.y
 
-    local min_y = minp.y
-    local max_y = maxp.y
+	local min_x = minp.x
+	local max_x = maxp.x
+	local min_z = minp.z
+	local max_z = maxp.z
 
-    local min_x = minp.x
-    local max_x = maxp.x
-    local min_z = minp.z
-    local max_z = maxp.z
+	local center_x = math.floor((min_x + max_x) / 2)
+	local center_y = math.floor((min_y + max_y) / 2)
+	local center_z = math.floor((min_z + max_z) / 2)
+	local pos = {
+		x = center_x,
+		y = center_y,
+		z = center_z
+	}
 
-    local center_x = math.floor((min_x + max_x) / 2)
-    local center_y = math.floor((min_y + max_y) / 2)
-    local center_z = math.floor((min_z + max_z) / 2)
-    local pos = {
-        x = center_x,
-        y = center_y,
-        z = center_z
-    }
+	local surface = false
+	for y = max_y, 2, -1 do
+		local vi = area:index(center_x, y, center_z)
+		if data[vi] ~= c_air then
+			break
+		elseif data[vi] == c_air
+			and data[area:index(center_x, y - 1, center_z)] ~= c_air
+			and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
+			surface = y
+			break
+		end
+	end
 
-    local surface = false
-    for y = max_y, 2, -1 do
-        local vi = area:index(center_x, y, center_z)
-        if data[vi] ~= c_air then
-            break
-        elseif data[vi] == c_air
-        and data[area:index(center_x, y - 1, center_z)] ~= c_air
-        and data[area:index(center_x, y - 1, center_z)] ~= c_ignore then
-            surface = y
-            break
-        end
-    end
+	if not surface
+		or surface - 6 < min_y then
+		return
+	end
 
-    if not surface
-    or surface - 6 < min_y then return end
+	center_y = surface
 
-    center_y = surface
+	local sidelen = max_x - min_x + 1
+	local chulens = { x = sidelen, y = sidelen, z = sidelen }
+	local minposxyz = { x = min_x, y = min_y, z = min_z }
 
-    local sidelen = max_x - min_x + 1
-    local chulens = {x = sidelen, y = sidelen, z = sidelen}
-    local minposxyz = {x = min_x, y = min_y, z = min_z}
+	local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
 
-    local nvals_nest = minetest.get_perlin_map(np_nest, chulens):get3dMap_flat(minposxyz)
+	local c_dragonstone = minetest.get_content_id("waterdragon:scottish_dragon_dragonstone_block")
 
-    local c_dragonstone = minetest.get_content_id("waterdragon:scottish_dragon_dragonstone_block")
+	local nixyz = 1
+	for z = min_z, max_z do
+		for y = min_y, max_y do
+			local vi = area:index(min_x, y, z)
+			for x = min_x, max_x do
+				local noise = (nvals_nest[nixyz] + 1) * 7.88
+				local height = math.abs(y - center_y)
+				local dist_slope = (noise - height) * 0.77
+				local distance = vector.distance({ x = x, y = y, z = z }, { x = center_x, y = center_y, z = center_z }) -
+				dist_slope
 
-    local nixyz = 1
-    for z = min_z, max_z do
-        for y = min_y, max_y do
-            local vi = area:index(min_x, y, z)
-            for x = min_x, max_x do
-                local noise = (nvals_nest[nixyz] + 1) * 7.88
-                local height = math.abs(y - center_y)
-                local dist_slope = (noise - height) * 0.77
-                local distance = vector.distance({x = x, y = y, z = z}, {x = center_x, y = center_y, z = center_z}) - dist_slope
-                
-                if distance < 15 - (height * 0.66)
-                and distance > 4 + ((y - center_y) * 2) then
-                    data[vi] = c_dragonstone
-                elseif distance < 15 - (height * 0.66)
-                and distance < 4 + ((y - center_y) * 2)
-                and data[vi] ~= c_dragonstone then
-                    data[vi] = c_air
-                end
-                
-                if distance < 15 - (height * 0.33)
-                and distance > 4 + ((y - center_y) * 1.5)
-                and y < center_y then
-                    data[vi] = c_dragonstone
-                end
-                
-                
-                nixyz = nixyz + 1
-                vi = vi + 1
-            end
-        end
-    end
+				if distance < 15 - (height * 0.66)
+					and distance > 4 + ((y - center_y) * 2) then
+					data[vi] = c_dragonstone
+				elseif distance < 15 - (height * 0.66)
+					and distance < 4 + ((y - center_y) * 2)
+					and data[vi] ~= c_dragonstone then
+					data[vi] = c_air
+				end
+
+				if distance < 15 - (height * 0.33)
+					and distance > 4 + ((y - center_y) * 1.5)
+					and y < center_y then
+					data[vi] = c_dragonstone
+				end
+
+
+				nixyz = nixyz + 1
+				vi = vi + 1
+			end
+		end
+	end
 end

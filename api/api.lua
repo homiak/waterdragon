@@ -80,65 +80,65 @@ local scottish_bow_players = {}
 local scottish_bow_timers = {}
 
 local function start_scottish_bow(player_name, dragon)
-    scottish_bow_timers[player_name] = {
-        start_time = minetest.get_us_time(),
-        dragon = dragon
-    }
+	scottish_bow_timers[player_name] = {
+		start_time = minetest.get_us_time(),
+		dragon = dragon
+	}
 end
 
 local function finish_scottish_bow(player_name, dragon)
-    scottish_bow_players[player_name] = dragon
-    minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
+	scottish_bow_players[player_name] = dragon
+	minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
 end
 
 function has_bowed_to_scottish_dragon(player_name, dragon)
-    return scottish_bow_players[player_name] == dragon
+	return scottish_bow_players[player_name] == dragon
 end
 
 minetest.register_globalstep(function(dtime)
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local player_name = player:get_player_name()
-        local control = player:get_player_control()
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local player_name = player:get_player_name()
+		local control = player:get_player_control()
 
-        if control.sneak then
-            if not scottish_bow_timers[player_name] then
-                local pos = player:get_pos()
-                local nearest_dragon = nil
-                local nearest_dist = 15
+		if control.sneak then
+			if not scottish_bow_timers[player_name] then
+				local pos = player:get_pos()
+				local nearest_dragon = nil
+				local nearest_dist = 15
 
-                for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
-                    local ent = obj:get_luaentity()
-                    if ent and ent.name == "waterdragon:scottish_dragon" then
-                        local dist = vector.distance(pos, obj:get_pos())
-                        if not nearest_dragon or dist < nearest_dist then
-                            nearest_dragon = ent
-                            nearest_dist = dist
-                        end
-                    end
-                end
+				for _, obj in pairs(minetest.get_objects_inside_radius(pos, nearest_dist)) do
+					local ent = obj:get_luaentity()
+					if ent and ent.name == "waterdragon:scottish_dragon" then
+						local dist = vector.distance(pos, obj:get_pos())
+						if not nearest_dragon or dist < nearest_dist then
+							nearest_dragon = ent
+							nearest_dist = dist
+						end
+					end
+				end
 
-                if nearest_dragon then
-                    start_scottish_bow(player_name, nearest_dragon)
-                end
-            else
-                local bow_data = scottish_bow_timers[player_name]
-                local current_time = minetest.get_us_time()
-                if (current_time - bow_data.start_time) >= 1000000 then
-                    if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
-                        finish_scottish_bow(player_name, bow_data.dragon)
-                    end
-                end
-            end
-        else
-            scottish_bow_timers[player_name] = nil
-        end
-    end
+				if nearest_dragon then
+					start_scottish_bow(player_name, nearest_dragon)
+				end
+			else
+				local bow_data = scottish_bow_timers[player_name]
+				local current_time = minetest.get_us_time()
+				if (current_time - bow_data.start_time) >= 1000000 then
+					if not has_bowed_to_scottish_dragon(player_name, bow_data.dragon) then
+						finish_scottish_bow(player_name, bow_data.dragon)
+					end
+				end
+			end
+		else
+			scottish_bow_timers[player_name] = nil
+		end
+	end
 end)
 
 minetest.register_on_leaveplayer(function(player)
-    local name = player:get_player_name()
-    scottish_bow_players[name] = nil
-    scottish_bow_timers[name] = nil
+	local name = player:get_player_name()
+	scottish_bow_players[name] = nil
+	scottish_bow_timers[name] = nil
 end)
 
 -- Math --
@@ -168,30 +168,30 @@ local sin = math.sin
 local cos = math.cos
 
 local function diff(a, b)
-    if type(a) ~= "number" or type(b) ~= "number" then
-        return 0
-    end
+	if type(a) ~= "number" or type(b) ~= "number" then
+		return 0
+	end
 
-    return atan2(sin(b - a), cos(b - a))
+	return atan2(sin(b - a), cos(b - a))
 end
 
 local function interp_angle(a, b, w)
-    if a == nil or b == nil or w == nil then
-        return 0
-    end
+	if a == nil or b == nil or w == nil then
+		return 0
+	end
 
-    if type(a) ~= "number" or type(b) ~= "number" then
-        return 0
-    end
+	if type(a) ~= "number" or type(b) ~= "number" then
+		return 0
+	end
 
-    
-    if type(w) ~= "number" or w < 0 or w > 1 then
-        return 0
-    end
 
-    local cs = (1 - w) * cos(a) + w * cos(b)
-    local sn = (1 - w) * sin(a) + w * sin(b)
-    return atan2(sn, cs)
+	if type(w) ~= "number" or w < 0 or w > 1 then
+		return 0
+	end
+
+	local cs = (1 - w) * cos(a) + w * cos(b)
+	local sn = (1 - w) * sin(a) + w * sin(b)
+	return atan2(sn, cs)
 end
 
 local function clamp(val, _min, _max)
@@ -2195,21 +2195,20 @@ end
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_break_block(self, pos)
-    if not minetest.settings:get_bool("water_dragon_terrain_destruction", true) then
-        return
-    end
+	if not minetest.settings:get_bool("water_dragon_terrain_destruction", true) then
+		return
+	end
 
-    local node = minetest.get_node(pos)
-    local node_def = minetest.registered_nodes[node.name]
+	local node = minetest.get_node(pos)
+	local node_def = minetest.registered_nodes[node.name]
 
-    if node_def and node_def.groups and 
-       (node_def.groups.cracky or node_def.groups.crumbly or node_def.groups.snappy) and
-       not node_def.groups.unbreakable and
-       (not node_def.groups.level or node_def.groups.level < 3) then
-        minetest.remove_node(pos)
-    end
+	if node_def and node_def.groups and
+		(node_def.groups.cracky or node_def.groups.crumbly or node_def.groups.snappy) and
+		not node_def.groups.unbreakable and
+		(not node_def.groups.level or node_def.groups.level < 3) then
+		minetest.remove_node(pos)
+	end
 end
-
 
 function waterdragon.scottish_dragon_step(self, dtime)
 	-- Animation Tracking
@@ -2233,24 +2232,24 @@ function waterdragon.scottish_dragon_step(self, dtime)
 	waterdragon.rotate_to_pitch(self, is_flying)
 	-- Breaking blocks
 	if self._anim == "fly" or self._anim == "dive" then
-        local pos = self.object:get_pos()
-        local velocity = self.object:get_velocity()
-        
-        if velocity and vector.length(velocity) > 5 then
-            local yaw = self.object:get_yaw()
-            local dir = minetest.yaw_to_dir(yaw)
-            local front_pos = vector.add(pos, vector.multiply(dir, 2))
-            
-            for y = -1, 1 do
-                for x = -1, 1 do
-                    for z = -1, 1 do
-                        local check_pos = vector.add(front_pos, {x=x, y=y, z=z})
-                        waterdragon.scottish_dragon_break_block(self, check_pos)
-                    end
-                end
-            end
-        end
-    end
+		local pos = self.object:get_pos()
+		local velocity = self.object:get_velocity()
+
+		if velocity and vector.length(velocity) > 5 then
+			local yaw = self.object:get_yaw()
+			local dir = minetest.yaw_to_dir(yaw)
+			local front_pos = vector.add(pos, vector.multiply(dir, 2))
+
+			for y = -1, 1 do
+				for x = -1, 1 do
+					for z = -1, 1 do
+						local check_pos = vector.add(front_pos, { x = x, y = y, z = z })
+						waterdragon.scottish_dragon_break_block(self, check_pos)
+					end
+				end
+			end
+		end
+	end
 	-- Timers
 	if self:timer(1) then
 		if random(16) < 2 then
@@ -2262,7 +2261,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		local fly_stam = self.flight_stamina or 1600
 		if is_flying
 			and not self.in_liquid
-			and fly_stam > 0 then -- Drain Stamina when flying
+			and fly_stam > 0 then         -- Drain Stamina when flying
 			fly_stam = fly_stam - 1
 			self.turn_rate = self.turn_rate * 0.75 -- Turning radius incrased when flying
 		else
@@ -2300,39 +2299,38 @@ end
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_rightclick(self, clicker)
-    if self.hp <= 0 then return end
-    local name = clicker:get_player_name()
+	if self.hp <= 0 then return end
+	local name = clicker:get_player_name()
 
-    if self:feed(clicker) then
-        return
-    end
-    
-    local item_name = clicker:get_wielded_item():get_name() or ""
-    if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
-        if clicker:get_player_control().sneak then
-            self:show_formspec(clicker)
-        else
-           
-            waterdragon.attach_player(self, clicker)
-            if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
-                minetest.after(1, function()
-                    if self.object:get_luaentity() then
-                        waterdragon.action_takeoff(self, 20)
-                        minetest.after(5, function()
-                            if self.object:get_luaentity() then
-                                throw_rider(self)
-                            end
-                        end)
-                    end
-                end)
-                minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
-            end
-        end
-    elseif name ~= self.owner and self.owner then
-        minetest.chat_send_player(name, S("This Scottish Dragon belongs to someone else."))
-    elseif not self.owner then
-        minetest.chat_send_player(name, S("This is a wild Scottish Dragon"))
-    end
+	if self:feed(clicker) then
+		return
+	end
+
+	local item_name = clicker:get_wielded_item():get_name() or ""
+	if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
+		if clicker:get_player_control().sneak then
+			self:show_formspec(clicker)
+		else
+			waterdragon.attach_player(self, clicker)
+			if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
+				minetest.after(1, function()
+					if self.object:get_luaentity() then
+						waterdragon.action_takeoff(self, 20)
+						minetest.after(5, function()
+							if self.object:get_luaentity() then
+								throw_rider(self)
+							end
+						end)
+					end
+				end)
+				minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
+			end
+		end
+	elseif name ~= self.owner and self.owner then
+		minetest.chat_send_player(name, S("This Scottish Dragon belongs to someone else."))
+	elseif not self.owner then
+		minetest.chat_send_player(name, S("This is a wild Scottish Dragon"))
+	end
 end
 
 -- Water Dragon
@@ -2421,7 +2419,7 @@ local function create_healing_water(pos, radius)
 					local node = minetest.get_node(water_pos)
 					if node.name == "default:water_source" then
 						minetest.set_node(water_pos, { name = "waterdragon:healing_water" })
-						
+
 						table.insert(healing_water_positions, water_pos)
 					end
 				end
@@ -2494,39 +2492,39 @@ minetest.register_abm({
 })
 
 function throw_rider(self)
-    if self.rider and self.owner then
-        local rider = self.rider
-        waterdragon.detach_player(self, rider)
-        local dragon_pos = self.object:get_pos()
-        local throw_dir
-        if self.object:get_yaw() then
-            local yaw = self.object:get_yaw()
-            throw_dir = {
-                x = -math.sin(yaw),
-                y = 0,
-                z = math.cos(yaw)
-            }
-        else
-            throw_dir = {
-                x = math.random() - 0.5,
-                y = 0,
-                z = math.random() - 0.5
-            }
-            local length = math.sqrt(throw_dir.x^2 + throw_dir.z^2)
-            throw_dir.x = throw_dir.x / length
-            throw_dir.z = throw_dir.z / length
-        end
+	if self.rider and self.owner then
+		local rider = self.rider
+		waterdragon.detach_player(self, rider)
+		local dragon_pos = self.object:get_pos()
+		local throw_dir
+		if self.object:get_yaw() then
+			local yaw = self.object:get_yaw()
+			throw_dir = {
+				x = -math.sin(yaw),
+				y = 0,
+				z = math.cos(yaw)
+			}
+		else
+			throw_dir = {
+				x = math.random() - 0.5,
+				y = 0,
+				z = math.random() - 0.5
+			}
+			local length = math.sqrt(throw_dir.x ^ 2 + throw_dir.z ^ 2)
+			throw_dir.x = throw_dir.x / length
+			throw_dir.z = throw_dir.z / length
+		end
 
-        local throw_strength = 10
-        rider:add_velocity({
-            x = throw_dir.x * throw_strength,
-            y = 5,  -- Подбрасываем игрока вверх
-            z = throw_dir.z * throw_strength
-        })
-        minetest.after(0.1, function()
-            if rider:get_hp() > 0 then
-                rider:set_hp(rider:get_hp() - 5)  -- Наносим небольшой урон при падении
-            end
-        end)
-    end
+		local throw_strength = 10
+		rider:add_velocity({
+			x = throw_dir.x * throw_strength,
+			y = 5, -- Подбрасываем игрока вверх
+			z = throw_dir.z * throw_strength
+		})
+		minetest.after(0.1, function()
+			if rider:get_hp() > 0 then
+				rider:set_hp(rider:get_hp() - 5) -- Наносим небольшой урон при падении
+			end
+		end)
+	end
 end

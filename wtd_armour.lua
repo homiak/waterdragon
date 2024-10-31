@@ -20,7 +20,7 @@ minetest.register_on_leaveplayer(function(player)
     local pos = player:get_pos()
     local radius = 20
     local objects = minetest.get_objects_inside_radius(pos, radius)
-    
+
     for _, obj in ipairs(objects) do
         local ent = obj:get_luaentity()
         if ent and ent.name:find("waterdragon:") and ent.armour then
@@ -42,7 +42,7 @@ minetest.register_on_joinplayer(function(player)
             local pos = player:get_pos()
             local radius = 20
             local objects = minetest.get_objects_inside_radius(pos, radius)
-            
+
             for _, obj in ipairs(objects) do
                 local ent = obj:get_luaentity()
                 if ent and ent.name == player_armor_state[name].dragon_name then
@@ -72,8 +72,8 @@ waterdragon.register_mob_armour = function(name, def)
     minetest.register_craftitem(itemname, {
         description = def.description or ("Water Dragon Armour: " .. name .. " (Protection: " .. def.protection .. ")"),
         inventory_image = def.inventory_image,
-        groups = {water_dragon_armour = 1},
-        
+        groups = { water_dragon_armour = 1 },
+
         on_use = function(itemstack, user, pointed_thing)
             if pointed_thing.type == "object" then
                 local obj = pointed_thing.ref
@@ -104,7 +104,7 @@ waterdragon.register_mob_armour = function(name, def)
             local pos = player:get_pos()
             local radius = 20
             local objects = minetest.get_objects_inside_radius(pos, radius)
-            
+
             for _, obj in ipairs(objects) do
                 local ent = obj:get_luaentity()
                 if ent and ent.name == def.mob_name and ent.armour then
@@ -120,14 +120,19 @@ waterdragon.register_mob_armour = function(name, def)
                     local inv = player:get_inventory()
                     if inv:room_for_item("main", armour_item) then
                         inv:add_item("main", armour_item)
-                        return true, "Armour successfully removed from " .. def.mob_name .. " (Protection was: " .. removed_armour.protection .. ") and added to your inventory"
+                        return true,
+                            "Armour successfully removed from " ..
+                            def.mob_name ..
+                            " (Protection was: " .. removed_armour.protection .. ") and added to your inventory"
                     else
                         minetest.add_item(player:get_pos(), armour_item)
-                        return true, "Armour successfully removed from " .. def.mob_name .. " (Protection was: " .. removed_armour.protection .. ") and dropped near you"
+                        return true,
+                            "Armour successfully removed from " ..
+                            def.mob_name .. " (Protection was: " .. removed_armour.protection .. ") and dropped near you"
                     end
                 end
             end
-            
+
             return false, "No Water Dragons with armour found nearby"
         end,
     })
@@ -138,7 +143,7 @@ waterdragon.register_mob_armour = function(name, def)
         func = function(name, param)
             local player = minetest.get_player_by_name(name)
             if not player then return false, "Player not found" end
-            
+
             local pos = player:get_pos()
             local radius = 20
             local objects = minetest.get_objects_inside_radius(pos, radius)
@@ -148,7 +153,7 @@ waterdragon.register_mob_armour = function(name, def)
                 if ent and ent.name == def.mob_name then
                     local stack = player:get_wielded_item()
                     if stack:get_name() == itemname then
-                        ent.armour = {name = name, protection = def.protection, texture = def.dragon_armour_texture}
+                        ent.armour = { name = name, protection = def.protection, texture = def.dragon_armour_texture }
                         local props = obj:get_properties()
                         props.textures[1] = def.dragon_armour_texture
                         obj:set_properties(props)
@@ -157,11 +162,12 @@ waterdragon.register_mob_armour = function(name, def)
                         local armour = obj.armour or false
                         obj.armour = true
                         obj.armour = obj:memorize("water_dragon_armour", armour)
-                        return true, "Armour successfully set on " .. def.mob_name .. " (Protection: " .. def.protection .. ")"
+                        return true,
+                            "Armour successfully set on the Water Dragon (Protection: " .. def.protection .. ")"
                     end
                 end
             end
-            
+
             return false, "No suitable Water Dragons found nearby or no suitable armour in hand"
         end,
     })
@@ -176,18 +182,20 @@ waterdragon.register_mob_armour = function(name, def)
             local pos = player:get_pos()
             local radius = 20
             local objects = minetest.get_objects_inside_radius(pos, radius)
-            
+
             for _, obj in ipairs(objects) do
                 local ent = obj:get_luaentity()
                 if ent and ent.name == def.mob_name then
                     if ent.armour then
-                        return true, def.mob_name .. " is wearing " .. ent.armour.name .. " armour (Protection: " .. ent.armour.protection .. ")"
+                        return true,
+                            def.mob_name ..
+                            " is wearing " .. ent.armour.name .. " armour (Protection: " .. ent.armour.protection .. ")"
                     else
                         return true, def.mob_name .. " is not wearing any armour"
                     end
                 end
             end
-            
+
             return false, "No Water Dragons found nearby"
         end,
     })
@@ -198,16 +206,16 @@ waterdragon.register_mob_armour("scottish", {
     inventory_image = "waterdragon_scottish_armour_inv.png",
     dragon_armour_texture = "waterdragon_scottish_armour.png",
     mob_name = "waterdragon:scottish_dragon",
-    protection = 8  -- Protection level from 1 to 10
+    protection = 8 -- Protection level from 1 to 10
 })
 
 minetest.register_craft({
-	output = "waterdragon:armour_scottish",
-	recipe = {
-		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
-		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
-		{ "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
-	}
+    output = "waterdragon:armour_scottish",
+    recipe = {
+        { "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+        { "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+        { "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot", "waterdragon:scottish_dragon_steel_ingot" },
+    }
 })
 
 waterdragon.register_mob_armour("pure_water", {
@@ -219,12 +227,12 @@ waterdragon.register_mob_armour("pure_water", {
 })
 
 minetest.register_craft({
-	output = "waterdragon:armour_pure_water",
-	recipe = {
-		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
-		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
-		{ "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
-	}
+    output = "waterdragon:armour_pure_water",
+    recipe = {
+        { "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+        { "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+        { "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water", "waterdragon:draconic_steel_ingot_pure_water" },
+    }
 })
 
 waterdragon.register_mob_armour("rare_water", {
@@ -232,14 +240,14 @@ waterdragon.register_mob_armour("rare_water", {
     inventory_image = "waterdragon_rare_water_armour_inv.png",
     dragon_armour_texture = "waterdragon_rare_water_armour.png",
     mob_name = "waterdragon:rare_water_dragon",
-    protection = 8  -- Protection level from 1 to 10
+    protection = 8 -- Protection level from 1 to 10
 })
 
 minetest.register_craft({
-	output = "waterdragon:armour_rare_water",
-	recipe = {
-		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
-		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
-		{ "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
-	}
+    output = "waterdragon:armour_rare_water",
+    recipe = {
+        { "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+        { "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+        { "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water", "waterdragon:draconic_steel_ingot_rare_water" },
+    }
 })
