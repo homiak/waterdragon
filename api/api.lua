@@ -2298,6 +2298,68 @@ end
 
 -- Scottish Dragon
 
+function waterdragon.scottish_action_fly_and_throw(self, rider)
+	self.fly_allowed = true
+    local initial_pos = self.object:get_pos()
+    if not initial_pos then return end
+    
+    -- First stage - fly up
+    local target_pos = {
+        x = initial_pos.x,
+        y = initial_pos.y + 75,
+        z = initial_pos.z
+    }
+    
+    waterdragon.action_fly(self, target_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+    
+    -- Second stage - circular flight and throw
+    minetest.after(3, function()
+        if not self.object:get_luaentity() then return end
+        
+        local current_pos = self.object:get_pos()
+        if not current_pos then return end
+        
+        -- Create a target position for circular flight
+        local circle_pos = {
+            x = current_pos.x + 15,
+            y = current_pos.y,
+            z = current_pos.z + 15
+        }
+        
+        waterdragon.action_fly(self, circle_pos, 2, "waterdragon:fly_simple", 1, "fly")
+        
+        -- Throw rider after the flight
+        minetest.after(2, function()
+            if not self.object:get_luaentity() then return end
+            if self.rider and self.owner then
+                local rider_obj = self.rider
+                waterdragon.detach_player(self, rider_obj)
+                
+                local dragon_pos = self.object:get_pos()
+                local yaw = self.object:get_yaw()
+                local throw_dir = {
+                    x = -math.sin(yaw),
+                    y = 0,
+                    z = math.cos(yaw)
+                }
+                
+                local throw_strength = 15
+                rider_obj:add_velocity({
+                    x = throw_dir.x * throw_strength,
+                    y = 5,
+                    z = throw_dir.z * throw_strength
+                })
+                
+                minetest.after(0.1, function()
+                    if rider_obj:get_hp() > 0 then
+                        rider_obj:set_hp(rider_obj:get_hp() - 5)
+                    end
+                end)
+            end
+        end)
+    end)
+end
+
 function waterdragon.scottish_dragon_rightclick(self, clicker)
 	if self.hp <= 0 then return end
 	local name = clicker:get_player_name()
@@ -2315,12 +2377,7 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
 			if not has_bowed_to_scottish_dragon(name, self) and self.rider and self.owner then
 				minetest.after(1, function()
 					if self.object:get_luaentity() then
-						waterdragon.action_takeoff(self, 20)
-						minetest.after(5, function()
-							if self.object:get_luaentity() then
-								throw_rider(self)
-							end
-						end)
+						waterdragon.scottish_action_fly_and_throw(self)
 					end
 				end)
 				minetest.chat_send_player(name, S("You didn't bow to the Scottish Dragon. Hold on tight!"))
@@ -2336,6 +2393,7 @@ end
 -- Water Dragon
 
 function waterdragon.action_fly_and_throw(self, rider)
+	self.fly_allowed = true
     local initial_pos = self.object:get_pos()
     if not initial_pos then return end
     
