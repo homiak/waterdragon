@@ -747,43 +747,58 @@ function waterdragon.action_repel(self)
 	local scale = self.growth_scale
 	self:set_gravity(-9.8)
 	self:halt()
+
 	minetest.sound_play("waterdragon_repel", {
 		object = self.object,
 		gain = 1.0,
 		max_hear_distance = 64,
 		loop = false,
 	})
+
 	local function func(_self)
 		local yaw = _self.object:get_yaw()
 		local pos = _self.object:get_pos()
 		if not pos then return end
+
 		_self:animate("repel")
 		timeout = timeout - _self.dtime
-		if timeout < anim_time * 0.7
-			and not damage_init then
+
+		if timeout < anim_time * 0.7 and not damage_init then
 			_self.alert_timer = 15
 			local aoe_center = vec_add(pos, vec_multi(yaw2dir(yaw), _self.width))
-			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 8 * scale)
+			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 20 * scale)
+
 			for _, object in ipairs(affected_objs) do
-				local tgt_pos = object and object ~= self.object and object:get_pos()
-				if tgt_pos then
-					local ent = object:get_luaentity()
+				if object and object ~= self.object then
 					local is_player = object:is_player()
-					if (modding.is_alive(ent)
-							and not ent._ignore)
-						or is_player then
-						local dir = vec_dir(pos, tgt_pos)
-						local vel = {
-							x = dir.x * _self.damage * 1.5,
-							y = dir.y * _self.damage * 2,
-							z = dir.z * _self.damage * 1.5
+					local ent = object:get_luaentity()
+
+					if is_player or (ent and modding.is_alive(ent) and not ent._ignore) then
+						local obj_pos = object:get_pos()
+						local dir = vec_dir(pos, obj_pos)
+
+						-- Strong horizontal wind blast
+						local wind_force = {
+							x = dir.x * 200, -- Сильный горизонтальный толчок
+							y = 12,          -- Минимальный подъем для реалистичности
+							z = dir.z * 200  -- Сильный горизонтальный толчок
 						}
-						object:add_velocity(vel)
+
+						object:add_velocity(wind_force)
+						-- Нанесение урона
+						if is_player then
+							object:set_hp(object:get_hp() - 3)
+						elseif ent and ent.health then
+							ent.health = ent.health - 3
+						elseif ent and ent.hp then
+							ent.hp = ent.hp - 3
+						end
 					end
 				end
 			end
 			damage_init = true
 		end
+
 		if timeout <= 0 then
 			self:animate("stand")
 			return true
@@ -1078,7 +1093,7 @@ function scottish_dragon_flying(self)
 		flight_timer = flight_timer + dtime
 		if flight_timer >= 3 then -- Каждые 3 секунды меняем направление
 			local new_dir = random_direction()
-			local speed = 5       -- Скорость полета, можно настроить
+			local speed = 5 -- Скорость полета, можно настроить
 
 			-- Установка скорости и направления
 			self.object:set_velocity({
@@ -1088,7 +1103,7 @@ function scottish_dragon_flying(self)
 			})
 			self:animate("fly") -- Включение анимации полета
 
-			flight_timer = 0    -- Сброс таймера
+			flight_timer = 0 -- Сброс таймера
 		end
 	end)
 end
