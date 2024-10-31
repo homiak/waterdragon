@@ -2336,41 +2336,85 @@ end
 -- Water Dragon
 
 function waterdragon.dragon_rightclick(self, clicker)
-	local name = clicker:get_player_name()
-	local inv = minetest.get_inventory({ type = "player", name = name })
-	if waterdragon.contains_book(inv) then
-		waterdragon.add_page(inv, "waterdragons")
-	end
-	if self.hp <= 0 then
-		if waterdragon.drop_items(self) then
-			waterdragon.waterdragons[self.wtd_id] = nil
-			self.object:remove()
-		end
-		return
-	end
-	if self:feed(clicker) then
-		return
-	end
-	local item_name = clicker:get_wielded_item():get_name() or ""
-	if self.owner and name == self.owner and item_name == "" then
-		if clicker:get_player_control().sneak then
-			self:show_formspec(clicker)
-		elseif not self.rider and self.age >= 20 then
-			if has_bowed_to_dragon(name, self) then
-				waterdragon.attach_player(self, clicker)
-			else
-				minetest.chat_send_player(name,
-					S("You must bow to the Water Dragon before mounting it. Hold Shift for more then 1 second to bow"))
-			end
-		elseif self.age < 5 then
-			self.shoulder_mounted = self:memorize("shoulder_mounted", true)
-			self.object:set_attach(clicker, "",
-				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
-		end
-	end
-	if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
-		waterdragon.send_passenger_request(self, clicker)
-	end
+    local name = clicker:get_player_name()
+    local inv = minetest.get_inventory({ type = "player", name = name })
+    if waterdragon.contains_book(inv) then
+        waterdragon.add_page(inv, "waterdragons")
+    end
+    if self.hp <= 0 then
+        if waterdragon.drop_items(self) then
+            waterdragon.waterdragons[self.wtd_id] = nil
+            self.object:remove()
+        end
+        return
+    end
+    if self:feed(clicker) then
+        return
+    end
+    local item_name = clicker:get_wielded_item():get_name() or ""
+    if self.owner and name == self.owner and item_name == "" then
+        if clicker:get_player_control().sneak then
+            self:show_formspec(clicker)
+        elseif not self.rider and self.age >= 20 then
+            waterdragon.attach_player(self, clicker)
+            if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
+                minetest.after(1, function()
+                    if self.object:get_luaentity() then
+                        waterdragon.action_takeoff(self, 50)
+                        minetest.after(5, function()
+                            if self.object:get_luaentity() then
+                                if self.rider and self.owner then
+                                    local rider = self.rider
+                                    waterdragon.detach_player(self, rider)
+                                    
+                                    -- Get throw direction
+                                    local dragon_pos = self.object:get_pos()
+                                    local throw_dir
+                                    if self.object:get_yaw() then
+                                        local yaw = self.object:get_yaw()
+                                        throw_dir = {
+                                            x = -math.sin(yaw),
+                                            y = 0,
+                                            z = math.cos(yaw)
+                                        }
+                                    else
+                                        throw_dir = {
+                                            x = math.random() - 0.5,
+                                            y = 0,
+                                            z = math.random() - 0.5
+                                        }
+                                    end
+
+                                    -- Throw rider
+                                    local throw_strength = 15
+                                    rider:add_velocity({
+                                        x = throw_dir.x * throw_strength,
+                                        y = 5,
+                                        z = throw_dir.z * throw_strength
+                                    })
+                                    
+                                    -- Apply fall damage after a short delay
+                                    minetest.after(0.1, function()
+                                        if rider:get_hp() > 0 then
+                                            rider:set_hp(rider:get_hp() - 5)
+                                        end
+                                    end)
+                                end
+                            end
+                        end)
+                    end
+                end)
+                minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
+            end
+        elseif self.age < 5 then
+            self.shoulder_mounted = self:memorize("shoulder_mounted", true)
+            self.object:set_attach(clicker, "",
+                { x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
+        end
+    end
+    if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
+        waterdragon.send_passenger_request(self, clicker)
+    end
 end
 
 --------------------
