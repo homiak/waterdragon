@@ -1271,32 +1271,83 @@ function waterdragon.is_target_flying(target)
 	return true
 end
 
-minetest.register_entity("waterdragon:wing_horn", {
-	initial_properties = {
-		visual = "sprite",
-		textures = { "waterdragon_wing_horn.png" },
-		physical = true,
-		collisionbox = { -0.2, -0.2, -0.2, 0.2, 0.2, 0.2 },
-	},
-	owner = nil,
-	on_step = function(self, dtime)
-		if not self.object:get_pos() then return end
-		local pos = self.object:get_pos()
-		for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
-			if obj ~= self.object and obj ~= self.owner then
-				if obj:is_player() then
-					obj:set_hp(0)
-					self.object:remove()
-					return
-				elseif obj:get_luaentity() and obj:get_luaentity().health then
-					obj:get_luaentity().health = 0
-					self.object:remove()
-					return
-				end
-			end
-		end
-	end
+minetest.register_craftitem("waterdragon:wing_horn", {
+    description = S("Wing Horn"),
+    inventory_image = "waterdragon_wing_horn.png",
+
+    on_use = function(itemstack, user, pointed_thing)
+        if not user then return end
+        
+        local pos = user:get_pos()
+        pos.y = pos.y + 1.5
+        local dir = user:get_look_dir()
+        local obj = minetest.add_entity(pos, "waterdragon:wing_horn")
+        
+        if obj then
+            obj:set_velocity({
+                x = dir.x * 15,
+                y = dir.y * 15,
+                z = dir.z * 15
+            })
+            obj:set_acceleration({x = 0, y = -9.8, z = 0})
+
+            local ent = obj:get_luaentity()
+            if ent then
+                ent.owner = user
+            end
+            
+            itemstack:take_item(1)
+        end
+        
+        return itemstack
+    end
 })
+
+-- Entity for thrown horns
+minetest.register_entity("waterdragon:wing_horn", {
+    initial_properties = {
+        visual = "sprite",
+        textures = {"waterdragon_wing_horn.png"},
+        physical = true,
+        collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
+    },
+    owner = nil,
+    
+    on_step = function(self, dtime)
+        local pos = self.object:get_pos()
+        if not pos then return end
+        
+        -- Check for collisions with entities
+        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+            if obj ~= self.object and obj ~= self.owner then
+                if obj:is_player() then
+                    obj:set_hp(math.max(1, obj:get_hp() * 0.5))  -- Reduce HP by 50%, but leave at least 1 HP
+                    self.object:remove()
+                    return
+                elseif obj:get_luaentity() then
+                    local ent = obj:get_luaentity()
+                    local hp_field = ent.hp or ent.health  -- Check both `hp` and `health` fields
+
+                    if hp_field then
+                        ent.hp = hp_field * 0.5  -- Reduce HP by 50%
+                        ent.health = hp_field * 0.5
+                        self.object:remove()
+                        return
+                    end
+                end
+            end
+        end
+        
+        -- Check for node collision
+        local node = minetest.get_node_or_nil(pos)
+        if node and node.name ~= "air" and node.name ~= "ignore" then
+            minetest.add_item(pos, "waterdragon:wing_horn")
+            self.object:remove()
+            return
+        end
+    end
+})
+
 
 
 modding.register_utility("waterdragon:attack", function(self, target)
