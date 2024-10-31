@@ -2335,6 +2335,67 @@ end
 
 -- Water Dragon
 
+function waterdragon.action_fly_and_throw(self, rider)
+    local initial_pos = self.object:get_pos()
+    if not initial_pos then return end
+    
+    -- First stage - fly up
+    local target_pos = {
+        x = initial_pos.x,
+        y = initial_pos.y + 75,
+        z = initial_pos.z
+    }
+    
+    waterdragon.action_fly(self, target_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+    
+    -- Second stage - circular flight and throw
+    minetest.after(3, function()
+        if not self.object:get_luaentity() then return end
+        
+        local current_pos = self.object:get_pos()
+        if not current_pos then return end
+        
+        -- Create a target position for circular flight
+        local circle_pos = {
+            x = current_pos.x + 15,
+            y = current_pos.y,
+            z = current_pos.z + 15
+        }
+        
+        waterdragon.action_fly(self, circle_pos, 2, "waterdragon:fly_simple", 1, "fly")
+        
+        -- Throw rider after the flight
+        minetest.after(2, function()
+            if not self.object:get_luaentity() then return end
+            if self.rider and self.owner then
+                local rider_obj = self.rider
+                waterdragon.detach_player(self, rider_obj)
+                
+                local dragon_pos = self.object:get_pos()
+                local yaw = self.object:get_yaw()
+                local throw_dir = {
+                    x = -math.sin(yaw),
+                    y = 0,
+                    z = math.cos(yaw)
+                }
+                
+                local throw_strength = 15
+                rider_obj:add_velocity({
+                    x = throw_dir.x * throw_strength,
+                    y = 5,
+                    z = throw_dir.z * throw_strength
+                })
+                
+                minetest.after(0.1, function()
+                    if rider_obj:get_hp() > 0 then
+                        rider_obj:set_hp(rider_obj:get_hp() - 5)
+                    end
+                end)
+            end
+        end)
+    end)
+end
+
 function waterdragon.dragon_rightclick(self, clicker)
     local name = clicker:get_player_name()
     local inv = minetest.get_inventory({ type = "player", name = name })
@@ -2358,54 +2419,13 @@ function waterdragon.dragon_rightclick(self, clicker)
         elseif not self.rider and self.age >= 20 then
             waterdragon.attach_player(self, clicker)
             if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
-                minetest.after(1, function()
-                    if self.object:get_luaentity() then
-                        waterdragon.action_takeoff(self, 50)
-                        minetest.after(5, function()
-                            if self.object:get_luaentity() then
-                                if self.rider and self.owner then
-                                    local rider = self.rider
-                                    waterdragon.detach_player(self, rider)
-                                    
-                                    -- Get throw direction
-                                    local dragon_pos = self.object:get_pos()
-                                    local throw_dir
-                                    if self.object:get_yaw() then
-                                        local yaw = self.object:get_yaw()
-                                        throw_dir = {
-                                            x = -math.sin(yaw),
-                                            y = 0,
-                                            z = math.cos(yaw)
-                                        }
-                                    else
-                                        throw_dir = {
-                                            x = math.random() - 0.5,
-                                            y = 0,
-                                            z = math.random() - 0.5
-                                        }
-                                    end
-
-                                    -- Throw rider
-                                    local throw_strength = 15
-                                    rider:add_velocity({
-                                        x = throw_dir.x * throw_strength,
-                                        y = 5,
-                                        z = throw_dir.z * throw_strength
-                                    })
-                                    
-                                    -- Apply fall damage after a short delay
-                                    minetest.after(0.1, function()
-                                        if rider:get_hp() > 0 then
-                                            rider:set_hp(rider:get_hp() - 5)
-                                        end
-                                    end)
-                                end
-                            end
-                        end)
-                    end
-                end)
-                minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
-            end
+				minetest.after(1, function()
+					if self.object:get_luaentity() then
+						waterdragon.action_fly_and_throw(self)
+					end
+				end)
+				minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
+			end
         elseif self.age < 5 then
             self.shoulder_mounted = self:memorize("shoulder_mounted", true)
             self.object:set_attach(clicker, "",
