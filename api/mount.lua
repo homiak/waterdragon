@@ -259,6 +259,28 @@ function waterdragon.attach_passenger(self, player)
     end
 end
 
+local function cleanup_scottish_dragon_hud(player)
+    local name = player:get_player_name()
+    if not name then return end
+    
+    -- Check if player has HUD data
+    if waterdragon.mounted_player_data[name] and 
+       waterdragon.mounted_player_data[name].huds then
+        local hud_data = waterdragon.mounted_player_data[name].huds
+        
+        -- Remove all HUD elements
+        player:hud_remove(hud_data["health"])
+        player:hud_remove(hud_data["hunger"])
+        player:hud_remove(hud_data["stamina"])
+        
+        -- Clear HUD data
+        waterdragon.mounted_player_data[name].huds = nil
+    end
+    
+    -- Re-enable wielding
+    player:hud_set_flags({wielditem = true})
+end
+
 function waterdragon.detach_player(self, player)
     if not player
         or not player:get_look_horizontal()
@@ -276,6 +298,7 @@ function waterdragon.detach_player(self, player)
         player:hud_remove(data.huds["stamina"])
         player:hud_remove(data.huds["breath"])
     end
+    cleanup_scottish_dragon_hud(player)
     player:hud_set_flags({ wielditem = true })
     -- Set Fake Player (Using a fake player and changing 1st person eye offset works around the above issue)
     waterdragon.unset_fake_player(player)
@@ -398,6 +421,45 @@ end)
 minetest.register_on_leaveplayer(function(player)
     waterdragon.unset_fake_player(player)
 end)
+
+local function update_scottish_dragon_hud(self, player)
+    local name = player:get_player_name()
+    if not name then return end
+    
+    -- Get Stats without scaling
+    local health = self.hp / self.max_health * 100
+    local hunger = self.hunger / self.max_hunger * 100
+    local stamina = self.flight_stamina / 1600 * 100  -- Scottish Dragon has 1600 flight stamina
+    
+    -- Initialize HUD data if it doesn't exist
+    if not waterdragon.mounted_player_data[name] then
+        waterdragon.mounted_player_data[name] = {}
+    end
+    
+    -- Remove old HUD elements if they exist
+    if waterdragon.mounted_player_data[name].huds then
+        local hud_data = waterdragon.mounted_player_data[name].huds
+        player:hud_remove(hud_data["health"])
+        player:hud_remove(hud_data["hunger"])
+        player:hud_remove(hud_data["stamina"])
+    end
+    
+    -- Create new HUD elements
+    waterdragon.mounted_player_data[name].huds = {
+        ["health"] = set_hud(player, {
+            text = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png",
+            position = { x = 0, y = 0.75 }
+        }),
+        ["hunger"] = set_hud(player, {
+            text = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png",
+            position = { x = 0, y = 0.85 }
+        }),
+        ["stamina"] = set_hud(player, {
+            text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
+            position = { x = 0, y = 0.95 }
+        })
+    }
+end
 
 local function update_hud(self, player)
     local name = player:get_player_name()
@@ -753,7 +815,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
             or not player:get_look_horizontal() then
             return true
         end
-
+        update_scottish_dragon_hud(self, player)
         local player_name = player:get_player_name()
         local control = player:get_player_control()
 
