@@ -1326,7 +1326,7 @@ modding.register_utility("waterdragon:attack", function(self, target)
 			return true
 		end
 
-		if target:get_luaentity() and (target:get_luaentity().name == "waterdragon:pure_water_dragon" or target:get_luaentity().name == "waterdragon:rare_water_dragon" or target:get_luaentity().name == "pegasus:pegasus") then
+		if target:get_luaentity() and (target:get_luaentity().name == "waterdragon:pure_water_dragon" or target:get_luaentity().name == "waterdragon:rare_water_dragon" or target:get_luaentity().name == "pegasus:pegasus" or target:get_luaentity().name == "waterdragon:scottish_dragon") then
 			_self._target = nil
 			return true
 		end
