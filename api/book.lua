@@ -122,14 +122,6 @@ local book_pages = {
 			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		},
-		{ -- Last Page
-			unlock_key = "draconic_steel",
-			element_type = "image_button",
-			font_size = 24,
-			offset = { x = 1, y = 9 },
-			size = { x = 1, y = 1 },
-			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
-		}
 	},
 	{ -- Water Dragons Page 3
 		{ -- Scottish Dragon Text
@@ -144,7 +136,7 @@ local book_pages = {
 			offset = { x = 8.5, y = 2 },
 			size = { x = 7.5, y = 6.5 },
 			text = "waterdragon_wtd.png"
-		},
+	},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
@@ -157,12 +149,39 @@ local book_pages = {
 			offset = { x = 15, y = 9 },
 			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
-			unlock_key = "draconic_steel"
 		},
 
 	},
+	{ -- Chapter 2 - Mounting
+	{ -- Mounting text 1
+    element_type = "label",
+    font_size = 24,
+    offset = { x = 0, y = 1.2 },  -- Сдвинули правее (было x = 1)
+    file = "waterdragon_book_mount1.txt"
+},
+{ -- Mounting text 2
+    element_type = "label",
+    font_size = 24,  -- Оставляем крупный шрифт
+    offset = { x = 8, y = 1.2 },  -- Центр правой страницы
+    file = "waterdragon_book_mount2.txt"
+},
+		{ -- Last Page
+			element_type = "image_button",
+			font_size = 24,
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+		},
+		{ -- Next Page
+			element_type = "image_button",
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
+			unlock_key = "draconic_steel",
+		},
 
-	-- Chapter 2
+	},
+	-- Chapter 3
 	{ -- Steel Page 1
 		{ -- Main Page
 			unlock_key = "draconic_steel",

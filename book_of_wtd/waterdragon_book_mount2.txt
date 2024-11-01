@@ -1,0 +1,9 @@
+If you press
+Forward, the Water Dragon will walk. If you
+press the right mouse button, it will attack
+from the ground. If you press the right mouse
+button and go backward, it will create wind
+with its powerful wings. If
+you press the jump button, it will take off.
+If you hold the left mouse button, it will
+breathe water.
