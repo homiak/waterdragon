@@ -673,14 +673,74 @@ modding.register_utility("waterdragon:mount", function(self)
             if is_landed then
                 _self:set_gravity(-9.8)
                 anim = "stand"
-                if control.up then
-                    _self:set_forward_velocity(12)
-                    _self:turn_to(look_yaw, 4)
-                    anim = "walk"
+                
+                local pos = _self.object:get_pos()
+                if pos then
+                    local yaw = _self.object:get_yaw()
+                    local dir = minetest.yaw_to_dir(yaw)
+                    
+                    -- Сохраняем текущий целевой yaw или устанавливаем новый
+                    _self.target_yaw = _self.target_yaw or yaw
+                    
+                    if control.up then
+                        -- Проверяем стену при движении вперед
+                        local front_pos = {
+                            x = pos.x + (dir.x * 16),
+                            y = pos.y,
+                            z = pos.z + (dir.z * 16)
+                        }
+                        local minp = {x = front_pos.x - 1, y = front_pos.y, z = front_pos.z - 1}
+                        local maxp = {x = front_pos.x + 1, y = front_pos.y + 2, z = front_pos.z + 1}
+                        local has_wall = false
+                        
+                        for x = minp.x, maxp.x do
+                            for y = minp.y, maxp.y do
+                                for z = minp.z, maxp.z do
+                                    local check_pos = {x = x, y = y, z = z}
+                                    local node = minetest.get_node(check_pos)
+                                    if minetest.registered_nodes[node.name].walkable then
+                                        has_wall = true
+                                        break
+                                    end
+                                end
+                                if has_wall then break end
+                            end
+                            if has_wall then break end
+                        end
+                        
+                        if not has_wall then
+                            _self:set_forward_velocity(12)
+                            _self:turn_to(look_yaw, 4)
+                            anim = "walk"
+                            _self.target_yaw = yaw  -- Сбрасываем целевой yaw
+                        else
+                            _self:set_forward_velocity(0)
+                            anim = "stand"
+                        end
+                    elseif control.left or control.right then
+                        if not _self.is_side_walking then
+                            -- Устанавливаем новый целевой yaw только при начале движения в сторону
+                            _self.target_yaw = yaw + (control.left and math.pi/2 or -math.pi/2)
+                            _self.is_side_walking = true
+                        end
+                        
+                        local diff = math.abs(_self.target_yaw - yaw)
+                        if diff > 0.1 then
+                            _self:turn_to(_self.target_yaw, 4)
+                        end
+                        _self:set_forward_velocity(12)
+                        anim = "walk"
+                    else
+                        _self.is_side_walking = false
+                        _self.target_yaw = yaw
+                    end
                 end
+            
                 if control.jump then
                     is_landed = false
                     waterdragon.action_takeoff(_self)
+                    _self.is_side_walking = false
+                    _self.target_yaw = nil
                 end
                 if control.RMB then
                     waterdragon.action_slam(_self)
@@ -693,13 +753,13 @@ modding.register_utility("waterdragon:mount", function(self)
             else
                 _self:set_gravity(0)
                 
-                if control.up and _self.moveresult and _self.moveresult.collisions then
+                if control.up and _self.moveresult and _self.moveresult.collisions and not control.down then
                     for _, collision in ipairs(_self.moveresult.collisions) do
                         if collision.type == "node" then
                             local node = minetest.get_node(collision.node_pos)
                             if minetest.registered_nodes[node.name].walkable then
                                 is_wall_clinging = true
-                                _self:set_weighted_velocity(0, look_dir) -- Используем set_weighted_velocity с нулевой скоростью
+                                _self:set_weighted_velocity(0, look_dir)
                                 break
                             end
                         end
@@ -708,11 +768,11 @@ modding.register_utility("waterdragon:mount", function(self)
                 
                 if is_wall_clinging then
                     anim = "shoulder_idle"
-                    _self:set_weighted_velocity(0, look_dir) -- Используем set_weighted_velocity для сохранения правильной ориентации
+                    _self:set_weighted_velocity(0, look_dir)
                     if control.jump then
                         is_wall_clinging = false
                         _self:set_vertical_velocity(12)
-                        _self:set_weighted_velocity(-12, look_dir) -- Используем set_weighted_velocity для отталкивания
+                        _self:set_weighted_velocity(-12, look_dir)
                     end
                 else
                     anim = "hover"
