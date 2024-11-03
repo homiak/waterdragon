@@ -543,7 +543,10 @@ modding.register_utility("waterdragon:mount", function(self)
     local view_point = 3
     local first_person_height = 45
     local is_landing = false
+    local is_wall_clinging = false
+
     self:halt()
+    
     local func = function(_self)
         local player = _self.rider
         if not player or not player:get_pos() then return true end
@@ -583,7 +586,6 @@ modding.register_utility("waterdragon:mount", function(self)
             end
             local target = _self._target
             if target and target:get_pos() then
-                -- Dragon wants to fight
                 local target_pos = target:get_pos()
                 local self_pos = _self.object:get_pos()
                 local dir = vector.direction(self_pos, target_pos)
@@ -596,20 +598,11 @@ modding.register_utility("waterdragon:mount", function(self)
                     _self:initialize_utlilty("waterdragon:attack", target)
                 end
             else
-                -- No target, move in the direction the player is looking
                 if _self.touching_ground then
                     waterdragon.action_takeoff(_self, 20)
                 else
                     waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
                         "waterdragon:fly_simple", 0.5)
-                end
-                if control.sneak
-                    or player:get_player_name() ~= _self.owner then
-                    waterdragon.detach_player(_self, player)
-                    if pssngr then
-                        waterdragon.detach_player(_self, _self.passenger)
-                    end
-                    return true
                 end
             end
             return
@@ -692,51 +685,69 @@ modding.register_utility("waterdragon:mount", function(self)
                 if control.RMB then
                     waterdragon.action_slam(_self)
                 end
-                if control.RMB
-                    and control.down then
+                if control.RMB and control.down then
                     waterdragon.action_repel(_self)
                 end
             elseif is_landing then
                 anim = "fly_to_land"
             else
                 _self:set_gravity(0)
-                anim = "hover"
-
-                if _self.flight_stamina < 100 then
-                    if autopilot_active[player_name] then
-                        autopilot_active[player_name] = false
+                
+                if control.up and _self.moveresult and _self.moveresult.collisions then
+                    for _, collision in ipairs(_self.moveresult.collisions) do
+                        if collision.type == "node" then
+                            local node = minetest.get_node(collision.node_pos)
+                            if minetest.registered_nodes[node.name].walkable then
+                                is_wall_clinging = true
+                                _self:set_weighted_velocity(0, look_dir) -- Используем set_weighted_velocity с нулевой скоростью
+                                break
+                            end
+                        end
                     end
-                    anim = "fly"
-                    _self:set_vertical_velocity(-20)
-                    minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
-                    if _self.touching_ground then
-                        waterdragon.action_land(_self)
-                        is_landed = true
+                end
+                
+                if is_wall_clinging then
+                    anim = "shoulder_idle"
+                    _self:set_weighted_velocity(0, look_dir) -- Используем set_weighted_velocity для сохранения правильной ориентации
+                    if control.jump then
+                        is_wall_clinging = false
+                        _self:set_vertical_velocity(12)
+                        _self:set_weighted_velocity(-12, look_dir) -- Используем set_weighted_velocity для отталкивания
                     end
                 else
-                    if control.up then
+                    anim = "hover"
+                    if _self.flight_stamina < 100 then
+                        autopilot_active[player_name] = false
                         anim = "fly"
-                        if _self.pitch_fly then
-                            _self:set_vertical_velocity(12 * look_dir.y)
+                        _self:set_vertical_velocity(-20)
+                        minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
+                        if _self.touching_ground then
+                            waterdragon.action_land(_self)
+                            is_landed = true
                         end
-                        _self:set_forward_velocity(24)
                     else
-                        _self:set_vertical_velocity(0)
-                        _self:set_forward_velocity(0)
-                    end
-                    _self:tilt_to(look_yaw, 2)
-                    if not _self.pitch_fly then
-                        if control.jump then
-                            _self:set_vertical_velocity(12)
-                        elseif control.down then
-                            _self:set_vertical_velocity(-12)
+                        if control.up then
+                            anim = "fly"
+                            if _self.pitch_fly then
+                                _self:set_vertical_velocity(12 * look_dir.y)
+                            end
+                            _self:set_forward_velocity(24)
                         else
                             _self:set_vertical_velocity(0)
+                            _self:set_forward_velocity(0)
                         end
-                    end
+                        _self:tilt_to(look_yaw, 2)
+                        if not _self.pitch_fly then
+                            if control.jump then
+                                _self:set_vertical_velocity(12)
+                            elseif control.down then
+                                _self:set_vertical_velocity(-12)
+                            else
+                                _self:set_vertical_velocity(0)
+                            end
+                        end
 
-                    if not is_landed then
-                        if _self.touching_ground and not control.jump then
+                        if not is_landed and _self.touching_ground then
                             is_landed = true
                             _self:set_gravity(-9.8)
                             _self:set_vertical_velocity(0)
@@ -764,9 +775,7 @@ modding.register_utility("waterdragon:mount", function(self)
             if anim then
                 _self:animate(anim)
                 if view_point == 1 then
-                    if anim:match("idle")
-                        or (anim:match("fly")
-                            and control.jump) then
+                    if anim:match("idle") or (anim:match("fly") and control.jump) then
                         first_person_height = first_person_height + (65 - first_person_height) * 0.2
                     else
                         first_person_height = first_person_height + (45 - first_person_height) * 0.2
@@ -782,16 +791,14 @@ modding.register_utility("waterdragon:mount", function(self)
 
         _self:move_head(look_yaw, look_dir.y)
 
-        if control.sneak
-            or player:get_player_name() ~= _self.owner then
+        if control.sneak or player:get_player_name() ~= _self.owner then
             waterdragon.detach_player(_self, player)
             if pssngr then
                 waterdragon.detach_player(_self, _self.passenger)
             end
             return true
         end
-        if pssngr
-            and pssngr:get_player_control().sneak then
+        if pssngr and pssngr:get_player_control().sneak then
             waterdragon.detach_player(_self, pssngr)
         end
     end
