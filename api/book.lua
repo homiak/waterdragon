@@ -136,7 +136,7 @@ local book_pages = {
 			offset = { x = 8.5, y = 2 },
 			size = { x = 7.5, y = 6.5 },
 			text = "waterdragon_wtd.png"
-	},
+		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
@@ -153,18 +153,25 @@ local book_pages = {
 
 	},
 	{ -- Chapter 2 - Mounting
-	{ -- Mounting text 1
-    element_type = "label",
-    font_size = 24,
-    offset = { x = 0, y = 1.2 },  -- Сдвинули правее (было x = 1)
-    file = "waterdragon_book_mount1.txt"
-},
-{ -- Mounting text 2
-    element_type = "label",
-    font_size = 24,  -- Оставляем крупный шрифт
-    offset = { x = 8, y = 1.2 },  -- Центр правой страницы
-    file = "waterdragon_book_mount2.txt"
-},
+		{ -- Mounting text 1
+			element_type = "label",
+			font_size = 24,
+			offset = { x = 0, y = 1.2 }, -- Сдвинули правее (было x = 1)
+			file = "waterdragon_book_mount1.txt"
+		},
+		{ -- Water Dragon Image
+			element_type = "image",
+			font_size = 24,
+			offset = { x = 2, y = 6 }, -- Увеличили y с 5 до 6
+			size = { x = 3, y = 2 },
+			text = "waterdragon_book_player_and_wtd.png"
+		},
+		{ -- Mounting text 2
+			element_type = "label",
+			font_size = 24,
+			offset = { x = 8, y = 1.2 },
+			file = "waterdragon_book_mount2.txt"
+		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
