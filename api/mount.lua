@@ -806,10 +806,6 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
     local attack_cooldown = 0
     self:halt()
     local func = function(_self)
-        if not has_bowed_to_scottish_dragon then
-            throw_rider(self)
-            return true
-        end
         local player = _self.rider
         if not player
             or not player:get_look_horizontal() then
