@@ -779,7 +779,7 @@ modding.register_utility("waterdragon:mount", function(self)
                     if _self.flight_stamina < 100 then
                         autopilot_active[player_name] = false
                         anim = "fly"
-                        _self:set_vertical_velocity(-20)
+                        _self:set_vertical_velocity(-10)
                         minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
                         if _self.touching_ground then
                             waterdragon.action_land(_self)
@@ -807,7 +807,7 @@ modding.register_utility("waterdragon:mount", function(self)
                             end
                         end
 
-                        if not is_landed and _self.touching_ground then
+                        if not is_landed and _self.touching_ground and not control.jump then
                             is_landed = true
                             _self:set_gravity(-9.8)
                             _self:set_vertical_velocity(0)
