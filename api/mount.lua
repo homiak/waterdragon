@@ -829,7 +829,7 @@ modding.register_utility("waterdragon:mount", function(self)
                 local head_dir = vector.direction(start, tpos)
                 look_dir.y = head_dir.y
                 _self:breath_attack(tpos)
-                anim = anim .. "_pure_water"
+                anim = anim .. "_water"
             end
 
             if anim then
