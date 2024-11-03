@@ -417,7 +417,7 @@ function waterdragon.action_flight_pure_water(self, target, timeout)
 		end
 		if los then
 			_self:breath_attack(tgt_pos)
-			_self:animate("fly_pure_water")
+			_self:animate("fly_water")
 		else
 			_self:animate("fly")
 		end
@@ -571,7 +571,7 @@ function waterdragon.action_idle_pure_water(self, target, time)
 	self:set_action(func)
 end
 
-function waterdragon.action_hover_pure_water(self, target, time)
+function waterdragon.action_hover_water(self, target, time)
 	local timer = time
 	local start_angle = rad(45)
 	local end_angle = rad(-45)
@@ -600,7 +600,7 @@ function waterdragon.action_hover_pure_water(self, target, time)
 		_self:set_gravity(0)
 		_self:set_forward_velocity(-2)
 		_self:set_vertical_velocity(0.5)
-		_self:animate("hover_pure_water")
+		_self:animate("hover_water")
 		_self:breath_attack(tgt_pos)
 		timer = timer - _self.dtime
 		if timer <= 0
@@ -1469,7 +1469,7 @@ modding.register_utility("waterdragon:attack", function(self, target)
 						if math.random(3) < 2 then
 							waterdragon.action_flight_pure_water(_self, target, 12)
 						else
-							waterdragon.action_hover_pure_water(_self, target, 3)
+							waterdragon.action_hover_water(_self, target, 3)
 						end
 					end
 				end

@@ -133,12 +133,12 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 		repel = { range = { x = 161, y = 209 }, speed = 30, frame_blend = 0.3, loop = false },
 		walk = { range = { x = 211, y = 249 }, speed = 40, frame_blend = 0.3, loop = true },
 		walk_slow = { range = { x = 211, y = 249 }, speed = 15, frame_blend = 0.3, loop = true },
-		walk_pure_water = { range = { x = 251, y = 289 }, speed = 30, frame_blend = 0.3, loop = true },
+		walk_water = { range = { x = 251, y = 289 }, speed = 30, frame_blend = 0.3, loop = true },
 		takeoff = { range = { x = 291, y = 319 }, speed = 30, frame_blend = 0.3, loop = false },
 		hover = { range = { x = 321, y = 359 }, speed = 30, frame_blend = 0.3, loop = true },
-		hover_pure_water = { range = { x = 361, y = 399 }, speed = 30, frame_blend = 0.3, loop = true },
+		hover_water = { range = { x = 361, y = 399 }, speed = 30, frame_blend = 0.3, loop = true },
 		fly = { range = { x = 401, y = 439 }, speed = 30, frame_blend = 0.3, loop = true },
-		fly_pure_water = { range = { x = 441, y = 479 }, speed = 30, frame_blend = 0.3, loop = true },
+		fly_water = { range = { x = 441, y = 479 }, speed = 30, frame_blend = 0.3, loop = true },
 		land = { range = { x = 481, y = 509 }, speed = 30, frame_blend = 0.3, loop = false },
 		sleep = { range = { x = 511, y = 569 }, speed = 30, frame_blend = 1, prty = 2, loop = true },
 		death = { range = { x = 571, y = 579 }, speed = 30, frame_blend = 5, prty = 3, loop = false },
@@ -347,7 +347,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 			local tgt_pos = puncher:get_pos()
 			self:breath_attack(tgt_pos)
 			waterdragon.action_slam(self)
-			waterdragon.action_hover_pure_water(self, puncher, 100)
+			waterdragon.action_hover_water(self, puncher, 100)
 			waterdragon.action_flight_pure_water(self, puncher, 100000)
 		end
 	end,
