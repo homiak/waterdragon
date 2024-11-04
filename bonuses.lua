@@ -95,6 +95,12 @@ local special_dragon_names = {
         speed_bonus = 8,
         effect = "powerful"
     },
+    ["Gleannach"] = {
+        health_bonus = 190,
+        damage_bonus = 10,
+        speed_bonus = 8,
+        effect = "powerful"
+    },
 
     -- Not very powerful names ..
     ["Suzie"] = {

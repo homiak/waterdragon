@@ -679,15 +679,13 @@ modding.register_utility("waterdragon:mount", function(self)
                     local yaw = _self.object:get_yaw()
                     local dir = minetest.yaw_to_dir(yaw)
                     
-                    -- Сохраняем текущий целевой yaw или устанавливаем новый
                     _self.target_yaw = _self.target_yaw or yaw
                     
                     if control.up then
-                        -- Проверяем стену при движении вперед
                         local front_pos = {
                             x = pos.x + (dir.x * 16),
-                            y = pos.y,
-                            z = pos.z + (dir.z * 16)
+                            y = pos.y + 7,
+                            z = pos.z
                         }
                         local minp = {x = front_pos.x - 1, y = front_pos.y, z = front_pos.z - 1}
                         local maxp = {x = front_pos.x + 1, y = front_pos.y + 2, z = front_pos.z + 1}
@@ -712,14 +710,13 @@ modding.register_utility("waterdragon:mount", function(self)
                             _self:set_forward_velocity(12)
                             _self:turn_to(look_yaw, 4)
                             anim = "walk"
-                            _self.target_yaw = yaw  -- Сбрасываем целевой yaw
+                            _self.target_yaw = yaw
                         else
                             _self:set_forward_velocity(0)
                             anim = "stand"
                         end
                     elseif control.left or control.right then
                         if not _self.is_side_walking then
-                            -- Устанавливаем новый целевой yaw только при начале движения в сторону
                             _self.target_yaw = yaw + (control.left and math.pi/2 or -math.pi/2)
                             _self.is_side_walking = true
                         end
@@ -753,7 +750,7 @@ modding.register_utility("waterdragon:mount", function(self)
             else
                 _self:set_gravity(0)
                 
-                if control.up and _self.moveresult and _self.moveresult.collisions and not control.down then
+                if control.up and _self.moveresult and _self.moveresult.collisions and not control.down and not control.LMB then
                     for _, collision in ipairs(_self.moveresult.collisions) do
                         if collision.type == "node" then
                             local node = minetest.get_node(collision.node_pos)
