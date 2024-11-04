@@ -684,7 +684,7 @@ modding.register_utility("waterdragon:mount", function(self)
                     if control.up then
                         local front_pos = {
                             x = pos.x + (dir.x * 16),
-                            y = pos.y + 7,
+                            y = pos.y + 6,
                             z = pos.z
                         }
                         local minp = {x = front_pos.x - 1, y = front_pos.y, z = front_pos.z - 1}
