@@ -149,6 +149,7 @@ local book_pages = {
 			offset = { x = 15, y = 9 },
 			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
+			unlock_key = "mounting",
 		},
 
 	},
@@ -156,28 +157,31 @@ local book_pages = {
 		{ -- Mounting text 1
 			element_type = "label",
 			font_size = 24,
-			offset = { x = 0, y = 1.2 }, -- Сдвинули правее (было x = 1)
-			file = "waterdragon_book_mount1.txt"
+			offset = { x = 0, y = 1.2 },
+			file = "waterdragon_book_mount1.txt",
+			unlock_key = "mounting",
 		},
 		{ -- Water Dragon Image
 			element_type = "image",
 			font_size = 24,
-			offset = { x = 2, y = 6 }, -- Увеличили y с 5 до 6
+			offset = { x = 2, y = 6 },
 			size = { x = 3, y = 2 },
-			text = "waterdragon_book_player_and_wtd.png"
+			text = "waterdragon_book_player_and_wtd.png",
+			unlock_key = "mounting",
 		},
 		{ -- Mounting text 2
 			element_type = "label",
 			font_size = 24,
 			offset = { x = 8, y = 1.2 },
-			file = "waterdragon_book_mount2.txt"
+			file = "waterdragon_book_mount2.txt",
+			unlock_key = "mounting",
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
 			offset = { x = 1, y = 9 },
 			size = { x = 1, y = 1 },
-			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false",
 		},
 		{ -- Next Page
 			element_type = "image_button",
@@ -478,8 +482,3 @@ minetest.register_globalstep(function()
 		end
 	end
 end)
-
-
--- To Do
-
--- Flight Stamina
