@@ -113,14 +113,15 @@ local book_pages = {
 			element_type = "image_button",
 			offset = { x = 15, y = 9 },
 			size = { x = 1, y = 1 },
-			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
+			unlock_key = "scottish_dragons",
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
 			offset = { x = 1, y = 9 },
 			size = { x = 1, y = 1 },
-			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false",
 		},
 	},
 	{ -- Water Dragons Page 3
@@ -128,21 +129,23 @@ local book_pages = {
 			element_type = "label",
 			font_size = 24,
 			offset = { x = 0, y = 1.5 },
-			file = "waterdragon_book_dragon5.txt"
+			file = "waterdragon_book_dragon5.txt",
+			unlock_key = "scottish_dragons",
 		},
 		{ -- Water Dragon Image
 			element_type = "image",
 			font_size = 24,
 			offset = { x = 8.5, y = 2 },
 			size = { x = 7.5, y = 6.5 },
-			text = "waterdragon_wtd.png"
+			text = "waterdragon_wtd.png",
+			unlock_key = "scottish_dragons",
 		},
 		{ -- Last Page
 			element_type = "image_button",
 			font_size = 24,
 			offset = { x = 1, y = 9 },
 			size = { x = 1, y = 1 },
-			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false",
 		},
 		{ -- Next Page
 			element_type = "image_button",

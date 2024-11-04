@@ -869,11 +869,15 @@ modding.register_utility("waterdragon:mount", function(self)
 end)
 
 modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
-    local name = clicker:get_player_name()
-    local inv = minetest.get_inventory({ type = "player", name = name })
-    if waterdragon.contains_book(inv) then
-        waterdragon.add_page(inv, "mounting")
-        waterdragon.add_page(inv, "scottish_dragons")
+    if self.owner then
+        local player = minetest.get_player_by_name(self.owner)
+        if player then
+            local inv = minetest.get_inventory({ type = "player", name = player:get_player_name() })
+            if waterdragon.contains_book(inv) then
+                waterdragon.add_page(inv, "mounting")
+                waterdragon.add_page(inv, "scottish_dragons")
+            end
+        end
     end
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
