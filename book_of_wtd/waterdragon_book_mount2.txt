@@ -1,15 +1,9 @@
-If you press
-Forward, the Water Dragon will walk. If you
-press the right mouse button, it will attack
-from the ground. If you press the right mouse
-button and go backward, it will create wind
-with its powerful wings. If
-you press the jump button, it will take off.
-If you hold the left mouse button, it will
-breathe water. If you hold the left mouse button 
-and fly towards a wall, the Water Dragon will
-destroy it. If you just fly towards a wall, the
-Water Dragon will cling on it. To stop clinging,
-just press Space, or jump. If you go backward
-the Water Dragon will go down or land. You can
-also use A and D keys for walking.
+Press Forward to walk. Right-click to attack from the 
+ground. Right-click while moving backward to create 
+wind with wings. Press Jump to take off. Hold 
+left-click to breathe water. Hold left-click and 
+fly into a wall to destroy it. 
+Flying into a wall makes the Water Dragon cling to it. 
+Press Space or Jump to stop clinging. 
+Move backward to descend or land. 
+A and D keys also control walking.

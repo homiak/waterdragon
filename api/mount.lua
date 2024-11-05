@@ -537,12 +537,14 @@ function waterdragon.set_utility(self, utility_name, ...)
     end
 end
 
-modding.register_utility("waterdragon:mount", function(self)
-    local name = clicker:get_player_name()
-    local inv = minetest.get_inventory({ type = "player", name = name })
-    if waterdragon.contains_book(inv) then
-        waterdragon.add_page(inv, "mounting")
-        waterdragon.add_page(inv, "waterdragons")
+modding.register_utility("waterdragon:mount", function(self, clicker)
+    if clicker then
+        local name = clicker:get_player_name()
+        local inv = minetest.get_inventory({ type = "player", name = name })
+        if waterdragon.contains_book(inv) then
+            waterdragon.add_page(inv, "mounting")
+            waterdragon.add_page(inv, "waterdragons")
+        end
     end
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false

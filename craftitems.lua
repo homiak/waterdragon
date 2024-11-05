@@ -1904,13 +1904,13 @@ minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
 							ent.scottish_id = bound_id
 							ent.hp = dragon_data.hp
 							ent.nametag = dragon_data.name
-							ent.name_tag = dragon_data.name
+							ent.flight_stamina = dragon_data.stamina
 							if ent.memorize then
 								ent:memorize("owner", ent.owner)
 								ent:memorize("scottish_id", ent.scottish_id)
 								ent:memorize("hp", ent.hp)
 								ent:memorize("nametag", ent.nametag)
-								ent:memorize("name_tag", ent.name_tag)
+								ent:memorize("flight_stamina", ent.flight_stamina)
 							end
 							if ent.nametag ~= "" then
 								dragon:set_properties({ nametag = ent.nametag })

@@ -164,19 +164,18 @@ local book_pages = {
 			file = "waterdragon_book_mount1.txt",
 			unlock_key = "mounting",
 		},
-		{ -- Water Dragon Image
-			element_type = "image",
-			font_size = 24,
-			offset = { x = 2, y = 6 },
-			size = { x = 3, y = 2 },
-			text = "waterdragon_book_player_and_wtd.png",
-			unlock_key = "mounting",
-		},
 		{ -- Mounting text 2
 			element_type = "label",
 			font_size = 24,
 			offset = { x = 8, y = 1.2 },
 			file = "waterdragon_book_mount2.txt",
+			unlock_key = "mounting",
+		},
+		{ -- Pure Water Dragon and a rider
+			element_type = "image",
+			offset = { x = 8.1, y = 5.3 },
+			size = { x = 8, y = 4.5 },
+			text = "waterdragon_book_screenshot.png",
 			unlock_key = "mounting",
 		},
 		{ -- Last Page
