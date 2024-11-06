@@ -775,30 +775,48 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
 
 
                 if is_wall_clinging then
-                    anim = "shoulder_idle"
-                    local pos = _self.object:get_pos()
                     local yaw = _self.object:get_yaw()
                     local dir = minetest.yaw_to_dir(yaw)
+                    local pos = _self.object:get_pos()
                     local front_pos = {
-                        x = pos.x + (dir.x * 16),
+                        x = pos.x + (dir.x * 10),
                         y = pos.y + 6,
                         z = pos.z
                     }
+
+                    if not front_pos then
+                        return
+                    end
+                    anim = "shoulder_idle"
+
+
                     _self:set_weighted_velocity(0, front_pos)
                     local node = minetest.get_node(pos)
                     if minetest.get_item_group(node.name, "cracky") ~= 3 or minetest.get_item_group(node.name, "wood") then
                         _self:set_vertical_velocity(-2)
 
                         local last_sound_time = 0
-                        local sound_cooldown = 2 -- 2 секунды
+                        local sound_cooldown = 1 -- Интервал между воспроизведением звуков, в секундах
+                        local wall_slide_sound
+                        local is_playing_sound = false -- Флаг для отслеживания состояния звука
 
                         minetest.register_globalstep(function(dtime)
-                            if (minetest.get_gametime() - last_sound_time) >= sound_cooldown and is_wall_clinging then
-                                minetest.sound_play({
-                                    name = "waterdragon_wall_slide",
-                                    gain = 1,
-                                })
-                                last_sound_time = minetest.get_gametime()
+                            if not _self.rider then return end
+
+                            if anim == "shoulder_idle" then
+                                -- Проверяем, что звук еще не воспроизводится
+                                if not is_playing_sound and (minetest.get_gametime() - last_sound_time) >= sound_cooldown then
+                                    -- Воспроизводим звук и устанавливаем флаг состояния
+                                    wall_slide_sound = minetest.sound_play("waterdragon_wall_slide", { gain = 1 })
+                                    is_playing_sound = true
+                                    last_sound_time = minetest.get_gametime()
+                                end
+                            else
+                                -- Останавливаем звук, если дракон больше не на стене
+                                if is_playing_sound then
+                                    minetest.sound_stop(wall_slide_sound)
+                                    is_playing_sound = false
+                                end
                             end
                         end)
                     else
