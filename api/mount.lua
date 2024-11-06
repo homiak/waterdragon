@@ -262,23 +262,23 @@ end
 local function cleanup_scottish_dragon_hud(player)
     local name = player:get_player_name()
     if not name then return end
-    
+
     -- Check if player has HUD data
-    if waterdragon.mounted_player_data[name] and 
-       waterdragon.mounted_player_data[name].huds then
+    if waterdragon.mounted_player_data[name] and
+        waterdragon.mounted_player_data[name].huds then
         local hud_data = waterdragon.mounted_player_data[name].huds
-        
+
         -- Remove all HUD elements
         player:hud_remove(hud_data["health"])
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
-        
+
         -- Clear HUD data
         waterdragon.mounted_player_data[name].huds = nil
     end
-    
+
     -- Re-enable wielding
-    player:hud_set_flags({wielditem = true})
+    player:hud_set_flags({ wielditem = true })
 end
 
 function waterdragon.detach_player(self, player)
@@ -425,17 +425,17 @@ end)
 local function update_scottish_dragon_hud(self, player)
     local name = player:get_player_name()
     if not name then return end
-    
+
     -- Get Stats without scaling
     local health = self.hp / self.max_health * 100
     local hunger = self.hunger / self.max_hunger * 100
-    local stamina = self.flight_stamina / 1600 * 100  -- Scottish Dragon has 1600 flight stamina
-    
+    local stamina = self.flight_stamina / 1600 * 100 -- Scottish Dragon has 1600 flight stamina
+
     -- Initialize HUD data if it doesn't exist
     if not waterdragon.mounted_player_data[name] then
         waterdragon.mounted_player_data[name] = {}
     end
-    
+
     -- Remove old HUD elements if they exist
     if waterdragon.mounted_player_data[name].huds then
         local hud_data = waterdragon.mounted_player_data[name].huds
@@ -443,7 +443,7 @@ local function update_scottish_dragon_hud(self, player)
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
     end
-    
+
     -- Create new HUD elements
     waterdragon.mounted_player_data[name].huds = {
         ["health"] = set_hud(player, {
@@ -554,7 +554,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
     local is_wall_clinging = false
 
     self:halt()
-    
+
     local func = function(_self)
         local player = _self.rider
         if not player or not player:get_pos() then return true end
@@ -681,28 +681,28 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
             if is_landed then
                 _self:set_gravity(-9.8)
                 anim = "stand"
-                
+
                 local pos = _self.object:get_pos()
                 if pos then
                     local yaw = _self.object:get_yaw()
                     local dir = minetest.yaw_to_dir(yaw)
-                    
+
                     _self.target_yaw = _self.target_yaw or yaw
-                    
+
                     if control.up then
                         local front_pos = {
                             x = pos.x + (dir.x * 16),
                             y = pos.y + 6,
                             z = pos.z
                         }
-                        local minp = {x = front_pos.x - 1, y = front_pos.y, z = front_pos.z - 1}
-                        local maxp = {x = front_pos.x + 1, y = front_pos.y + 2, z = front_pos.z + 1}
+                        local minp = { x = front_pos.x - 1, y = front_pos.y, z = front_pos.z - 1 }
+                        local maxp = { x = front_pos.x + 1, y = front_pos.y + 2, z = front_pos.z + 1 }
                         local has_wall = false
-                        
+
                         for x = minp.x, maxp.x do
                             for y = minp.y, maxp.y do
                                 for z = minp.z, maxp.z do
-                                    local check_pos = {x = x, y = y, z = z}
+                                    local check_pos = { x = x, y = y, z = z }
                                     local node = minetest.get_node(check_pos)
                                     if minetest.registered_nodes[node.name].walkable then
                                         has_wall = true
@@ -713,7 +713,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                             end
                             if has_wall then break end
                         end
-                        
+
                         if not has_wall then
                             _self:set_forward_velocity(12)
                             _self:turn_to(look_yaw, 4)
@@ -725,10 +725,10 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                         end
                     elseif control.left or control.right then
                         if not _self.is_side_walking then
-                            _self.target_yaw = yaw + (control.left and math.pi/2 or -math.pi/2)
+                            _self.target_yaw = yaw + (control.left and math.pi / 2 or -math.pi / 2)
                             _self.is_side_walking = true
                         end
-                        
+
                         local diff = math.abs(_self.target_yaw - yaw)
                         if diff > 0.1 then
                             _self:turn_to(_self.target_yaw, 4)
@@ -740,7 +740,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                         _self.target_yaw = yaw
                     end
                 end
-            
+
                 if control.jump then
                     is_landed = false
                     waterdragon.action_takeoff(_self)
@@ -757,7 +757,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                 anim = "fly_to_land"
             else
                 _self:set_gravity(0)
-                
+
                 if control.up and _self.moveresult and _self.moveresult.collisions and not control.down and not control.LMB then
                     for _, collision in ipairs(_self.moveresult.collisions) do
                         if collision.type == "node" then
@@ -770,10 +770,42 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                         end
                     end
                 end
-                
+
+
+
+
                 if is_wall_clinging then
                     anim = "shoulder_idle"
-                    _self:set_weighted_velocity(0, look_dir)
+                    local pos = _self.object:get_pos()
+                    local yaw = _self.object:get_yaw()
+                    local dir = minetest.yaw_to_dir(yaw)
+                    local front_pos = {
+                        x = pos.x + (dir.x * 16),
+                        y = pos.y + 6,
+                        z = pos.z
+                    }
+                    _self:set_weighted_velocity(0, front_pos)
+                    local node = minetest.get_node(pos)
+                    if minetest.get_item_group(node.name, "cracky") ~= 3 or minetest.get_item_group(node.name, "wood") then
+                        _self:set_vertical_velocity(-2)
+
+                        local last_sound_time = 0
+                        local sound_cooldown = 2 -- 2 секунды
+
+                        minetest.register_globalstep(function(dtime)
+                            if (minetest.get_gametime() - last_sound_time) >= sound_cooldown and is_wall_clinging then
+                                minetest.sound_play({
+                                    name = "waterdragon_wall_slide",
+                                    gain = 1,
+                                })
+                                last_sound_time = minetest.get_gametime()
+                            end
+                        end)
+                    else
+                        _self:set_vertical_velocity(0)
+                    end
+
+
                     if control.jump then
                         is_wall_clinging = false
                         _self:set_vertical_velocity(12)
