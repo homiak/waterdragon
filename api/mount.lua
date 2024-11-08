@@ -779,53 +779,51 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                     local dir = minetest.yaw_to_dir(yaw)
                     local pos = _self.object:get_pos()
                     local front_pos = {
-                        x = pos.x + (dir.x * 10),
-                        y = pos.y + 6,
-                        z = pos.z
+                        x = pos.x + (dir.x * 2.5), -- уменьшил множитель с 4 до 2.5
+                        y = pos.y + 11.9,
+                        z = pos.z + (dir.z * 5.5)    -- уменьшил множитель с 5.5 до 4
                     }
 
-                    if not front_pos then
-                        return
-                    end
-                    anim = "shoulder_idle"
-
-
-                    _self:set_vertical_velocity(0)
-                    _self:set_forward_velocity(0)
-                    local node = minetest.get_node(pos)
-                    if minetest.get_item_group(node.name, "cracky") == 3 or minetest.get_item_group(node.name, "wood") or minetest.get_item_group(node.name, "snow") and not minetest.get_item_group(node.name, "stone") then
+                    local node_front = minetest.get_node(front_pos)
+                    if minetest.get_item_group(node_front.name, "ice") > 0 or
+                        minetest.get_item_group(node_front.name, "wood") > 0 or
+                        minetest.get_item_group(node_front.name, "cracky") == 3 then
+                        -- Скользит на блоках из групп ice, wood и cracky = 3
                         _self:set_vertical_velocity(-2)
-                        _self:set_forward_velocity(0)
-
-                        local last_sound_time = 0
-                        local sound_cooldown = 1 -- Интервал между воспроизведением звуков, в секундах
-                        local wall_slide_sound
-                        local is_playing_sound = false -- Флаг для отслеживания состояния звука
-
-                        minetest.register_globalstep(function(dtime)
-                            if not _self.rider then return end
-
-                            if anim == "shoulder_idle" then
-                                if not is_playing_sound and (minetest.get_gametime() - last_sound_time) >= sound_cooldown then
-                                    -- Воспроизводим звук и устанавливаем флаг состояния
-                                    wall_slide_sound = minetest.sound_play("waterdragon_wall_slide", { gain = 1 })
-                                    is_playing_sound = true
-                                    last_sound_time = minetest.get_gametime()
-                                end
-                            else
-                                if is_playing_sound then
-                                    minetest.sound_stop(wall_slide_sound)
-                                    is_playing_sound = false
-                                end
-                            end
-                        end)
+                        anim = "shoulder_idle"
+                    else
+                        -- Висит на остальных блоках
+                        _self:set_vertical_velocity(0)
+                        anim = "shoulder_idle"
                     end
-                    if not minetest.get_item_group(node.name, "cracky") == 3 or not minetest.get_item_group(node.name, "wood") or not minetest.get_item_group(node.name, "snow") then
-                    _self:set_vertical_velocity(0)
+
                     _self:set_forward_velocity(0)
-                    minetest.sound_stop(wall_slide_sound)
+                    local last_sound_time = 0
+                    local sound_cooldown = 1 -- Интервал между воспроизведением звуков, в секундах
+                    local wall_slide_sound
+                    local is_playing_sound = false
+                    if not is_playing_sound and (minetest.get_gametime() - last_sound_time) >= sound_cooldown then
+                        wall_slide_sound = minetest.sound_play("waterdragon_wall_slide", { gain = 1 })
+                        is_playing_sound = true
+                        last_sound_time = minetest.get_gametime()
                     end
 
+                    if not (minetest.get_item_group(node_front.name, "ice") > 0 or
+                            minetest.get_item_group(node_front.name, "wood") > 0 or
+                            minetest.get_item_group(node_front.name, "stone") > 0 or
+                            minetest.get_item_group(node_front.name, "cracky") == 3) then
+                        if wall_slide_sound then
+                            minetest.sound_stop(wall_slide_sound)
+                        end
+                        is_playing_sound = false
+                    end
+
+                    if node_front.name == "default:cobble" or node_front.name == "default:stone" or node_front.name == "default:diamondblock" then
+                        minetest.sound_stop(wall_slide_sound)
+                        is_playing_sound = false
+                        _self:set_vertical_velocity(0)
+                        _self:set_forward_velocity(0)
+                    end
 
                     if control.jump then
                         is_wall_clinging = false
