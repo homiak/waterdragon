@@ -790,10 +790,12 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                     anim = "shoulder_idle"
 
 
-                    _self:set_weighted_velocity(0, front_pos)
+                    _self:set_vertical_velocity(0)
+                    _self:set_forward_velocity(0)
                     local node = minetest.get_node(pos)
-                    if minetest.get_item_group(node.name, "cracky") ~= 3 or minetest.get_item_group(node.name, "wood") then
+                    if minetest.get_item_group(node.name, "cracky") == 3 or minetest.get_item_group(node.name, "wood") or minetest.get_item_group(node.name, "snow") and not minetest.get_item_group(node.name, "stone") then
                         _self:set_vertical_velocity(-2)
+                        _self:set_forward_velocity(0)
 
                         local last_sound_time = 0
                         local sound_cooldown = 1 -- Интервал между воспроизведением звуков, в секундах
@@ -804,7 +806,6 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                             if not _self.rider then return end
 
                             if anim == "shoulder_idle" then
-                                -- Проверяем, что звук еще не воспроизводится
                                 if not is_playing_sound and (minetest.get_gametime() - last_sound_time) >= sound_cooldown then
                                     -- Воспроизводим звук и устанавливаем флаг состояния
                                     wall_slide_sound = minetest.sound_play("waterdragon_wall_slide", { gain = 1 })
@@ -812,15 +813,17 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                                     last_sound_time = minetest.get_gametime()
                                 end
                             else
-                                -- Останавливаем звук, если дракон больше не на стене
                                 if is_playing_sound then
                                     minetest.sound_stop(wall_slide_sound)
                                     is_playing_sound = false
                                 end
                             end
                         end)
-                    else
-                        _self:set_vertical_velocity(0)
+                    end
+                    if not minetest.get_item_group(node.name, "cracky") == 3 or not minetest.get_item_group(node.name, "wood") or not minetest.get_item_group(node.name, "snow") then
+                    _self:set_vertical_velocity(0)
+                    _self:set_forward_velocity(0)
+                    minetest.sound_stop(wall_slide_sound)
                     end
 
 

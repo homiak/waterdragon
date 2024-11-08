@@ -718,7 +718,7 @@ end)
 minetest.register_node("waterdragon:scottish_dragon_dragonstone_block", {
 	description = S("Scottish Dragon Dragonstone Block"),
 	tiles = { "waterdragon_scottish_dragon_forge_bottom.png" },
-	groups = { cracky = 2 },
+	groups = { cracky = 1 },
 	is_ground_content = false,
 	sounds = default.node_sound_stone_defaults(),
 })

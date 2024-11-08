@@ -1004,8 +1004,6 @@ local function draconic_step(itemstack, player, pointed_thing)
 	end
 	if pointed_thing.ref then
 		pointed_thing.ref:punch(player, nil, toolcaps)
-		if dist2dragon < 30 then
-		end
 	end
 	if update then
 		meta:set_tool_capabilities(toolcaps)

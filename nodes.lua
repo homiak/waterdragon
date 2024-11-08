@@ -2,13 +2,6 @@
 -- Nodes --
 -----------
 local S = waterdragon.S
-local random = math.random
-
--- Sounds --
-
--- Get Craft Items --
-
-local steel_ingot = "default:steel_ingot"
 
 -- Local Utilities --
 
@@ -174,16 +167,6 @@ local S = waterdragon.S
 local random = math.random
 
 local steel_ingot = "default:steel_ingot"
-
-local forge_core = {
-    ["waterdragon:draconic_forge_pure_water"] = "waterdragon:dragonstone_block_pure_water",
-    ["waterdragon:draconic_forge_rare_water"] = "waterdragon:dragonstone_block_rare_water"
-}
-
-local forge_shell = {
-    ["waterdragon:draconic_forge_pure_water"] = "waterdragon:dragonstone_bricks_pure_water",
-    ["waterdragon:draconic_forge_rare_water"] = "waterdragon:dragonstone_bricks_rare_water"
-}
 
 local function update_forge_form(meta, forge_type)
     local melt_perc = meta:get_int("melt_perc") or 0
@@ -510,8 +493,6 @@ register_draconic_forge("rare_water")
 ---------------------------
 -- Scottish Dragon Forge --
 ---------------------------
-
-local random = math.random
 
 minetest.register_node("waterdragon:scottish_dragon_forge", {
     description = S("Scottish Dragon Steel Forge"),
