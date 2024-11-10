@@ -898,9 +898,9 @@ function waterdragon.pure_water_breath(self, pos2)
 	if breath_delay <= 0 then
 		local vel = self.object:get_velocity()
 		local particle_origin = {
-			x = pos.x + dir.x * (self.growth_scale * 0.5) + vel.x * 200,
-			y = pos.y + dir.y * (self.growth_scale * 0.5) + vel.y * 200,
-			z = pos.z + dir.z * (self.growth_scale * 0.5) + vel.z * 200
+			x = pos.x + dir.x * (self.growth_scale * 5) + vel.x,
+			y = pos.y + dir.y * (self.growth_scale * 5) + vel.y + 2,
+			z = pos.z + dir.z * (self.growth_scale * 4) + vel.z
 		}
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
@@ -983,9 +983,9 @@ function waterdragon.rare_water_breath(self, pos2)
 	if breath_delay <= 0 then
 		local vel = self.object:get_velocity()
 		local particle_origin2 = {
-			x = pos.x + vel.x * 0.25,
-			y = pos.y + vel.y * 0.25,
-			z = pos.z + vel.z * 0.25
+			x = pos.x + dir.x * (self.growth_scale * 5) + vel.x,
+			y = pos.y + dir.y * (self.growth_scale * 5) + vel.y + 2,
+			z = pos.z + dir.z * (self.growth_scale * 4) + vel.z
 		}
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
@@ -1443,7 +1443,7 @@ waterdragon.wtd_api = {
 				self.food = (self.food or 0) + 1
 			end
 			if self.food
-				and self.food >= 20
+				and self.food >= 15
 				and self.age then
 				self.food = 0
 				self:increase_age()
