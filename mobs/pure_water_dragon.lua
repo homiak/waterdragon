@@ -307,6 +307,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 		end
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+		if puncher == self.rider then return end
 		if time_from_last_punch < 0.66
 			or (self.passenger and puncher == self.passenger)
 			or (self.rider and puncher == self.rider) then

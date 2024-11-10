@@ -704,7 +704,9 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                                 for z = minp.z, maxp.z do
                                     local check_pos = { x = x, y = y, z = z }
                                     local node = minetest.get_node(check_pos)
-                                    if minetest.registered_nodes[node.name].walkable then
+                                    local nodedef = minetest.registered_nodes[node.name]
+                                    
+                                    if nodedef and nodedef.walkable then
                                         has_wall = true
                                         break
                                     end
