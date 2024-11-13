@@ -404,7 +404,7 @@ local function cleanup_scottish_dragon_hud(player)
         player:hud_remove(hud_data["health"])
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
-        player:hud_remove(hud_data["fire"])
+        player:hud_remove(hud_data["breath"])
 
         -- Clear HUD data
         waterdragon.mounted_player_data[name].huds = nil
@@ -576,7 +576,7 @@ local function update_scottish_dragon_hud(self, player)
         player:hud_remove(hud_data["health"])
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
-        player:hud_remove(hud_data["fire"])
+        player:hud_remove(hud_data["breath"])
     end
 
     -- Create new HUD elements
@@ -593,7 +593,7 @@ local function update_scottish_dragon_hud(self, player)
             text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
             position = { x = 0, y = 0.95 }
         }),
-        ["fire"] = set_hud(player, {
+        ["breath"] = set_hud(player, {
             text = "waterdragon_forms_breath_bg.png^[lowpart:" .. fire .. ":waterdragon_forms_breath_fg.png",
             position = { x = 0, y = 0.65 }  -- Поместим над здоровьем
         })
@@ -725,7 +725,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                 autopilot_active[player_name] = false
                 anim = "fly"
                 _self:set_vertical_velocity(-20)
-                minetest.chat_send_player(player_name, S("the Water Dragon is tired and needs to land"))
+                minetest.chat_send_player(player_name, S("The Water Dragon is tired and needs to land"))
                 if _self.touching_ground then
                     waterdragon.action_land(_self)
                     is_landed = true
@@ -742,7 +742,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                     _self:tilt_to(minetest.dir_to_yaw(dir), 2)
                     _self:animate("fly")
                 else
-                    _self:initialize_utlilty("waterdragon:attack", target)
+                    _self:initiate_utlilty("waterdragon:attack", target)
                 end
             else
                 if _self.touching_ground then
