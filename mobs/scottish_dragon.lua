@@ -165,6 +165,10 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	activate_func = function(self)
 		waterdragon.scottish_dragon_activate(self)
 		apply_name_bonuses(self)
+		self.has_pegasus_fire = self.has_pegasus_fire or false
+		self.fire = self.fire or 0
+		self.fire_breathing = self.fire_breathing or false
+		self.fire_timer = 0
 	end,
 	on_activate = function(self, staticdata, dtime_s)
 		if staticdata ~= "" then
@@ -186,6 +190,14 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	end,
 	step_func = function(self, dtime)
 		waterdragon.scottish_dragon_step(self, dtime)
+		if self.has_pegasus_fire then
+			self.fire_timer = (self.fire_timer or 0) + dtime
+			
+			-- Check if we should breathe fire
+			if self.fire_breathing then
+				breathe_pegasus_fire(self)
+			end
+		end
 	end,
 	get_staticdata = function(self)
 		local data = {

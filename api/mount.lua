@@ -8,6 +8,137 @@ waterdragon.mounted_player_data = {}
 local abs = math.abs
 local ceil = math.ceil
 
+function breathe_pegasus_fire(self)
+    if not self.fire_breathing then return end
+    if not self.fire or self.fire <= 0 then
+        self.fire_breathing = false
+        return
+    end
+    self.fire_timer = self.fire_timer or 0
+
+    local pos = self.object:get_pos()
+    if not pos then return end
+
+    local dir
+    if self.rider then
+        -- Если есть всадник, используем направление его взгляда
+        local look_dir = self.rider:get_look_dir()
+        dir = vector.new(
+            look_dir.x,
+            look_dir.y,
+            look_dir.z
+        )
+    else
+        -- Если всадника нет, используем поворот дракона
+        local yaw = self.object:get_yaw()
+        local pitch = self.object:get_rotation().x
+        dir = vector.new(
+            -math.sin(yaw) * math.cos(pitch),
+            -math.sin(pitch),
+            math.cos(yaw) * math.cos(pitch)
+        )
+    end
+
+    local start_pos = vector.add(pos, vector.new(0, 1.2, 0))
+
+    local particle_types = {
+        {
+            texture = "waterdragon_fire_1.png",
+            size = { min = 2, max = 4 },
+            velocity = { min = 15, max = 20 },
+            acceleration = { y = { min = 2, max = 4 } },
+            exptime = { min = 0.8, max = 1.2 },
+            glow = 14
+        },
+        {
+            texture = "waterdragon_fire_2.png",
+            size = { min = 2, max = 4 },
+            velocity = { min = 15, max = 20 },
+            acceleration = { y = { min = 2, max = 4 } },
+            exptime = { min = 0.8, max = 1.2 },
+            glow = 14
+        },
+        {
+            texture = "waterdragon_fire_3.png",
+            size = { min = 2, max = 4 },
+            velocity = { min = 15, max = 20 },
+            acceleration = { y = { min = 2, max = 4 } },
+            exptime = { min = 0.8, max = 1.2 },
+            glow = 14
+        },
+    }
+
+    -- Spawn particles
+    for i = 1, 20 do
+        local particle = particle_types[math.random(#particle_types)]
+
+        minetest.add_particle({
+            pos = vector.add(start_pos, vector.new(
+                math.random(-5, 5) / 10,
+                math.random(-5, 5) / 10,
+                math.random(-5, 5) / 10
+            )),
+            velocity = vector.multiply(vector.add(dir, vector.new(
+                math.random(-2, 2) / 10,
+                math.random(-2, 2) / 10,
+                math.random(-2, 2) / 10
+            )), math.random(particle.velocity.min, particle.velocity.max)),
+            acceleration = { x = 0, y = math.random(particle.acceleration.y.min, particle.acceleration.y.max), z = 0 },
+            expirationtime = math.random(particle.exptime.min, particle.exptime.max),
+            size = math.random(particle.size.min, particle.size.max),
+            collisiondetection = true,
+            collision_removal = true,
+            vertical = false,
+            texture = particle.texture,
+            glow = particle.glow
+        })
+    end
+
+    -- Check for block collisions and ignite blocks
+    local step = 1
+    for i = 0, 20, step do
+        local check_pos = vector.add(start_pos, vector.multiply(dir, i))
+        local node = minetest.get_node(check_pos)
+        if node.name ~= "air" and node.name ~= "pegasus:fire_animated" then
+            minetest.set_node(check_pos, { name = "pegasus:fire_animated" })
+        end
+
+        -- Check for entities at each step
+        local objects = minetest.get_objects_inside_radius(check_pos, 1)
+        for _, obj in ipairs(objects) do
+            if obj ~= self.object then
+                local ent = obj:get_luaentity()
+                if ent and ent.name ~= self.name then
+                    obj:punch(self.object, 1.0, {
+                        full_punch_interval = 1.0,
+                        damage_groups = { fleshy = 6 },
+                    }, nil)
+                end
+            end
+        end
+
+        -- Stop if we hit a non-air block
+        if node.name ~= "air" and node.name ~= "pegasus:fire_animated" then
+            break
+        end
+    end
+
+    -- Decrease fire charge every second
+    if self.fire_timer >= 1 then
+        self.fire = self.fire - 1
+        self.fire_timer = 0
+        if self.fire <= 0 then
+            self.fire_breathing = false
+            return
+        end
+    end
+
+    -- Schedule the next fire breath
+    minetest.after(0.1, function()
+        breathe_pegasus_fire(self)
+    end)
+end
+
 -------------------
 -- Player Visual --
 -------------------
@@ -289,7 +420,7 @@ function waterdragon.detach_player(self, player)
     end
     local player_name = player:get_player_name()
     local data = waterdragon.mounted_player_data[player_name]
-    -- Attach Player
+    -- Detach Player
     player:set_detach()
     -- Set HUD
     if self.attack_stamina then
@@ -318,7 +449,7 @@ local function passenger_form(player)
         "size[6,3.476]",
         "real_coordinates[true]",
         "label[0.25,1;" .. name .. " " .. S("would like to ride as a passenger]"),
-        "button_exit[0.25,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
+        "button_exit[0,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
         "button_exit[3.5,1.3;2.3,0.8;btn_decline_pssngr;Decline]",
     }
     return table.concat(formspec, "")
@@ -430,6 +561,7 @@ local function update_scottish_dragon_hud(self, player)
     local health = self.hp / self.max_health * 100
     local hunger = self.hunger / self.max_hunger * 100
     local stamina = self.flight_stamina / 1600 * 100 -- Scottish Dragon has 1600 flight stamina
+    local fire = (self.fire or 0) / 10 * 100 -- Calculate fire percentage from 10 max charges
 
     -- Initialize HUD data if it doesn't exist
     if not waterdragon.mounted_player_data[name] then
@@ -442,6 +574,7 @@ local function update_scottish_dragon_hud(self, player)
         player:hud_remove(hud_data["health"])
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
+        player:hud_remove(hud_data["fire"])
     end
 
     -- Create new HUD elements
@@ -457,6 +590,10 @@ local function update_scottish_dragon_hud(self, player)
         ["stamina"] = set_hud(player, {
             text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
             position = { x = 0, y = 0.95 }
+        }),
+        ["fire"] = set_hud(player, {
+            text = "waterdragon_forms_breath_bg.png^[lowpart:" .. fire .. ":waterdragon_forms_breath_fg.png",
+            position = { x = 0, y = 0.65 }  -- Поместим над здоровьем
         })
     }
 end
@@ -705,7 +842,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                                     local check_pos = { x = x, y = y, z = z }
                                     local node = minetest.get_node(check_pos)
                                     local nodedef = minetest.registered_nodes[node.name]
-                                    
+
                                     if nodedef and nodedef.walkable then
                                         has_wall = true
                                         break
@@ -783,7 +920,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                     local front_pos = {
                         x = pos.x + (dir.x * 2.5), -- уменьшил множитель с 4 до 2.5
                         y = pos.y + 11.9,
-                        z = pos.z + (dir.z * 5.5)    -- уменьшил множитель с 5.5 до 4
+                        z = pos.z + (dir.z * 5.5)  -- уменьшил множитель с 5.5 до 4
                     }
 
                     local node_front = minetest.get_node(front_pos)
@@ -1073,7 +1210,12 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         attack_cooldown = math.max(0, attack_cooldown - _self.dtime)
-
+        if control.right then
+            _self.fire_breathing = true  -- Установим флаг перед вызовом
+            breathe_pegasus_fire(_self)
+        elseif not control.right then
+            _self.fire_breathing = false  -- Выключаем когда кнопка отпущена
+        end
         if view_point == 2 then
             local goal_y = 0 - 60 * look_dir.y
             local goal_z = -120 + 60 * abs(look_dir.y)
@@ -1125,3 +1267,59 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
     end
     self:set_utility(func)
 end)
+
+-- Define the fire node
+
+minetest.register_node("waterdragon:fire_animated", {
+	description = "Scottish Dragon Fire",
+	drawtype = "firelike",
+	tiles = {
+		{
+			name = "waterdragon_fire_animated.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 1
+			},
+		},
+	},
+	inventory_image = "waterdragon_fire_1.png",
+	paramtype = "light",
+	light_source = 14,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	floodable = true,
+	damage_per_second = 4,
+	groups = { igniter = 2, not_in_creative_inventory = 1 },
+	drop = "",
+	on_timer = function(pos, elapsed)
+		-- Check for entities and damage them
+		local objects = minetest.get_objects_inside_radius(pos, 1.5)
+		for _, obj in ipairs(objects) do
+			local ent = obj:get_luaentity()
+			if obj:is_player() or (ent and ent.name ~= "waterdragon:scottish_dragon") then
+				obj:punch(obj, 1.0, {
+					full_punch_interval = 1.0,
+					damage_groups = { fleshy = 4 },
+				}, vector.new(0, 0, 0))
+			end
+		end
+
+		-- Remove the fire after some time
+		if math.random(1, 5) == 1 then -- 20% chance to remove each tick
+			minetest.remove_node(pos)
+			return false
+		end
+		return true
+	end,
+	on_construct = function(pos)
+		minetest.get_node_timer(pos):start(0.5) -- Check every 0.5 seconds
+	end,
+	on_flood = function(pos, oldnode, newnode)
+		minetest.remove_node(pos)
+		return false
+	end,
+})
