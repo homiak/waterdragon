@@ -220,6 +220,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		end
 	end,
 	on_rightclick = function(self, clicker)
+		if clicker == self.rider then return end
 		waterdragon.scottish_dragon_rightclick(self, clicker)
 		local item = clicker:get_wielded_item()
 		local item_name = item:get_name()
