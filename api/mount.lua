@@ -1273,7 +1273,7 @@ end)
 -- Define the fire node
 
 minetest.register_node("waterdragon:fire_animated", {
-    description = "Scottish Dragon Fire",
+    description = S("Scottish Dragon Fire"),
     drawtype = "firelike",
     tiles = {
         {

@@ -233,11 +233,33 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if puncher == self.rider then return end
-		if time_from_last_punch < 0.66
-			or (self.passenger and puncher == self.passenger)
-			or (self.rider and puncher == self.rider) then
-			return
-		end
+		-- Initialize punch tracking
+        if not self.punch_data then
+            self.punch_data = { count = 0, last_punch_time = 0, attacker = nil }
+        end
+		local puncher_name = puncher:get_player_name() or puncher:get_luaentity().name
+        local current_time = minetest.get_gametime()
+        -- If the puncher is the same and it's within 30 seconds, increment the punch count
+        if self.punch_data.attacker == puncher_name and (current_time - self.punch_data.last_punch_time) <= 30 then
+            self.punch_data.count = self.punch_data.count + 1
+        else
+            -- Reset counter if it's a new attacker or more than 30 seconds have passed
+            self.punch_data.count = 1
+            self.punch_data.attacker = puncher_name
+        end
+
+        -- Update the time of the last punch
+        self.punch_data.last_punch_time = current_time
+
+        -- If punched 6 times within 30 seconds, attack the puncher
+        if self.punch_data.count >= 6 then
+            -- Reset the counter
+            self.punch_data.count = 0
+            if self.rider then return end
+            -- Make the dragon attack the puncher
+            self._target = puncher
+            self:initiate_utility("waterdragon:scottish_dragon_attack", puncher)
+        end
 		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)

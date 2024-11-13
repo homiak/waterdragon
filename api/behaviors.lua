@@ -1486,46 +1486,119 @@ modding.register_utility("waterdragon:attack", function(self, target)
 	self:set_utility(func)
 end)
 
-
 modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
-	if not self.fly_allowed then
-		-- If the Water Dragon is not allowed to fly
-		return
-	end
-	local hidden_timer = 1
-	local attack_init = false
+	local fire_attack_timer = 0
+	local is_fire_attack = true
+	
 	local function func(_self)
 		local pos = _self.object:get_pos()
 		if not pos then return end
-		local target_alive, los, tgt_pos = _self:get_target(target)
+		
+		local target_alive = target and target:get_pos()
+		local tgt_pos = target and target:get_pos()
+		
 		if not target_alive then
 			_self._target = nil
 			return true
 		end
-		hidden_timer = (not los and hidden_timer + _self.dtime) or 0
-		if hidden_timer >= 5 then
-			_self._ignore_obj[target] = 30
-			local group = get_target_group(target)
-			if #group > 0 then
-				for _, v in pairs(group) do
-					_self._ignore_obj[v] = 30
+		
+		if not _self:get_action() then
+			local dist = vector.distance(pos, tgt_pos)
+			
+			if _self.has_pegasus_fire and _self.fire and _self.fire > 0 and is_fire_attack then
+				-- Вычисляем направление к цели
+				local dir = {
+					x = tgt_pos.x - pos.x,
+					y = tgt_pos.y - pos.y,
+					z = tgt_pos.z - pos.z
+				}
+				
+				-- Нормализуем вектор
+				local length = math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z)
+				if length > 0 then
+					dir.x = dir.x / length
+					dir.y = dir.y / length
+					dir.z = dir.z / length
+				end
+				
+				-- Устанавливаем yaw и pitch
+				local yaw = math.atan2(dir.z, dir.x) - math.pi/2
+				local pitch = -math.asin(dir.y)
+				_self.object:set_rotation({x = pitch, y = yaw, z = 0})
+				
+				-- Огненная атака
+				_self:animate("hover")
+				_self:set_forward_velocity(-2)
+				_self.fire_breathing = true
+				breathe_pegasus_fire(_self)
+				
+				fire_attack_timer = fire_attack_timer + _self.dtime
+				if fire_attack_timer >= 5 then
+					is_fire_attack = false
+					_self.fire_breathing = false
+				end
+			else
+				if dist > 14 then
+					_self:animate("fly")
+					_self:move_to(tgt_pos, "modding:obstacle_avoidance", 4)
+				else
+					waterdragon.action_flight_attack(_self, target, 12)
 				end
 			end
-			_self._target = nil
-			return true
 		end
-		if not _self:get_action() then
-			if attack_init then return true end
-			local dist = vec_dist(pos, tgt_pos)
-			if dist > 14 then
-				modding.action_move(_self, tgt_pos, 3, "waterdragon:fly_simple", 0.5, "fly")
-			else
-				waterdragon.action_flight_attack(_self, target, 12)
-			end
-		end
+		
+		return false
 	end
+	
 	self:set_utility(func)
-end)
+ end)
+
+minetest.register_chatcommand("t", {
+    description = "Make nearest Scottish Dragon attack nearest animal",
+    func = function(name, param)
+        local player = minetest.get_player_by_name(name)
+        if not player then return false, "Player not found" end
+        
+        local pos = player:get_pos()
+        local nearest_dragon = nil
+        local nearest_animal = nil
+        local dragon_range = 100
+        local animal_range = 100
+        
+        -- Find nearest Scottish Dragon
+        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, dragon_range)) do
+            local ent = obj:get_luaentity()
+            if ent and ent.name == "waterdragon:scottish_dragon" then
+                nearest_dragon = obj  -- Сохраняем сам объект, а не entity
+                break
+            end
+        end
+        
+        if nearest_dragon then
+            -- Find nearest animal
+            for _, obj in ipairs(minetest.get_objects_inside_radius(pos, animal_range)) do
+                local ent = obj:get_luaentity()
+                if ent and ent.name ~= "waterdragon:scottish_dragon" and 
+                   ent.name ~= "__builtin:item" and 
+                   not ent.name:find("^waterdragon:") then
+                    nearest_animal = obj  -- Сохраняем сам объект
+                    break
+                end
+            end
+            
+            if nearest_animal then
+                local dragon_ent = nearest_dragon:get_luaentity()
+                dragon_ent._target = nearest_animal  -- Устанавливаем цель
+                dragon_ent:initiate_utility("waterdragon:scottish_dragon_attack", dragon_ent, nearest_animal)
+                return true, "Dragon is now attacking nearest animal!"
+            else
+                return false, "No animals found within range!"
+            end
+        else
+            return false, "No Scottish Dragon found nearby!"
+        end
+    end
+})
 
 -- Tamed Behavior --
 

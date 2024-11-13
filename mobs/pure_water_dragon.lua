@@ -342,9 +342,9 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 		if self.punch_data.count >= 6 then
 			-- Reset the counter
 			self.punch_data.count = 0
-if self.rider then return end
+			if self.rider then return end
 			-- Make the dragon attack the puncher
-			self.attack_target = puncher
+			self._target = puncher
 			local tgt_pos = puncher:get_pos()
 			self:breath_attack(tgt_pos)
 			waterdragon.action_slam(self)
