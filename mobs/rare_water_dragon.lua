@@ -254,6 +254,8 @@ end
 minetest.register_craftitem("waterdragon:spawn_rare_water_dragon", spawn_egg_def)
 
 function rescue_pegasus(rescuer, pegasus)
+    if rescuer.rider then return end
+    if not minetest.get_modpath("pegasus") then return end
     if not pegasus.needs_rescue then return end
 
 
@@ -311,6 +313,7 @@ function rescue_pegasus(rescuer, pegasus)
 end
 
 minetest.register_globalstep(function(dtime)
+    if not minetest.get_modpath("pegasus") then return end
     if not _G.pegasus_rescue_initialized then
         _G.pegasus_rescue_initialized = true
         _G.rescue_pegasus = rescue_pegasus

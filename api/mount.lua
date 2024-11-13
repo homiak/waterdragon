@@ -9,6 +9,7 @@ local abs = math.abs
 local ceil = math.ceil
 
 function breathe_pegasus_fire(self)
+    if not minetest.get_modpath("pegasus") then return end
     if not self.fire_breathing then return end
     if not self.fire or self.fire <= 0 then
         self.fire_breathing = false
@@ -403,6 +404,7 @@ local function cleanup_scottish_dragon_hud(player)
         player:hud_remove(hud_data["health"])
         player:hud_remove(hud_data["hunger"])
         player:hud_remove(hud_data["stamina"])
+        player:hud_remove(hud_data["fire"])
 
         -- Clear HUD data
         waterdragon.mounted_player_data[name].huds = nil
@@ -1210,7 +1212,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         attack_cooldown = math.max(0, attack_cooldown - _self.dtime)
-        if control.right then
+        if control.right and minetest.get_modpath("pegasus") then
             _self.fire_breathing = true  -- Установим флаг перед вызовом
             breathe_pegasus_fire(_self)
         elseif not control.right then

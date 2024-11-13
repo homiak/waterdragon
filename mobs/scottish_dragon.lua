@@ -194,7 +194,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 			self.fire_timer = (self.fire_timer or 0) + dtime
 			
 			-- Check if we should breathe fire
-			if self.fire_breathing then
+			if self.fire_breathing and minetest.get_modpath("pegasus") then
 				breathe_pegasus_fire(self)
 			end
 		end
