@@ -865,6 +865,13 @@ modding.register_utility("waterdragon:sleep", function(self)
 			_self.object:set_yaw(_self.object:get_yaw())
 			modding.action_idle(_self, 3, "sleep")
 		end
+		-- Increment flight stamina while sleeping
+		minetest.after(1, function()
+			if _self.flight_stamina < 300 then
+				_self.flight_stamina = math.min(_self.flight_stamina * 2, 300)
+				func(_self)  -- Call again to keep the loop going each second
+			end
+		end)
 	end
 	self:set_utility(func)
 end)

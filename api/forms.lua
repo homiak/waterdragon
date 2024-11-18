@@ -55,10 +55,11 @@ end
 local function get_dragon_formspec(self)
 	-- Stats
 	local current_age = self.age or 150
-	local health = get_stat(self, "hp", "max_health")
-	local hunger = get_stat(self, "hunger", "max_hunger")
-	local stamina = get_perc(self.flight_stamina, 300)
-	local breath = get_perc(self.attack_stamina, 150)
+	local scale = self.growth_scale
+	local health = self.hp / ceil(self.max_health * scale) * 100
+	local hunger = self.hunger / ceil(self.max_hunger * scale) * 100
+	local stamina = self.flight_stamina / 900 * 100
+	local breath = self.attack_stamina / 100 * 100
 	-- Visuals
 	local frame_range = self.animations["stand"].range
 	local frame_loop = frame_range.x .. "," .. frame_range.y
@@ -203,7 +204,7 @@ local function get_dragon_actions_formspec(ent)
 		"size[8,6]",
 		"label[3,0.5;Dragon Actions]",
 		"button[1,2;6,0.8;btn_roar;Roar]",
-		"button[1,3;6,0.8;btn_breath;Breath Attack]",
+		"button[1,3;6,0.8;btn_takeoff;Takeoff]",
 		"button[1,4;6,0.8;btn_lay;Sleep]",
 		"button_exit[1,5;6,0.8;btn_close;Close]"
 	}
@@ -211,13 +212,12 @@ local function get_dragon_actions_formspec(ent)
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	
 	if formname == "waterdragon:actions" then
 		local name = player:get_player_name()
 		local ent = form_objref[name]
-		
+
 		if not ent or not ent.object then return end
-		
+
 		if fields.btn_roar then
 			minetest.sound_play("waterdragon_water_dragon_random_3", {
 				object = ent.object,
@@ -225,20 +225,17 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				max_hear_distance = 32
 			})
 		end
-		
-		if fields.btn_breath then
-			local pos2 = ent.object:get_pos()
-			if ent.name == "waterdragon:rare_water_dragon" then
-				ent.breath_duration = 5
-				waterdragon.rare_water_breath(ent, pos2)
-			elseif ent.name == "waterdragon:pure_water_dragon" then
-				ent.breath_duration = 5
-				waterdragon.pure_water_breath(ent, pos2)
+
+		if fields.btn_takeoff then
+			if not ent.is_landed then
+				waterdragon.action_takeoff(ent, 10)
+				ent:set_gravity(0)
+				modding.action_idle(ent, 300, "hover")
 			end
 		end
-		
+
 		if fields.btn_lay then
-			modding.action_idle(ent, 30, "sleep")
+			modding.action_idle(ent, 300, "sleep")
 		end
 	end
 end)
