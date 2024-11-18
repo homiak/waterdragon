@@ -94,6 +94,7 @@ local function get_dragon_formspec(self)
 		"image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
 		"tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
 		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;true;false;]",
+		"button[0.5,8.75;2.6,0.5;btn_dragon_actions;Actions]",
 		"button[9.75,8.75;2.6,0.5;btn_customize;" .. S("Customize") .. "]"
 	}
 	table.insert(form, "button[9.75,8.75;2.6,0.5;btn_customize;Customize]")
@@ -172,7 +173,7 @@ local function get_scottish_dragon_formspec(self)
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
-		
+
 		"tooltip[13.45,7.6;1.9,1.9;" .. correct_name(self.stance) .. "]",
 		"image_button[13.45,7.6;1.9,1.9;waterdragon_forms_dragon_" .. self.stance .. ".png;btn_wtd_stance;;false;false;]",
 		"tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
@@ -195,6 +196,52 @@ end
 ----------------
 -- Get Fields --
 ----------------
+
+local function get_dragon_actions_formspec(ent)
+	local form = {
+		"formspec_version[4]",
+		"size[8,6]",
+		"label[3,0.5;Dragon Actions]",
+		"button[1,2;6,0.8;btn_roar;Roar]",
+		"button[1,3;6,0.8;btn_breath;Breath Attack]",
+		"button[1,4;6,0.8;btn_lay;Sleep]",
+		"button_exit[1,5;6,0.8;btn_close;Close]"
+	}
+	return table.concat(form, "")
+end
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	
+	if formname == "waterdragon:actions" then
+		local name = player:get_player_name()
+		local ent = form_objref[name]
+		
+		if not ent or not ent.object then return end
+		
+		if fields.btn_roar then
+			minetest.sound_play("waterdragon_water_dragon_random_3", {
+				object = ent.object,
+				gain = 1.0,
+				max_hear_distance = 32
+			})
+		end
+		
+		if fields.btn_breath then
+			local pos2 = ent.object:get_pos()
+			if ent.name == "waterdragon:rare_water_dragon" then
+				ent.breath_duration = 5
+				waterdragon.rare_water_breath(ent, pos2)
+			elseif ent.name == "waterdragon:pure_water_dragon" then
+				ent.breath_duration = 5
+				waterdragon.pure_water_breath(ent, pos2)
+			end
+		end
+		
+		if fields.btn_lay then
+			modding.action_idle(ent, 30, "sleep")
+		end
+	end
+end)
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local name = player:get_player_name()
@@ -235,6 +282,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				ent.fly_allowed = ent:memorize("fly_allowed", true)
 			end
 			ent:show_formspec(player)
+		end
+		if fields.btn_dragon_actions then
+			minetest.show_formspec(name, "waterdragon:actions", get_dragon_actions_formspec(ent))
 		end
 		if fields.btn_wtd_name then
 			minetest.show_formspec(name, "waterdragon:set_name", get_rename_formspec(ent))

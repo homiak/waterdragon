@@ -902,6 +902,12 @@ function waterdragon.pure_water_breath(self, pos2)
 			y = pos.y + dir.y * (self.growth_scale * 5) + vel.y + 2,
 			z = pos.z + dir.z * (self.growth_scale * 4) + vel.z
 		}
+		local ignore_blocks = {
+			["waterdragon:dragonstone_block_rare_water"] = true,
+			["waterdragon:dragonstone_bricks_rare_water"] = true,
+			["waterdragon:dragonstone_block_pure_water"] = true,
+			["waterdragon:dragonstone_bricks_pure_water"] = true
+		}
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
 			minetest.add_particlespawner({
@@ -949,7 +955,7 @@ function waterdragon.pure_water_breath(self, pos2)
 				damage_objects(self, pure_water_pos, spread + 2)
 			end
 			local def = modding.get_node_def(pure_water_pos)
-			if def.walkable
+			if def.walkable and not ignore_blocks
 				or def.drawtype == "liquid" then
 				breath_end = pure_water_pos
 				break
@@ -1028,6 +1034,13 @@ function waterdragon.rare_water_breath(self, pos2)
 		end
 		local spread = floor(clamp(2.5 * scale, 1, 4))
 		local breath_end = vec_add(pos, vec_multi(dir, 32))
+		-- Special check to prevent stopping on specific dragonstone blocks
+		local ignore_blocks = {
+			["waterdragon:dragonstone_block_rare_water"] = true,
+			["waterdragon:dragonstone_bricks_rare_water"] = true,
+			["waterdragon:dragonstone_block_pure_water"] = true,
+			["waterdragon:dragonstone_bricks_pure_water"] = true
+		}
 		for i = 1, 32, spread do
 			local rare_water_pos = vec_add(pos, vec_multi(dir, i))
 			make_wet_nodes(rare_water_pos, spread)
@@ -1045,7 +1058,7 @@ function waterdragon.rare_water_breath(self, pos2)
 				break
 			end
 			local def = modding.get_node_def(rare_water_pos)
-			if def.walkable then
+			if def.walkable and not ignore_blocks then
 				breath_end = rare_water_pos
 				break
 			end
