@@ -430,3 +430,11 @@ spawn_egg_def.on_place = function(itemstack, _, pointed_thing)
 end
 
 minetest.register_craftitem("waterdragon:spawn_pure_water_dragon", spawn_egg_def)
+
+minetest.register_globalstep(function(dtime)
+    if not minetest.get_modpath("pegasus") then return end
+    if not _G.pegasus_rescue_initialized then
+        _G.pegasus_rescue_initialized = true
+        _G.rescue_pegasus = rescue_pegasus
+    end
+end)

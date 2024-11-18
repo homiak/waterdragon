@@ -169,6 +169,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		self.fire = self.fire or 0
 		self.fire_breathing = self.fire_breathing or false
 		self.fire_timer = 0
+		
 	end,
 	on_activate = function(self, staticdata, dtime_s)
 		if staticdata ~= "" then
@@ -192,7 +193,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		waterdragon.scottish_dragon_step(self, dtime)
 		if self.has_pegasus_fire then
 			self.fire_timer = (self.fire_timer or 0) + dtime
-			
+
 			-- Check if we should breathe fire
 			if self.fire_breathing and minetest.get_modpath("pegasus") then
 				breathe_pegasus_fire(self)
@@ -234,32 +235,32 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if puncher == self.rider then return end
 		-- Initialize punch tracking
-        if not self.punch_data then
-            self.punch_data = { count = 0, last_punch_time = 0, attacker = nil }
-        end
+		if not self.punch_data then
+			self.punch_data = { count = 0, last_punch_time = 0, attacker = nil }
+		end
 		local puncher_name = puncher:get_player_name() or puncher:get_luaentity().name
-        local current_time = minetest.get_gametime()
-        -- If the puncher is the same and it's within 30 seconds, increment the punch count
-        if self.punch_data.attacker == puncher_name and (current_time - self.punch_data.last_punch_time) <= 30 then
-            self.punch_data.count = self.punch_data.count + 1
-        else
-            -- Reset counter if it's a new attacker or more than 30 seconds have passed
-            self.punch_data.count = 1
-            self.punch_data.attacker = puncher_name
-        end
+		local current_time = minetest.get_gametime()
+		-- If the puncher is the same and it's within 30 seconds, increment the punch count
+		if self.punch_data.attacker == puncher_name and (current_time - self.punch_data.last_punch_time) <= 30 then
+			self.punch_data.count = self.punch_data.count + 1
+		else
+			-- Reset counter if it's a new attacker or more than 30 seconds have passed
+			self.punch_data.count = 1
+			self.punch_data.attacker = puncher_name
+		end
 
-        -- Update the time of the last punch
-        self.punch_data.last_punch_time = current_time
+		-- Update the time of the last punch
+		self.punch_data.last_punch_time = current_time
 
-        -- If punched 6 times within 30 seconds, attack the puncher
-        if self.punch_data.count >= 6 then
-            -- Reset the counter
-            self.punch_data.count = 0
-            if self.rider then return end
-            -- Make the dragon attack the puncher
-            self._target = puncher
-            self:initiate_utility("waterdragon:scottish_dragon_attack", puncher)
-        end
+		-- If punched 6 times within 30 seconds, attack the puncher
+		if self.punch_data.count >= 6 then
+			-- Reset the counter
+			self.punch_data.count = 0
+			if self.rider then return end
+			-- Make the dragon attack the puncher
+			self._target = puncher
+			self:initiate_utility("waterdragon:scottish_dragon_attack", puncher)
+		end
 		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
@@ -303,3 +304,11 @@ minetest.register_craftitem("waterdragon:scales_scottish_dragon", {
 	description = S("Scottish Dragon Scales"),
 	inventory_image = "waterdragon_scottish_dragon_scales.png",
 })
+
+minetest.register_globalstep(function(dtime)
+	if not minetest.get_modpath("pegasus") then return end
+	if not _G.pegasus_rescue_initialized then
+		_G.pegasus_rescue_initialized = true
+		_G.rescue_pegasus = rescue_pegasus
+	end
+end)

@@ -65,6 +65,7 @@ end)
 
 
 waterdragon.register_mob_armour = function(name, def)
+    
     local itemname = "waterdragon:armour_" .. name
 
     def.protection = math.max(1, math.min(10, def.protection or 1))
@@ -78,6 +79,7 @@ waterdragon.register_mob_armour = function(name, def)
             if pointed_thing.type == "object" then
                 local obj = pointed_thing.ref
                 local ent = obj:get_luaentity()
+                ent.armour = ent.armour or false
                 if ent and ent.name == def.mob_name then
                     ent.armour = {
                         name = name,
@@ -88,6 +90,7 @@ waterdragon.register_mob_armour = function(name, def)
                     props.textures[1] = def.dragon_armour_texture
                     obj:set_properties(props)
                     itemstack:take_item()
+                    ent.armour = true
                     return itemstack
                 end
             end
@@ -119,7 +122,10 @@ waterdragon.register_mob_armour = function(name, def)
                     local armour_item = ItemStack(itemname)
                     local inv = player:get_inventory()
                     if inv:room_for_item("main", armour_item) then
+                        obj.armour = false
+
                         inv:add_item("main", armour_item)
+                        
                         return true,
                             "Armour successfully removed from " ..
                             def.mob_name ..
@@ -134,69 +140,6 @@ waterdragon.register_mob_armour = function(name, def)
             end
 
             return false, "No Water Dragons with armour found nearby"
-        end,
-    })
-
-    minetest.register_chatcommand("set_armour", {
-        params = "",
-        description = "Sets armour on the nearest Water Dragon",
-        func = function(name, param)
-            local player = minetest.get_player_by_name(name)
-            if not player then return false, "Player not found" end
-
-            local pos = player:get_pos()
-            local radius = 20
-            local objects = minetest.get_objects_inside_radius(pos, radius)
-            for _, obj in ipairs(objects) do
-                obj.armour = false
-                local ent = obj:get_luaentity()
-                if ent and ent.name == def.mob_name then
-                    local stack = player:get_wielded_item()
-                    if stack:get_name() == itemname then
-                        ent.armour = { name = name, protection = def.protection, texture = def.dragon_armour_texture }
-                        local props = obj:get_properties()
-                        props.textures[1] = def.dragon_armour_texture
-                        obj:set_properties(props)
-                        stack:take_item()
-                        player:set_wielded_item(stack)
-                        local armour = obj.armour or false
-                        obj.armour = true
-                        obj.armour = obj:memorize("water_dragon_armour", armour)
-                        return true,
-                            "Armour successfully set on the Water Dragon (Protection: " .. def.protection .. ")"
-                    end
-                end
-            end
-
-            return false, "No suitable Water Dragons found nearby or no suitable armour in hand"
-        end,
-    })
-
-    minetest.register_chatcommand("check_wtd_armour", {
-        params = "",
-        description = "Checks armour on the nearest Water Dragon",
-        func = function(name, param)
-            local player = minetest.get_player_by_name(name)
-            if not player then return false, "Player not found" end
-
-            local pos = player:get_pos()
-            local radius = 20
-            local objects = minetest.get_objects_inside_radius(pos, radius)
-
-            for _, obj in ipairs(objects) do
-                local ent = obj:get_luaentity()
-                if ent and ent.name == def.mob_name then
-                    if ent.armour then
-                        return true,
-                            def.mob_name ..
-                            " is wearing " .. ent.armour.name .. " armour (Protection: " .. ent.armour.protection .. ")"
-                    else
-                        return true, def.mob_name .. " is not wearing any armour"
-                    end
-                end
-            end
-
-            return false, "No Water Dragons found nearby"
         end,
     })
 end

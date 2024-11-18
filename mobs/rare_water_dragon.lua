@@ -130,6 +130,7 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         if minetest.get_item_group(item_name, "water_dragon_armour") > 0 then
             local armour_def = minetest.registered_items[item_name]
             if armour_def and armour_def.on_use then
+                self:memorize("armour", self.armour)
                 return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
             end
         end
@@ -272,7 +273,7 @@ function rescue_pegasus(rescuer, pegasus)
         visual_size = { x = 0.4, y = 0.4, z = 0.4 },
         collisionbox = { -0.26, 0, -0.26, 0.26, 0.78, 0.26 }
     })
-    pegasus.object:set_attach(rescuer, "", { x = 0, y = 1.5, z = -2 }, { x = 0, y = 0, z = 0 })
+    pegasus.object:set_attach(rescuer, "", { x = 0, y = 2, z = -1 }, { x = 0, y = 0, z = 0 })
 
     if waterdragon and waterdragon.action_fly then
         local flight_duration = 20
@@ -294,7 +295,7 @@ function rescue_pegasus(rescuer, pegasus)
                     y = smooth_flight(t),
                     z = start_pos.z + (rescue_pos.z - start_pos.z) * progress
                 }
-                waterdragon.action_fly(rescuer:get_luaentity(), new_pos, 1, "waterdragon:fly_simple", 1, "fly")
+                waterdragon.action_fly(rescuer, new_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
             end)
         end
         minetest.after(flight_duration + 1, function()

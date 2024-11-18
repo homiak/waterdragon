@@ -100,8 +100,8 @@ function breathe_pegasus_fire(self)
     for i = 0, 20, step do
         local check_pos = vector.add(start_pos, vector.multiply(dir, i))
         local node = minetest.get_node(check_pos)
-        if node.name ~= "air" and node.name ~= "pegasus:fire_animated" then
-            minetest.set_node(check_pos, { name = "pegasus:fire_animated" })
+        if node.name ~= "air" and node.name ~= "waterdragon:fire_animated" then
+            minetest.set_node(check_pos, { name = "waterdragon:fire_animated" })
         end
 
         -- Check for entities at each step
@@ -583,19 +583,19 @@ local function update_scottish_dragon_hud(self, player)
     waterdragon.mounted_player_data[name].huds = {
         ["health"] = set_hud(player, {
             text = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png",
-            position = { x = 0, y = 0.75 }
+            position = { x = 0, y = 0.7 }
         }),
         ["hunger"] = set_hud(player, {
             text = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png",
-            position = { x = 0, y = 0.85 }
+            position = { x = 0, y = 0.8 }
         }),
         ["stamina"] = set_hud(player, {
             text = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png",
-            position = { x = 0, y = 0.95 }
+            position = { x = 0, y = 0.9 }
         }),
         ["breath"] = set_hud(player, {
             text = "waterdragon_forms_breath_bg.png^[lowpart:" .. fire .. ":waterdragon_forms_breath_fg.png",
-            position = { x = 0, y = 0.65 } -- Поместим над здоровьем
+            position = { x = 0, y = 1 }
         })
     }
 end
@@ -1302,7 +1302,7 @@ minetest.register_node("waterdragon:fire_animated", {
         local objects = minetest.get_objects_inside_radius(pos, 1.5)
         for _, obj in ipairs(objects) do
             local ent = obj:get_luaentity()
-            if obj:is_player() or (ent and ent.name ~= "waterdragon:scottish_dragon") then
+            if obj:is_player() or (ent and ent.name ~= "waterdragon:scottish_dragon" and ent.name ~= "pegasus:pegasus"and ent.name ~= "waterdragon:rare_water_dragon" and ent.name ~= "waterdragon:pure_water_dragon") then
                 obj:punch(obj, 1.0, {
                     full_punch_interval = 1.0,
                     damage_groups = { fleshy = 4 },

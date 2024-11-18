@@ -145,6 +145,7 @@ local function get_scottish_dragon_formspec(self)
 	local health = get_stat(self, "hp", "max_health")
 	local hunger = get_stat(self, "hunger", "max_hunger")
 	local stamina = get_perc(self.flight_stamina, 900)
+	local fire = get_perc(self.fire, 10)
 	-- Visuals
 	local frame_range = self.animations["stand"].range
 	local frame_loop = frame_range.x .. "," .. frame_range.y
@@ -152,6 +153,7 @@ local function get_scottish_dragon_formspec(self)
 	local health_ind = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png"
 	local hunger_ind = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png"
 	local stamina_ind = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png"
+	local breath_ind = "waterdragon_forms_breath_bg.png^[lowpart:" .. fire .. ":waterdragon_forms_breath_fg.png"
 	-- Settings
 	local fly_allowed = "Flight Allowed"
 	local fly_image = "waterdragon_forms_flight_allowed.png"
@@ -170,6 +172,7 @@ local function get_scottish_dragon_formspec(self)
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
+		
 		"tooltip[13.45,7.6;1.9,1.9;" .. correct_name(self.stance) .. "]",
 		"image_button[13.45,7.6;1.9,1.9;waterdragon_forms_dragon_" .. self.stance .. ".png;btn_wtd_stance;;false;false;]",
 		"tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
@@ -177,6 +180,9 @@ local function get_scottish_dragon_formspec(self)
 		"tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
 		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]",
 	}
+	if minetest.get_modpath("pegasus") then
+		table.insert(form, "image[1.1,7.3;1,1;" .. breath_ind .. "]")
+	end
 	return table.concat(form, "")
 end
 
