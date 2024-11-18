@@ -174,7 +174,7 @@ local function get_scottish_dragon_formspec(self)
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
-
+		"button[0.5,8.75;2.6,0.5;btn_takeoff;Takeoff]",
 		"tooltip[13.45,7.6;1.9,1.9;" .. correct_name(self.stance) .. "]",
 		"image_button[13.45,7.6;1.9,1.9;waterdragon_forms_dragon_" .. self.stance .. ".png;btn_wtd_stance;;false;false;]",
 		"tooltip[13.45,3.9;1.9,1.9;" .. correct_name(self.order) .. "]",
@@ -304,6 +304,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				ent.stance = ent:memorize("stance", "neutral")
 			end
 			ent:show_formspec(player)
+		end
+		if fields.btn_takeoff then
+			if not ent.is_landed then
+				waterdragon.action_takeoff(ent, 10)
+				ent:set_gravity(0)
+				modding.action_idle(ent, 300, "hover")
+			end
 		end
 		if fields.btn_wtd_order then
 			if not ent.object then return end
