@@ -206,7 +206,7 @@ local function get_dragon_actions_formspec(ent)
 		"button[1,2;6,0.8;btn_roar;Roar]",
 		"button[1,3;6,0.8;btn_takeoff;Takeoff]",
 		"button[1,4;6,0.8;btn_lay;Sleep]",
-		"button_exit[1,5;6,0.8;btn_close;Close]"
+		"button_exit[7.1,0.1;1.0,0.6;btn_close;Close]"
 	}
 	return table.concat(form, "")
 end
