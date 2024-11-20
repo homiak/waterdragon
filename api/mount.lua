@@ -1104,26 +1104,26 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
             })
         end
 
-            if control.aux1 then
-                if not view_held then
-                    if view_point == 2 then
-                        view_point = 1
-                        player_data.fake_player:set_properties({
-                            visual_size = { x = 0, y = 0, z = 0 },
-                        })
-                        player:hud_set_flags({ wielditem = false })
-                    elseif view_point == 1 then
-                        view_point = 2
-                        local dragon_size = _self.object:get_properties().visual_size
-                        player_data.fake_player:set_properties({
-                            visual_size = {
-                                x = 1 / dragon_size.x,
+        if control.aux1 then
+            if not view_held then
+                if view_point == 2 then
+                    view_point = 1
+                    player_data.fake_player:set_properties({
+                        visual_size = { x = 0, y = 0, z = 0 },
+                    })
+                    player:hud_set_flags({ wielditem = false })
+                elseif view_point == 1 then
+                    view_point = 2
+                    local dragon_size = _self.object:get_properties().visual_size
+                    player_data.fake_player:set_properties({
+                        visual_size = {
+                            x = 1 / dragon_size.x,
                             y = 1 / dragon_size.y
-                            }
-                        })
-                        player:hud_set_flags({ wielditem = false })
-                    end
-                    view_held = true
+                        }
+                    })
+                    player:hud_set_flags({ wielditem = false })
+                end
+                view_held = true
             end
         else
             view_held = false
@@ -1220,7 +1220,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
         if view_point == 2 then
             local goal_y = 0 - 60 * look_dir.y
-            local goal_z = -140 + 60 * abs(look_dir.y)  -- Здесь -140 для второй точки зрения
+            local goal_z = -140 + 60 * abs(look_dir.y)
             if _self._anim == "dive" then
                 local accel_offset = 60 + momentum
                 goal_y = 40 - accel_offset * look_dir.y
@@ -1239,7 +1239,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
             end
         else
             local goal_y = 25
-            local goal_z = 10  -- Оставляем прежние значения для первой точки зрения
+            local goal_z = 10
             if _self._anim == "fly" then
                 goal_y = goal_y + 15 * look_dir.y
                 goal_z = goal_z - 20 * look_dir.y
@@ -1261,7 +1261,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
             end
         end
 
-        if control.sneak
+        if control.sneak or _self.hp == 0
             or player:get_player_name() ~= _self.owner then
             waterdragon.detach_player(_self, player)
             return true
@@ -1302,7 +1302,7 @@ minetest.register_node("waterdragon:fire_animated", {
         local objects = minetest.get_objects_inside_radius(pos, 1.5)
         for _, obj in ipairs(objects) do
             local ent = obj:get_luaentity()
-            if obj:is_player() or (ent and ent.name ~= "waterdragon:scottish_dragon" and ent.name ~= "pegasus:pegasus"and ent.name ~= "waterdragon:rare_water_dragon" and ent.name ~= "waterdragon:pure_water_dragon") then
+            if obj:is_player() or (ent and ent.name ~= "waterdragon:scottish_dragon" and ent.name ~= "pegasus:pegasus" and ent.name ~= "waterdragon:rare_water_dragon" and ent.name ~= "waterdragon:pure_water_dragon") then
                 obj:punch(obj, 1.0, {
                     full_punch_interval = 1.0,
                     damage_groups = { fleshy = 4 },
