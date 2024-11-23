@@ -2447,7 +2447,6 @@ function waterdragon.action_fly_and_throw(self, rider)
 				local rider_obj = self.rider
 				waterdragon.detach_player(self, rider_obj)
 
-				local dragon_pos = self.object:get_pos()
 				local yaw = self.object:get_yaw()
 				local throw_dir = {
 					x = -math.sin(yaw),
