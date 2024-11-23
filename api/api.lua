@@ -1671,19 +1671,19 @@ waterdragon.scottish_wtd_api = {
 		end
 		return false
 	end,
-	play_wing_sound2 = function(self)
+	play_wing_sound = function(self)
 		local offset = self.frame_offset or 0
 		if offset > 20
-			and not self.flap_sound_played2 then
+			and not self.flap_sound_played then
 			minetest.sound_play("waterdragon_flap", {
 				object = self.object,
 				gain = 3.0,
 				max_hear_distance = 128,
 				loop = false,
 			})
-			self.flap_sound_played2 = true
+			self.flap_sound_played = true
 		elseif offset < 10 then
-			self.flap_sound_played2 = false
+			self.flap_sound_played = false
 		end
 	end
 }
@@ -2056,6 +2056,27 @@ end
 -- On Step --
 -------------
 
+function play_wing_sound(self)
+	if not self.is_flying then return end
+	if not self._anim == "fly" or not self._anim == "hover" and self.touching_ground then return end
+    -- Check if frame offset exists
+    local offset = self.frame_offset or 0
+    
+    -- Play sound at specific frame point (when wings are at highest position)
+    if offset > 20 and not self.flap_sound_played then
+        minetest.sound_play("waterdragon_flap", {
+            object = self.object,
+            gain = 3.0,
+            max_hear_distance = 128,
+            loop = false,
+        })
+        self.flap_sound_played = true
+    -- Reset sound flag when wings are down
+    elseif offset < 10 then
+        self.flap_sound_played = false
+    end
+end
+
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_activate(self)
@@ -2073,6 +2094,7 @@ function waterdragon.scottish_dragon_activate(self)
 	-- World Data
 	self._ignore_obj = {}
 	self.flight_stamina = self:recall("flight_stamina") or 1600
+	self.fire = self:recall("fire") or 10
 	-- Sound Data
 	self.time_from_last_sound = 0
 	self.flap_sound_timer = 5.0
@@ -2268,6 +2290,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if random(16) < 2 then
 			self:play_sound("random")
 		end
+		play_wing_sound(self)
 		self.speed = 32
 		self.turn_rate = 5
 		-- Dynamic Stats

@@ -523,6 +523,7 @@ function waterdragon.action_hover(self, time)
 		_self:set_gravity(0)
 		_self:set_forward_velocity(0)
 		_self:set_vertical_velocity(0)
+		play_wing_sound(_self)
 		_self:animate("hover")
 		timer = timer - _self.dtime
 		if timer <= 0 then
@@ -953,21 +954,6 @@ modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 	if not self.fly_allowed then
 		-- If the Water Dragon is not allowed to fly
 		return
-	end
-	play_wing_sound2 = function(self)
-		local offset = self.frame_offset or 0
-		if offset > 20
-			and not self.flap_sound_played2 then
-			minetest.sound_play("waterdragon_flap", {
-				object = self.object,
-				gain = 3.0,
-				max_hear_distance = 128,
-				loop = false,
-			})
-			self.flap_sound_played2 = true
-		elseif offset < 10 then
-			self.flap_sound_played2 = false
-		end
 	end
 	local center = self.object:get_pos()
 	if not center then return end
