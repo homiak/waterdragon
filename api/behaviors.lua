@@ -506,7 +506,7 @@ end
 
 function waterdragon.action_fly(self, pos2, timeout, method, speed_factor, anim)
 	local timer = timeout or 4
-	local function func(_self)
+	local function func2(_self)
 		timer = timer - _self.dtime
 		if timer <= 0
 			or _self:move_to(pos2, method or "waterdragon:fly_simple", speed_factor) then
@@ -514,7 +514,7 @@ function waterdragon.action_fly(self, pos2, timeout, method, speed_factor, anim)
 		end
 		_self:animate(anim or "fly")
 	end
-	self:set_action(func)
+	self:set_action(func2)
 end
 
 function waterdragon.action_hover(self, time)
@@ -781,8 +781,8 @@ function waterdragon.action_repel(self)
 						-- Strong horizontal wind blast
 						local wind_force = {
 							x = dir.x * 200, -- Сильный горизонтальный толчок
-							y = 12,          -- Минимальный подъем для реалистичности
-							z = dir.z * 200  -- Сильный горизонтальный толчок
+							y = 12, -- Минимальный подъем для реалистичности
+							z = dir.z * 200 -- Сильный горизонтальный толчок
 						}
 
 						object:add_velocity(wind_force)
@@ -870,7 +870,7 @@ modding.register_utility("waterdragon:sleep", function(self)
 		minetest.after(1, function()
 			if _self.flight_stamina < 300 then
 				_self.flight_stamina = math.min(_self.flight_stamina * 2, 300)
-				func(_self)  -- Call again to keep the loop going each second
+				func(_self) -- Call again to keep the loop going each second
 			end
 		end)
 	end
@@ -1479,25 +1479,242 @@ modding.register_utility("waterdragon:attack", function(self, target)
 	self:set_utility(func)
 end)
 
+local function breathe_fire(self)
+	local pos = self.object:get_pos()
+	if not pos then return end
+
+	local dir
+	if self.rider then
+		-- Если есть всадник, используем направление его взгляда
+		local look_dir = self.rider:get_look_dir()
+		dir = vector.new(
+			look_dir.x,
+			look_dir.y,
+			look_dir.z
+		)
+	else
+		-- Если всадника нет, используем поворот дракона
+		local yaw = self.object:get_yaw()
+		local pitch = self.object:get_rotation().x
+		dir = vector.new(
+			-math.sin(yaw) * math.cos(pitch),
+			-math.sin(pitch),
+			math.cos(yaw) * math.cos(pitch)
+		)
+	end
+
+	local start_pos = vector.add(pos, vector.new(0, 1.2, 0))
+
+	local particle_types = {
+		{
+			texture = "waterdragon_fire_1.png",
+			size = { min = 2, max = 4 },
+			velocity = { min = 15, max = 20 },
+			acceleration = { y = { min = 2, max = 4 } },
+			exptime = { min = 0.8, max = 1.2 },
+			glow = 14
+		},
+		{
+			texture = "waterdragon_fire_2.png",
+			size = { min = 2, max = 4 },
+			velocity = { min = 15, max = 20 },
+			acceleration = { y = { min = 2, max = 4 } },
+			exptime = { min = 0.8, max = 1.2 },
+			glow = 14
+		},
+		{
+			texture = "waterdragon_fire_3.png",
+			size = { min = 2, max = 4 },
+			velocity = { min = 15, max = 20 },
+			acceleration = { y = { min = 2, max = 4 } },
+			exptime = { min = 0.8, max = 1.2 },
+			glow = 14
+		},
+	}
+
+	-- Spawn particles
+	for i = 1, 10 do
+		local particle = particle_types[math.random(#particle_types)]
+
+		minetest.add_particle({
+			pos = vector.add(start_pos, vector.new(
+				math.random(-5, 5) / 10,
+				math.random(-5, 5) / 10,
+				math.random(-5, 5) / 10
+			)),
+			velocity = vector.multiply(vector.add(dir, vector.new(
+				math.random(-2, 2) / 10,
+				math.random(-2, 2) / 10,
+				math.random(-2, 2) / 10
+			)), math.random(particle.velocity.min, particle.velocity.max)),
+			acceleration = { x = 0, y = math.random(particle.acceleration.y.min, particle.acceleration.y.max), z = 0 },
+			expirationtime = math.random(particle.exptime.min, particle.exptime.max),
+			size = math.random(particle.size.min, particle.size.max),
+			collisiondetection = true,
+			collision_removal = true,
+			vertical = false,
+			texture = particle.texture,
+			glow = particle.glow
+		})
+	end
+
+	-- Check for block collisions and ignite blocks
+	local step = 1
+	for i = 0, 20, step do
+		local check_pos = vector.add(start_pos, vector.multiply(dir, i))
+		local node = minetest.get_node(check_pos)
+		if node.name ~= "air" and node.name ~= "waterdragon:fire_animated" then
+			minetest.set_node(check_pos, { name = "waterdragon:fire_animated" })
+		end
+
+		-- Check for entities at each step
+		local objects = minetest.get_objects_inside_radius(check_pos, 1)
+		for _, obj in ipairs(objects) do
+			if obj ~= self.object then
+				local ent = obj:get_luaentity()
+				if ent and ent.name ~= self.name then
+					obj:punch(self.object, 1.0, {
+						full_punch_interval = 1.0,
+						damage_groups = { fleshy = 6 },
+					}, nil)
+				end
+			end
+		end
+
+		-- Stop if we hit a non-air block
+		if node.name ~= "air" and node.name ~= "waterdragon:fire_animated" then
+			break
+		end
+	end
+end
+
+minetest.register_entity("waterdragon:fire_dragon", {
+	initial_properties = {
+		health = 500,
+		visual = "mesh",
+		mesh = "waterdragon_scottish_dragon.b3d",
+		textures = { "waterdragon_fire_dragon.png" },
+		visual_size = { x = 5, y = 5 },
+		collisionbox = { -0.75, -1, -0.75, 0.75, 1, 0.75 },
+		stepheight = 0.6,
+		physical = true,
+	},
+
+	-- Animation definitions
+	animations = {
+		stand = { range = { x = 1, y = 59 }, speed = 20, frame_blend = 0.3, loop = true },
+		bite = { range = { x = 61, y = 89 }, speed = 30, frame_blend = 0.3, loop = false },
+		walk = { range = { x = 91, y = 119 }, speed = 30, frame_blend = 0.3, loop = true },
+		takeoff = { range = { x = 121, y = 149 }, speed = 30, frame_blend = 0.3, loop = false },
+		hover = { range = { x = 151, y = 179 }, speed = 30, frame_blend = 0.3, loop = true },
+		fly = { range = { x = 181, y = 209 }, speed = 30, frame_blend = 0.3, loop = true },
+		dive = { range = { x = 211, y = 239 }, speed = 30, frame_blend = 0.3, loop = true },
+		fly_punch = { range = { x = 241, y = 279 }, speed = 30, frame_blend = 0.3, loop = false },
+		land = { range = { x = 281, y = 299 }, speed = 30, frame_blend = 1, loop = false }
+	},
+
+	-- Target handling
+	target = nil,
+
+	on_activate = function(self, staticdata)
+		self.object:set_armor_groups({ fleshy = 100 })
+	end,
+
+	on_step = function(self, dtime)
+		if not self._target or not self._target:get_pos() then
+			self.object:remove()
+			return
+		end
+		
+		local pos = self.object:get_pos()
+		local target_pos = self._target:get_pos()
+		
+		-- Calculate position behind target for attack
+		local target_dir = vector.normalize({
+			x = math.sin(self._target:get_yaw() or 0),
+			y = 0,
+			z = math.cos(self._target:get_yaw() or 0)
+		})
+		
+	
+		-- Face target
+		local dir = vector.direction(pos, target_pos)
+		local yaw = minetest.dir_to_yaw(dir)
+		self.object:set_yaw(yaw)
+	
+		-- Breathe fire at target
+		breathe_fire(self)
+	end
+})
+
+function summon_fire_dragon(self)
+	if not self._target or not self._target:get_pos() then return end
+	if self.hp > 500 or self.fire < 3 then return end
+
+	-- First hover and breathe fire
+	modding.action_idle(self, 3, "hover")
+	self.fire_breathing = true
+	breathe_pegasus_fire(self)
+
+	-- After 3 seconds, summon the Fire Dragon
+	minetest.after(3, function()
+		if not self.object:get_pos() then return end
+
+		-- Create Fire Dragon
+		local pos = self.object:get_pos()
+		pos.y = pos.y + 5 -- Spawn above the Scottish Dragon
+
+		local fire_dragon_obj = minetest.add_entity(pos, "waterdragon:fire_dragon")
+		if fire_dragon_obj then
+			local fire_dragon = fire_dragon_obj:get_luaentity()
+			if fire_dragon then
+				fire_dragon._target = self._target -- Set target for Fire Dragon entity
+				minetest.add_entity(pos, "waterdragon:fire_dragon")
+				-- Add particle effects
+				minetest.add_particlespawner({
+					amount = 2,
+					time = 0.5,
+					minpos = vector.subtract(pos, 2),
+					maxpos = vector.add(pos, 2),
+					minvel = { x = -1, y = 0, z = -1 },
+					maxvel = { x = 1, y = 2, z = 1 },
+					minacc = { x = 0, y = 0, z = 0 },
+					maxacc = { x = 0, y = 1, z = 0 },
+					minexptime = 1,
+					maxexptime = 2,
+					minsize = 2,
+					maxsize = 4,
+					texture = "waterdragon_fire_1.png",
+					glow = 14
+				})
+			end
+		end
+
+		-- Land after summoning
+		self:set_gravity(0)
+		waterdragon.action_land(self)
+	end)
+end
+
 modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
 	local fire_attack_timer = 0
 	local is_fire_attack = true
-	
+
 	local function func(_self)
 		local pos = _self.object:get_pos()
 		if not pos then return end
-		
+
 		local target_alive = target and target:get_pos()
 		local tgt_pos = target and target:get_pos()
-		
+
 		if not target_alive then
 			_self._target = nil
 			return true
 		end
-		
+
 		if not _self:get_action() then
 			local dist = vector.distance(pos, tgt_pos)
-			
+
 			if _self.has_pegasus_fire and _self.fire and _self.fire > 0 and is_fire_attack then
 				-- Вычисляем направление к цели
 				local dir = {
@@ -1505,7 +1722,7 @@ modding.register_utility("waterdragon:scottish_dragon_attack", function(self, ta
 					y = tgt_pos.y - pos.y,
 					z = tgt_pos.z - pos.z
 				}
-				
+
 				-- Нормализуем вектор
 				local length = math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z)
 				if length > 0 then
@@ -1513,18 +1730,18 @@ modding.register_utility("waterdragon:scottish_dragon_attack", function(self, ta
 					dir.y = dir.y / length
 					dir.z = dir.z / length
 				end
-				
+
 				-- Устанавливаем yaw и pitch
-				local yaw = math.atan2(dir.z, dir.x) - math.pi/2
+				local yaw = math.atan2(dir.z, dir.x) - math.pi / 2
 				local pitch = -math.asin(dir.y)
-				_self.object:set_rotation({x = pitch, y = yaw, z = 0})
-				
+				_self.object:set_rotation({ x = pitch, y = yaw, z = 0 })
+
 				-- Огненная атака
 				_self:animate("hover")
 				_self:set_forward_velocity(-2)
 				_self.fire_breathing = true
 				breathe_pegasus_fire(_self)
-				
+
 				fire_attack_timer = fire_attack_timer + _self.dtime
 				if fire_attack_timer >= 5 then
 					is_fire_attack = false
@@ -1539,59 +1756,12 @@ modding.register_utility("waterdragon:scottish_dragon_attack", function(self, ta
 				end
 			end
 		end
-		
+		summon_fire_dragon(self)
 		return false
 	end
-	
-	self:set_utility(func)
- end)
 
-minetest.register_chatcommand("t", {
-    description = "Make nearest Scottish Dragon attack nearest animal",
-    func = function(name, param)
-        local player = minetest.get_player_by_name(name)
-        if not player then return false, "Player not found" end
-        
-        local pos = player:get_pos()
-        local nearest_dragon = nil
-        local nearest_animal = nil
-        local dragon_range = 100
-        local animal_range = 100
-        
-        -- Find nearest Scottish Dragon
-        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, dragon_range)) do
-            local ent = obj:get_luaentity()
-            if ent and ent.name == "waterdragon:scottish_dragon" then
-                nearest_dragon = obj  -- Сохраняем сам объект, а не entity
-                break
-            end
-        end
-        
-        if nearest_dragon then
-            -- Find nearest animal
-            for _, obj in ipairs(minetest.get_objects_inside_radius(pos, animal_range)) do
-                local ent = obj:get_luaentity()
-                if ent and ent.name ~= "waterdragon:scottish_dragon" and 
-                   ent.name ~= "__builtin:item" and 
-                   not ent.name:find("^waterdragon:") then
-                    nearest_animal = obj  -- Сохраняем сам объект
-                    break
-                end
-            end
-            
-            if nearest_animal then
-                local dragon_ent = nearest_dragon:get_luaentity()
-                dragon_ent._target = nearest_animal  -- Устанавливаем цель
-                dragon_ent:initiate_utility("waterdragon:scottish_dragon_attack", dragon_ent, nearest_animal)
-                return true, "Dragon is now attacking nearest animal!"
-            else
-                return false, "No animals found within range!"
-            end
-        else
-            return false, "No Scottish Dragon found nearby!"
-        end
-    end
-})
+	self:set_utility(func)
+end)
 
 -- Tamed Behavior --
 

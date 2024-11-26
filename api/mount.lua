@@ -119,7 +119,7 @@ function breathe_pegasus_fire(self)
         end
 
         -- Stop if we hit a non-air block
-        if node.name ~= "air" and node.name ~= "pegasus:fire_animated" then
+        if node.name ~= "air" and node.name ~= "waterdragon:fire_animated" then
             break
         end
     end

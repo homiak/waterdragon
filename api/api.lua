@@ -2094,7 +2094,6 @@ function waterdragon.scottish_dragon_activate(self)
 	-- World Data
 	self._ignore_obj = {}
 	self.flight_stamina = self:recall("flight_stamina") or 1600
-	self.fire = self:recall("fire") or 10
 	-- Sound Data
 	self.time_from_last_sound = 0
 	self.flap_sound_timer = 5.0
