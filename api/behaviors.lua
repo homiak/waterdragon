@@ -1629,13 +1629,6 @@ minetest.register_entity("waterdragon:fire_dragon", {
 		local pos = self.object:get_pos()
 		local target_pos = self._target:get_pos()
 		
-		-- Calculate position behind target for attack
-		local target_dir = vector.normalize({
-			x = math.sin(self._target:get_yaw() or 0),
-			y = 0,
-			z = math.cos(self._target:get_yaw() or 0)
-		})
-		
 	
 		-- Face target
 		local dir = vector.direction(pos, target_pos)
@@ -1649,7 +1642,7 @@ minetest.register_entity("waterdragon:fire_dragon", {
 
 function summon_fire_dragon(self)
 	if not self._target or not self._target:get_pos() then return end
-	if self.hp > 500 or self.fire < 3 then return end
+	if self.hp > 100 or self.fire < 3 then return end
 
 	-- First hover and breathe fire
 	modding.action_idle(self, 3, "hover")
@@ -1662,7 +1655,7 @@ function summon_fire_dragon(self)
 
 		-- Create Fire Dragon
 		local pos = self.object:get_pos()
-		pos.y = pos.y + 5 -- Spawn above the Scottish Dragon
+		pos.y = pos.y + 4 -- Spawn above the Scottish Dragon
 
 		local fire_dragon_obj = minetest.add_entity(pos, "waterdragon:fire_dragon")
 		if fire_dragon_obj then

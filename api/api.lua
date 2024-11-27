@@ -22,6 +22,12 @@ local function finish_bow(player_name, dragon)
 	end
 	bow_players[player_name][dragon.wtd_id] = true
 	minetest.chat_send_player(player_name, S("You bow to the Water Dragon"))
+	minetest.sound_play("waterdragon_on_bowed", {
+		object = dragon.object,
+		gain = 1,
+		max_hear_distance = 20,
+		loop = false
+	})
 end
 
 function has_bowed_to_dragon(player_name, dragon)
@@ -89,6 +95,12 @@ end
 local function finish_scottish_bow(player_name, dragon)
 	scottish_bow_players[player_name] = dragon
 	minetest.chat_send_player(player_name, S("You bow to the Scottish Dragon"))
+	minetest.sound_play("waterdragon_on_bowed", {
+		object = dragon.object,
+		gain = 1,
+		max_hear_distance = 20,
+		loop = false
+	})
 end
 
 function has_bowed_to_scottish_dragon(player_name, dragon)
@@ -1496,8 +1508,8 @@ waterdragon.wtd_api = {
 			and not self.flap_sound_played then
 			minetest.sound_play("waterdragon_flap", {
 				object = self.object,
-				gain = 3.0,
-				max_hear_distance = 128,
+				gain = 2.5,
+				max_hear_distance = 60,
 				loop = false,
 			})
 			self.flap_sound_played = true
