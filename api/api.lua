@@ -169,10 +169,7 @@ local min = math.min
 local random = math.random
 local ceil = math.ceil
 local floor = math.floor
-local atan2 = math.atan2
-local sin = math.sin
 local sqrt = math.sqrt
-local cos = math.cos
 local rad = math.rad
 local pi = math.pi
 local atan2 = math.atan2
@@ -296,8 +293,6 @@ end
 local walkable_nodes = {}
 
 local wet_conversions = {}
-
-local flame_node = {}
 
 minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_nodes) do
