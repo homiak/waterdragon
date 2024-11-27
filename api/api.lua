@@ -155,12 +155,6 @@ end)
 
 -- Math --
 
-
-local function get_dragon_eye_item(self)
-	local eye_color = self.eye_color or "blue"
-	return "waterdragon:draconic_eye_" .. eye_color
-end
-
 local pi = math.pi
 local pi2 = pi * 2
 local abs = math.abs
@@ -1215,9 +1209,6 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
 			},
 		}
-		for i = 1, 5 do
-			table.insert(drops[i], { name = get_dragon_eye_item(self), min = 2, max = 2, chance = 1 })
-		end
 		self.drops = drops[stage]
 	end,
 	play_sound = function(self, sound)
@@ -2090,6 +2081,7 @@ function waterdragon.scottish_dragon_activate(self)
 	self.attack_cooldown = {}
 	-- Tamed Data
 	self.rider = nil
+	self.scottish_eye_colour = self:recall("scottish_eye_colour") or "blue"
 	self.owner = self:recall("owner") or false
 	self.stance = self:recall("stance") or "neutral"
 	self.order = self:recall("order") or "wander"
@@ -2111,8 +2103,14 @@ end
 -- Water Dragon
 
 function waterdragon.dragon_step(self, dtime)
-	self:update_emission()
+	if self.object and self.object:get_pos() then
+        self:update_emission()
+    end
 	self:destroy_terrain()
+	if not self.object or not self.object:get_pos() then
+		return
+	end
+	
 	-- Animation Tracking
 	local current_anim = self._anim
 	local is_flying = current_anim and current_anim:find("fly")
@@ -2241,12 +2239,7 @@ function waterdragon.scottish_dragon_break_block(self, pos)
 	end
 
 	local node = minetest.get_node(pos)
-	local node_def = minetest.registered_nodes[node.name]
-
-	if node_def and node_def.groups and
-		(node_def.groups.cracky or node_def.groups.crumbly or node_def.groups.snappy) and
-		not node_def.groups.unbreakable and
-		(not node_def.groups.level or node_def.groups.level < 3) then
+	if node.name ~= "air" then
 		minetest.remove_node(pos)
 	end
 end
@@ -2284,8 +2277,8 @@ function waterdragon.scottish_dragon_step(self, dtime)
 			for y = -1, 1 do
 				for x = -1, 1 do
 					for z = -1, 1 do
-						local check_pos = vector.add(front_pos, { x = x, y = y, z = z })
-						waterdragon.scottish_dragon_break_block(self, check_pos)
+						local check_pos = vector.add(front_pos, { x = x + 2, y = y, z = z + 2 })
+waterdragon.scottish_dragon_break_block(self, check_pos)
 					end
 				end
 			end

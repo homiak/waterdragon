@@ -62,6 +62,10 @@ end
 
 local function update_dragon_lighting(dragon, is_night)
 	local pos = dragon.object:get_pos()
+	if not pos then
+		return
+	end
+
 	local radius = 5
 	local light_level = is_night and 14 or 0
 
@@ -78,6 +82,7 @@ local function update_dragon_lighting(dragon, is_night)
 
 	remove_light_blocks(radius, pos)
 end
+
 
 local function on_dragon_step(self, dtime)
 	local time_of_day = minetest.get_timeofday()

@@ -181,11 +181,28 @@ local function get_scottish_dragon_formspec(self)
 		"image_button[13.45,3.9;1.9,1.9;waterdragon_forms_dragon_" .. self.order .. ".png;btn_wtd_order;;false;false;]",
 		"tooltip[13.45,0.3;1.9,1.9;" .. fly_allowed .. "]",
 		"image_button[13.45,0.3;1.9,1.9;" .. fly_image .. ";btn_wtd_fly;;false;false;]",
+		"button[9.75,8.75;2.6,0.5;btn_customize;" .. S("Customize") .. "]",
 	}
 	if minetest.get_modpath("pegasus") then
 		table.insert(form, "image[1.1,7.3;1,1;" .. breath_ind .. "]")
 	end
 	return table.concat(form, "")
+end
+
+local function get_scottish_customize_formspec(self)
+    local texture = self.object:get_properties().textures[1]
+    local frame_range = self.animations["stand"].range
+    local frame_loop = frame_range.x .. "," .. frame_range.y
+    
+    local form = {
+        "formspec_version[4]",
+        "size[12,6]",
+        "dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;1]",
+        "label[5.1,0.8;Eye Colour]",
+        "model[1.5,1.7;10,7;mob_mesh;" ..
+        self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
+    }
+    return table.concat(form, "")
 end
 
 waterdragon.scottish_wtd_api.show_formspec = function(self, player)
@@ -340,6 +357,29 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				ent.stance = ent:memorize("stance", "passive")
 			elseif ent.stance == "passive" then
 				ent.stance = ent:memorize("stance", "neutral")
+			end
+			ent:show_formspec(player)
+		end
+		if fields.btn_customize then
+			minetest.show_formspec(name, "waterdragon:scottish_customize", get_scottish_customize_formspec(ent))
+		end
+		if formname == "waterdragon:scottish_customize" then
+			if fields.drp_eyes then
+				local eyes = {
+					["Blue"] = "blue",
+					["Red"] = "red",
+					["Orange"] = "orange",
+					["Yellow"] = "yellow"
+				}
+				if eyes[fields.drp_eyes] then
+					ent.scottish_eye_colour = eyes[fields.drp_eyes]
+					ent:memorize("scottish_eye_colour", ent.scottish_eye_colour)
+					local base_texture = "waterdragon_scottish_dragon.png"
+					local eyes_texture = "waterdragon_scottish_eyes_" .. ent.scottish_eye_colour .. ".png"
+					ent.object:set_properties({
+						textures = { base_texture .. "^" .. eyes_texture }
+					})
+				end
 			end
 			ent:show_formspec(player)
 		end
