@@ -8,15 +8,6 @@ local scottish_spawn_rate = tonumber(minetest.settings:get("scottish_dragon_spaw
 
 local colors = { "blue" }
 
-function update_scottish_dragon_eyes(self)
-    local base_texture = "waterdragon_scottish_dragon.png"
-    local eyes = "waterdragon_scottish_eyes_" .. self.scottish_eye_colour .. ".png"
-    
-    self.object:set_properties({
-        textures = { base_texture .. "^" .. eyes }
-    })
-end
-
 modding.register_mob("waterdragon:scottish_dragon", {
 	-- Stats
 	max_health = 700,
@@ -178,15 +169,6 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		self.fire = self.fire or 0
 		self.fire_breathing = self.fire_breathing or false
 		self.fire_timer = 0
-		self.scottish_eye_colour = self:recall("scottish_eye_colour") or "orange"
-		update_scottish_dragon_eyes(self)
-		if self.scottish_eye_colour then
-			local base_texture = "waterdragon_scottish_dragon.png"
-			local eyes_texture = "waterdragon_scottish_eyes_" .. self.scottish_eye_colour .. ".png"
-			self.object:set_properties({
-				textures = { base_texture .. "^" .. eyes_texture }
-			})
-		end
 		local random = math.random
 		if not self.scottish_eye_colour then
 			local scottish_eye_textures = {

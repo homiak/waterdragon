@@ -1948,6 +1948,9 @@ end)
 -- Water Dragon
 
 function waterdragon.dragon_activate(self)
+	if not self.object or not self.object:get_pos() then
+		return
+	end
 	local dragon_type = "rare_water"
 	if self.name == "waterdragon:pure_water_dragon" then
 		dragon_type = "pure_water"
@@ -2055,6 +2058,9 @@ end
 -------------
 
 function play_wing_sound(self)
+	if not self.object or not self.object:get_pos() then
+		return
+	end
 	if not self.is_flying then return end
 	if not self._anim == "fly" or not self._anim == "hover" and self.touching_ground then return end
     -- Check if frame offset exists
@@ -2078,10 +2084,13 @@ end
 -- Scottish Dragon
 
 function waterdragon.scottish_dragon_activate(self)
+	if not self.object or not self.object:get_pos() then
+		return
+	end
+	self.scottish_eye_colour = self:recall("scottish_eye_colour")
 	self.attack_cooldown = {}
 	-- Tamed Data
 	self.rider = nil
-	self.scottish_eye_colour = self:recall("scottish_eye_colour") or "blue"
 	self.owner = self:recall("owner") or false
 	self.stance = self:recall("stance") or "neutral"
 	self.order = self:recall("order") or "wander"
