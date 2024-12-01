@@ -180,6 +180,15 @@ modding.register_mob("waterdragon:scottish_dragon", {
 			self.scottish_eye_colour = scottish_eye_textures[random(4)]
 			self:memorize("scottish_eye_colour", self.scottish_eye_colour)
 		end
+		self.scottish_eye_colour = self:recall("scottish_eye_colour") or "blue"
+		-- Set initial texture with eye color
+		if self.object:get_properties() then
+			local base_texture = "waterdragon_scottish_dragon.png"
+			local eyes_texture = "waterdragon_scottish_eyes_" .. self.scottish_eye_colour .. ".png"
+			self.object:set_properties({
+				textures = { base_texture .. "^" .. eyes_texture }
+			})
+		end
 	end,
 	on_activate = function(self, staticdata, dtime_s)
 		if staticdata ~= "" then
@@ -194,7 +203,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 			props.textures[1] = self.armour.texture
 			self.object:set_properties(props)
 		end
-		
+
 		if self.dragon_activate then
 			self.dragon_activate(self)
 		end
