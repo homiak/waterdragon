@@ -825,7 +825,7 @@ function waterdragon.action_punch(self)
 			and not damage_init then
 			_self.alert_timer = 15
 			local aoe_center = vec_add(pos, vec_multi(yaw2dir(yaw), _self.width))
-			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 2)
+			local affected_objs = minetest.get_objects_inside_radius(aoe_center, 1.49)
 			for _, object in ipairs(affected_objs) do
 				local tgt_pos = object and object ~= self.object and object:get_pos()
 				if tgt_pos then

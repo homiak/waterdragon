@@ -1541,6 +1541,32 @@ waterdragon.scottish_wtd_api = {
 			self._anim = nil
 		end
 	end,
+	open_jaw = function(self)
+		if not self._anim then return end
+		local _, rot = self.object:get_bone_position("Jaw.CTRL")
+		local tgt_angle
+		local open_angle = pi / 4
+		if self.jaw_init then
+			local end_anim = self._anim:find("pure_water") or floor(rot.x) == deg(-open_angle)
+			if end_anim
+				or self.roar_anim_length <= 0 then
+				self.jaw_init = false
+				self.roar_anim_length = 0
+				local step = math.min(self.dtime * 5, abs(diff(rad(rot.x), 0)) % (pi2))
+				tgt_angle = interp_angle(rad(rot.x), 0, step)
+			else
+				local step = math.min(self.dtime * 5, abs(diff(rad(rot.x), -open_angle)) % (pi2))
+				tgt_angle = interp_angle(rad(rot.x), -open_angle, step)
+				self.roar_anim_length = self.roar_anim_length - self.dtime
+			end
+		else
+			local step = math.min(self.dtime * 5, abs(diff(rad(rot.x), 0)) % (pi2))
+			tgt_angle = interp_angle(rad(rot.x), 0, step)
+		end
+		if tgt_angle < -45 then tgt_angle = -45 end
+		if tgt_angle > 0 then tgt_angle = 0 end
+		self.object:set_bone_position("Jaw.CTRL", { x = 0, y = 0.15, z = -0.29 }, { x = deg(tgt_angle), y = 0, z = 0 })
+	end,
 	play_sound = function(self, sound)
 		if self.time_from_last_sound < 6 then return end
 		local sounds = self.sounds
@@ -2063,22 +2089,22 @@ function play_wing_sound(self)
 	end
 	if not self.is_flying then return end
 	if not self._anim == "fly" or not self._anim == "hover" and self.touching_ground then return end
-    -- Check if frame offset exists
-    local offset = self.frame_offset or 0
-    
-    -- Play sound at specific frame point (when wings are at highest position)
-    if offset > 20 and not self.flap_sound_played then
-        minetest.sound_play("waterdragon_flap", {
-            object = self.object,
-            gain = 3.0,
-            max_hear_distance = 128,
-            loop = false,
-        })
-        self.flap_sound_played = true
-    -- Reset sound flag when wings are down
-    elseif offset < 10 then
-        self.flap_sound_played = false
-    end
+	-- Check if frame offset exists
+	local offset = self.frame_offset or 0
+
+	-- Play sound at specific frame point (when wings are at highest position)
+	if offset > 20 and not self.flap_sound_played then
+		minetest.sound_play("waterdragon_flap", {
+			object = self.object,
+			gain = 3.0,
+			max_hear_distance = 128,
+			loop = false,
+		})
+		self.flap_sound_played = true
+		-- Reset sound flag when wings are down
+	elseif offset < 10 then
+		self.flap_sound_played = false
+	end
 end
 
 -- Scottish Dragon
@@ -2113,13 +2139,13 @@ end
 
 function waterdragon.dragon_step(self, dtime)
 	if self.object and self.object:get_pos() then
-        self:update_emission()
-    end
+		self:update_emission()
+	end
 	self:destroy_terrain()
 	if not self.object or not self.object:get_pos() then
 		return
 	end
-	
+
 	-- Animation Tracking
 	local current_anim = self._anim
 	local is_flying = current_anim and current_anim:find("fly")
@@ -2136,7 +2162,9 @@ function waterdragon.dragon_step(self, dtime)
 		end
 	end
 	-- Dynamic Animation
-	waterdragon.head_tracking(self)
+	if self.owner then
+		waterdragon.head_tracking(self)
+	end
 	self:open_jaw()
 	self:move_tail()
 	waterdragon.rotate_to_pitch(self, is_flying)
@@ -2269,7 +2297,9 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		end
 	end
 	-- Dynamic Animation
-	waterdragon.head_tracking(self)
+	if self.owner then
+		waterdragon.head_tracking(self)
+	end
 	self:open_jaw()
 	self:move_tail()
 	waterdragon.rotate_to_pitch(self, is_flying)
@@ -2287,7 +2317,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 				for x = -1, 1 do
 					for z = -1, 1 do
 						local check_pos = vector.add(front_pos, { x = x + 2, y = y, z = z + 2 })
-waterdragon.scottish_dragon_break_block(self, check_pos)
+						waterdragon.scottish_dragon_break_block(self, check_pos)
 					end
 				end
 			end
@@ -2330,6 +2360,9 @@ waterdragon.scottish_dragon_break_block(self, check_pos)
 				end
 			end
 		end
+	end
+	if not self.owner then
+		self:initiate_utility("waterdragon:aerial_wander", self)
 	end
 	if self:timer(15) then
 		local obj = next(self._ignore_obj)
@@ -2419,7 +2452,7 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
 
 	local item_name = clicker:get_wielded_item():get_name() or ""
 	if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
-		if clicker:get_player_control().sneak then
+		if self.owner and clicker:get_player_control().sneak then
 			self:show_formspec(clicker)
 		else
 			waterdragon.attach_player(self, clicker)
