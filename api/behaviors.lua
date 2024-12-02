@@ -1069,60 +1069,39 @@ end)
 
 -- Scottish Dragon Breaking
 
-function scottish_dragon_flying(self)
-	local flight_timer = 0 -- Таймер для смены направления
-
-	-- Функция, задающая случайное направление полета
-	local function random_direction()
-		local angle = math.rad(math.random(0, 360))
-		return { x = math.cos(angle), y = math.random(-0.2, 0.2), z = math.sin(angle) }
-	end
-
-	-- Основной цикл полета
-	minetest.register_globalstep(function(dtime)
-		-- Проверка, что дракон существует
-		if not self.object or not self.object:get_pos() then return end
-
-		flight_timer = flight_timer + dtime
-		if flight_timer >= 3 then -- Каждые 3 секунды меняем направление
-			local new_dir = random_direction()
-			local speed = 5 -- Скорость полета, можно настроить
-
-			-- Установка скорости и направления
-			self.object:set_velocity({
-				x = new_dir.x * speed,
-				y = new_dir.y * speed,
-				z = new_dir.z * speed
-			})
-			self:animate("fly") -- Включение анимации полета
-
-			flight_timer = 0 -- Сброс таймера
-		end
-	end)
-end
-
 modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
+	self.fly_allowed = true
 	local center = self.object:get_pos()
 	if not center then return end
 	local taming = 0
 	local feed_timer = 10
-	local height_tick = 0
+	local throw_timer = 5 -- Timer for throwing the player
 
 	local function func(_self)
 		if not player or not player:get_pos() then
 			return true
 		end
-		scottish_dragon_flying(self)
+
+		local name = player:get_player_name()
+		local item = player:get_wielded_item()
+		local item_name = item:get_name()
+		local def = minetest.registered_items[item_name]
+		local has_meat = minetest.get_item_group(item_name, "meat") == 1 or
+		minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
+
+		-- Check if player has bowed and has meat
+		if not has_bowed_to_scottish_dragon(name, self) or not has_meat then
+			throw_timer = throw_timer - _self.dtime
+			if throw_timer <= 0 then
+				minetest.chat_send_player(name,
+					S("The Scottish Dragon has thrown you off because you must or bow to it or hold meat in hand"))
+				waterdragon.detach_player(_self, player)
+				return true
+			end
+		end
+
 		local pos = _self.object:get_pos()
 		if not pos then return end
-
-		-- Update Center
-		height_tick = height_tick - 1
-		if height_tick <= 0 then
-			local dist2floor = modding.sensor_floor(_self, 10, true)
-			center.y = center.y + (10 - dist2floor)
-			height_tick = 30
-		end
 
 		-- Player Interaction
 		if player:get_player_control().sneak then
@@ -1132,26 +1111,18 @@ modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, 
 
 		feed_timer = feed_timer - _self.dtime
 		if feed_timer <= 0 then
-			local wielded_item = player:get_wielded_item()
-			if minetest.get_item_group(wielded_item:get_name(), "meat") > 0 then
-				wielded_item:take_item(1)
-				player:set_wielded_item(wielded_item)
-				taming = taming + 10
-
-				-- Particle effects for feeding
-				local move_dir = vector.normalize(_self.object:get_velocity())
-				local part_pos = vector.add(pos, vector.multiply(move_dir, 12))
-				local def = minetest.registered_items[wielded_item:get_name()]
-				local texture = def.inventory_image
-				if not texture or texture == "" then
-					texture = def.wield_image
+			if has_meat then
+				if not minetest.is_creative_enabled(player) then
+					item:take_item()
+					player:set_wielded_item(item)
 				end
-
+				-- Add particle effects
+				local particle_pos = vector.add(pos, vector.multiply(vector.normalize(self.object:get_velocity()), 12))
 				minetest.add_particlespawner({
-					amount = 8,
+					amount = 3,
 					time = 0.1,
-					minpos = part_pos,
-					maxpos = part_pos,
+					minpos = particle_pos,
+					maxpos = particle_pos,
 					minvel = { x = -1, y = 1, z = -1 },
 					maxvel = { x = 1, y = 2, z = 1 },
 					minacc = { x = 0, y = -5, z = 0 },
@@ -1162,43 +1133,32 @@ modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, 
 					maxsize = 6,
 					collisiondetection = true,
 					vertical = false,
-					texture = texture,
+					texture = def.inventory_image,
 				})
-				minetest.chat_send_player(player:get_player_name(),
-					"The Scottish Dragon ate some " .. def.description .. "! Taming is at " .. taming .. "%")
-			else
-				minetest.chat_send_player(player:get_player_name(),
-					"The Scottish Dragon needs meat to be tamed!")
+
+				taming = taming + 10
+				minetest.chat_send_player(name,
+					S("The Scottish Dragon ate some ") .. def.description .. "! Taming progress: " .. taming .. "%")
+
+				if taming >= 100 then
+					minetest.chat_send_player(name, S("The Scottish Dragon has been tamed!"))
+					_self.owner = _self:memorize("owner", player:get_player_name())
+					return true
+				end
 			end
 			feed_timer = 10
 		end
 
-		if taming >= 100 then
-			minetest.chat_send_player(player:get_player_name(), "The Scottish Dragon has been tamed!")
-			_self.owner = _self:memorize("owner", player:get_player_name())
-			return true
-		end
-
+		-- Flying behavior while taming
 		if not _self:get_action() then
 			if _self.touching_ground then
-				if not can_takeoff(_self, pos) then
-					waterdragon.detach_player(_self, player)
-					return true
-				end
 				waterdragon.action_takeoff(_self)
 			else
-				local move_dir = (vector.distance(pos, center) > 16 and vector.direction(pos, center)) or nil
-				local pos2 = _self:get_wander_pos_3d(6, 9, move_dir)
-				_self:move_to(pos2, "waterdragon:fly_simple", 0.6)
-				if pos.y - pos2.y > 1 then
-					_self:animate("dive")
-				else
-					_self:animate("fly")
-				end
+				local pos2 = _self:get_wander_pos_3d(6, 9)
+				waterdragon.action_fly(_self, pos2, 3, "waterdragon:fly_simple", 0.6)
 			end
 		end
 	end
-
 	self:set_utility(func)
 end)
 
@@ -1625,16 +1585,16 @@ minetest.register_entity("waterdragon:fire_dragon", {
 			self.object:remove()
 			return
 		end
-		
+
 		local pos = self.object:get_pos()
 		local target_pos = self._target:get_pos()
-		
-	
+
+
 		-- Face target
 		local dir = vector.direction(pos, target_pos)
 		local yaw = minetest.dir_to_yaw(dir)
 		self.object:set_yaw(yaw)
-	
+
 		-- Breathe fire at target
 		breathe_fire(self)
 	end

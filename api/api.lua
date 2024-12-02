@@ -2300,6 +2300,9 @@ function waterdragon.scottish_dragon_step(self, dtime)
 	if self.owner then
 		waterdragon.head_tracking(self)
 	end
+	if not self.owner then
+		self.fly_allowed = true
+	end
 	self:open_jaw()
 	self:move_tail()
 	waterdragon.rotate_to_pitch(self, is_flying)
@@ -2360,9 +2363,6 @@ function waterdragon.scottish_dragon_step(self, dtime)
 				end
 			end
 		end
-	end
-	if not self.owner then
-		self:initiate_utility("waterdragon:aerial_wander", self)
 	end
 	if self:timer(15) then
 		local obj = next(self._ignore_obj)
@@ -2449,7 +2449,6 @@ function waterdragon.scottish_dragon_rightclick(self, clicker)
 	if self:feed(clicker) then
 		return
 	end
-
 	local item_name = clicker:get_wielded_item():get_name() or ""
 	if (not self.owner or name == self.owner) and not self.rider and item_name == "" then
 		if self.owner and clicker:get_player_control().sneak then
