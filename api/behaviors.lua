@@ -310,9 +310,6 @@ modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 end)
 
 modding.register_movement_method("waterdragon:fly_simple", function(self)
-	if not self.fly_allowed then
-		return
-	end
 	local steer_to
 	local steer_timer = 0.25
 	local width = self.width
@@ -1087,7 +1084,7 @@ modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, 
 		local item_name = item:get_name()
 		local def = minetest.registered_items[item_name]
 		local has_meat = minetest.get_item_group(item_name, "meat") == 1 or
-		minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
+			minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
 
 		-- Check if player has bowed and has meat
 		if not has_bowed_to_scottish_dragon(name, self) or not has_meat then
@@ -1969,6 +1966,38 @@ waterdragon.scottish_dragon_behavior = {
 			return 0
 		end
 	},
+	{ -- Water rescue behavior
+		utility = "waterdragon:water_dive",
+		get_score = function(self)
+			if not self.owner then return 0 end
+			local owner = minetest.get_player_by_name(self.owner)
+			if not owner or not owner:get_pos() then return 0 end
+
+			local pos = owner:get_pos()
+			local node = minetest.get_node(pos)
+
+			-- Check if owner is in water
+			if minetest.get_item_group(node.name, "water") == 0 then
+				return 0
+			end
+
+			-- Check distance to nearest air block
+			for i = 1, 30 do
+				local check_pos = {
+					x = pos.x,
+					y = pos.y + i,
+					z = pos.z
+				}
+				if minetest.get_node(check_pos).name == "air" then
+					-- If air found before 30 blocks, don't rescue
+					return 0
+				end
+			end
+
+			-- Owner is deep underwater, needs rescue
+			return 1, { self, owner }
+		end
+	},
 	{ -- Attack
 		utility = "waterdragon:scottish_dragon_attack",
 		get_score = function(self)
@@ -2025,7 +2054,7 @@ waterdragon.scottish_dragon_behavior = {
 			if attacking_tgt or util == "waterdragon:scottish_dragon_breaking" then return 0 end
 			local dist2floor = modding.sensor_floor(self, 5, true)
 			if dist2floor > 4 then
-				local is_landed = self.is_landed or self.flight_stamina < 15
+				local is_landed = self.is_landed
 				local is_grounded = (self.owner and not self.fly_allowed) or self.order == "stay"
 				if is_landed
 					or is_grounded then
@@ -2040,3 +2069,32 @@ waterdragon.scottish_dragon_behavior = {
 		end
 	}
 }
+
+modding.register_utility("waterdragon:water_dive", function(self, player)
+	local function func(_self)
+		if not player or not player:get_pos() then return true end
+
+		if self.rider then return true end
+
+		local pos = _self.object:get_pos()
+		if not pos then return end
+		local player_pos = player:get_pos()
+
+		if not _self:get_action() then
+			local target_pos = {
+				x = player_pos.x,
+				y = player_pos.y + 1,
+				z = player_pos.z
+			}
+
+			local dist = vector.distance(pos, player_pos)
+			if dist < 3 then
+				waterdragon.attach_player(self, player)
+				return true
+			end
+
+			waterdragon.action_fly(self, target_pos, 2, "waterdragon:fly_simple", 1, "dive")
+		end
+	end
+	self:set_utility(func)
+end)
