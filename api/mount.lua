@@ -127,8 +127,8 @@ function breathe_pegasus_fire(self)
     -- Decrease fire charge every second
     if self.fire_timer >= 1 then
         self.fire = self.fire - 1
-        self:memorize("fire", self.fire)
         self.fire_timer = 0
+        self:memorize("fire", self.fire)
         if self.fire <= 0 then
             self.fire_breathing = false
             return
