@@ -138,7 +138,7 @@ function get_customize_formspec(self)
 		form = {
             "formspec_version[4]",
             "size[12,6]",
-            "dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;1]",
+            "dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow,Purple;1]",
             "label[5.1,0.8;Eye Colour]",
             "model[1.5,1.7;10,7;mob_mesh;" ..
             self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
@@ -415,7 +415,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					["Blue"] = "blue",
 					["Red"] = "red",
 					["Orange"] = "orange",
-					["Yellow"] = "yellow"
+					["Yellow"] = "yellow",
+					["Purple"] = "purple",
 				}
 				
 				if eyes[fields.drp_eyes] and ent.object:get_properties() then
