@@ -2731,7 +2731,6 @@ function throw_rider(self)
 	end
 end
 
-
 -- Complete Dragon Chat System
 local S = waterdragon.S
 
@@ -2955,14 +2954,27 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
     local steer_timer = 0.25
     local vertical_adjust = 0
     local last_height = nil
+    local retreat_phase = nil
+    local retreat_start_pos = nil
+    local original_dir = nil
+    local maneuver_completed = false
+    local walking_mode = false
 
     -- Check obstacles in 3D space
     local function check_obstacles(pos, dir, range)
-        local obstacles = {front = false, up = false, down = false}
+        local obstacles = {
+            front = false,
+            up = false,
+            down = false,
+            left = false,
+            right = false
+        }
+        
         local check_points = {
             front = vector.add(pos, vector.multiply(dir, range)),
             up = vector.add(pos, {x = 0, y = range, z = 0}),
-            down = vector.add(pos, {x = 0, y = -range, z = 0})
+            left = vector.add(pos, {x = dir.z * range, y = 0, z = -dir.x * range}),
+            right = vector.add(pos, {x = -dir.z * range, y = 0, z = dir.x * range})
         }
 
         for direction, check_pos in pairs(check_points) do
@@ -2980,73 +2992,127 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
         return obstacles
     end
 
-    local function get_3d_avoidance_dir(self)
-        local pos = self.object:get_pos()
-        local current_dir = minetest.yaw_to_dir(self.object:get_yaw())
-        local obstacles = check_obstacles(pos, current_dir, box * 2)
-
-        -- If obstacle ahead, try to find best escape route
-        if obstacles.front then
-            local escape_dirs = {
-                {dir = {x = current_dir.z, y = 0, z = -current_dir.x}, name = "right"},
-                {dir = {x = -current_dir.z, y = 0, z = current_dir.x}, name = "left"},
-                {dir = {x = current_dir.x, y = 1, z = current_dir.z}, name = "up"},
-                {dir = {x = current_dir.x, y = -1, z = current_dir.z}, name = "down"}
-            }
-
-            -- Check each escape direction
-            for _, escape in ipairs(escape_dirs) do
-                local escape_pos = vector.add(pos, vector.multiply(escape.dir, box * 2))
-                local ray = minetest.raycast(pos, escape_pos, false, true)
-                local blocked = false
-                for pointed_thing in ray do
-                    if pointed_thing.type == "node" and 
-                       minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].walkable then
-                        blocked = true
-                        break
-                    end
-                end
-                if not blocked then
-                    -- Found clear path, adjust vertical component based on obstacles
-                    if obstacles.up and escape.name == "up" then
-                        vertical_adjust = 0
-                    elseif obstacles.down and escape.name == "down" then
-                        vertical_adjust = 0
-                    else
-                        vertical_adjust = escape.dir.y
-                    end
-                    return escape.dir
+    local function handle_tired_dragon(self, goal)
+        if not walking_mode then
+            waterdragon.action_land(self)
+            walking_mode = true
+            if self.transport_rider then
+                local rider_name = self.transport_rider:get_player_name()
+                if rider_name then
+                    minetest.chat_send_player(rider_name, "Dragon: *I need to rest my wings. I'll walk for a while.*")
                 end
             end
         end
         
+        modding.action_move(self, goal, 4, "modding:obstacle_avoidance", 0.5, "walk")
+        
+        if self.flight_stamina >= 300 then
+            walking_mode = false
+            waterdragon.action_takeoff(self)
+            if self.transport_rider then
+                local rider_name = self.transport_rider:get_player_name()
+                if rider_name then
+                    minetest.chat_send_player(rider_name, "Dragon: *I feel rested now. Let's take to the skies!*")
+                end
+            end
+        end
+    end
+
+    local function get_3d_avoidance_dir(self)
+        if maneuver_completed then
+            local pos = self.object:get_pos()
+            local current_dir = minetest.yaw_to_dir(self.object:get_yaw())
+            local obstacles = check_obstacles(pos, current_dir, box * 3)
+
+            if obstacles.front then
+                local escape_dirs = {
+                    {x = current_dir.z, y = 0.2, z = -current_dir.x},  -- Right and up
+                    {x = -current_dir.z, y = 0.2, z = current_dir.x},  -- Left and up
+                    {x = current_dir.x, y = 1, z = current_dir.z}      -- Straight up
+                }
+                
+                for _, dir in ipairs(escape_dirs) do
+                    local escape_pos = vector.add(pos, vector.multiply(dir, box * 3))
+                    local ray = minetest.raycast(pos, escape_pos, false, true)
+                    local blocked = false
+                    for pointed_thing in ray do
+                        if pointed_thing.type == "node" and 
+                           minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].walkable then
+                            blocked = true
+                            break
+                        end
+                    end
+                    if not blocked then
+                        return dir
+                    end
+                end
+            end
+            return nil
+        end
+
+        local pos = self.object:get_pos()
+        local current_dir = minetest.yaw_to_dir(self.object:get_yaw())
+        local obstacles = check_obstacles(pos, current_dir, box * 3)
+
+        if retreat_phase then
+            if not retreat_start_pos then
+                retreat_start_pos = vector.new(pos)
+                original_dir = vector.new(current_dir)
+                return vector.multiply(current_dir, -1)
+            end
+
+            local retreat_dist = vector.distance(retreat_start_pos, pos)
+            if retreat_phase == "back" and retreat_dist > 20 then
+                retreat_phase = "up"
+                return {x = 0, y = 1, z = 0}
+            elseif retreat_phase == "up" and retreat_dist > 30 then
+                retreat_phase = nil
+                retreat_start_pos = nil
+                maneuver_completed = true
+                return vector.multiply(original_dir, -1)
+            end
+
+            if retreat_phase == "back" then
+                return vector.multiply(current_dir, -1)
+            elseif retreat_phase == "up" then
+                return {x = 0, y = 1, z = 0}
+            end
+        end
+
+        if obstacles.front then
+            retreat_phase = "back"
+            retreat_start_pos = nil
+            return vector.multiply(current_dir, -1)
+        end
+
         return nil
     end
 
     local function func(_self, goal, speed_factor)
+        if _self.flight_stamina <= 50 and not walking_mode then
+            handle_tired_dragon(_self, goal)
+            return
+        end
+        
         local pos = _self.object:get_pos()
         if not pos then return end
-        
-        -- Remember initial height if not set
+
         if not last_height then
             last_height = pos.y
         end
 
-        -- Return true when goal is reached
         if vector.distance(pos, goal) < box * 1.33 then
             _self:halt()
+            retreat_phase = nil
+            retreat_start_pos = nil
             return true
         end
 
-        -- Handle steering timer
         steer_timer = (steer_timer > 0 and steer_timer - _self.dtime) or 0.25
-
-        -- Get movement direction with 3D avoidance
         steer_to = (steer_timer > 0 and steer_to) or (steer_timer <= 0 and get_3d_avoidance_dir(_self))
         local goal_dir = steer_to or vector.direction(pos, goal)
 
-        -- Maintain height unless actively avoiding obstacle
-        if not steer_to then
+        if not steer_to and not retreat_phase then
             goal_dir.y = (goal.y - pos.y) * 0.1
             if math.abs(goal_dir.y) < 0.1 then
                 goal_dir.y = 0
@@ -3056,22 +3122,21 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
             goal_dir.y = goal_dir.y + vertical_adjust
         end
 
-        -- Movement
         local yaw = _self.object:get_yaw()
         local goal_yaw = minetest.dir_to_yaw(goal_dir)
         local speed = math.abs(_self.speed or 2) * (speed_factor or 0.5)
         local turn_rate = math.abs(_self.turn_rate or 5)
 
-        -- Adjust speed based on turning angle
         local yaw_diff = math.abs(diff(yaw, goal_yaw))
-        if yaw_diff < math.pi * 0.25 or steer_to then
+        if yaw_diff < math.pi * 0.25 or steer_to or retreat_phase then
             _self:set_forward_velocity(speed)
         else
             _self:set_forward_velocity(speed * 0.33)
         end
 
-        -- Apply vertical movement
-        _self:set_vertical_velocity(speed * goal_dir.y)
+        if not walking_mode then
+            _self:set_vertical_velocity(speed * goal_dir.y)
+        end
         _self:turn_to(goal_yaw, turn_rate)
 
         last_height = pos.y
@@ -3182,17 +3247,17 @@ local function handle_transport(dragon, player, message)
 		return false, "These coordinates puzzle me. Speak them clearly: 'take me to X Y Z'."
 	end
 
-    local pos = dragon.object:get_pos()
-    if not dragon.object:get_pos() then
-        return false, "I cannot determine my position."
-    end
+	local pos = dragon.object:get_pos()
+	if not dragon.object:get_pos() then
+		return false, "I cannot determine my position."
+	end
 
-    local destination = {x = x, y = y, z = z}
-    local dist = vector.distance(dragon.object:get_pos(), destination)
+	local destination = { x = x, y = y, z = z }
+	local dist = vector.distance(dragon.object:get_pos(), destination)
 
-    if dist > 100000 then
-        return false, "That destination lies beyond my current strength to reach."
-    end
+	if dist > 100000 then
+		return false, "That destination lies beyond my current strength to reach."
+	end
 
 	-- Start the journey function
 	local function start_journey()
@@ -3221,13 +3286,13 @@ local function handle_transport(dragon, player, message)
 			waterdragon.action_takeoff(dragon, 5)
 			if dragon.object:get_pos() then
 				begin_flight()
-				
+
 				waterdragon.action_fly(dragon, dest_pos, distance / 10, "waterdragon:obstacle_avoidance", 0.8, "fly")
-				minetest.after(distance/10 + 2, function()
+				minetest.after(distance / 10 + 2, function()
 					if dragon.object:get_pos() then
 						if dragon.transport_rider then
 							player:set_detach()
-							player:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+							player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
 							dragon.transport_rider = nil
 						end
 						-- Найти и удалить визуальную модель игрока
@@ -3240,13 +3305,13 @@ local function handle_transport(dragon, player, message)
 							end
 						end
 						waterdragon.action_land(dragon)
-						minetest.chat_send_player(player:get_player_name(), 
+						minetest.chat_send_player(player:get_player_name(),
 							"Dragon: *We have arrived at our destination*")
 					end
 					if dragon.object:get_pos() and minetest.get_player_control().sneak then
 						if dragon.transport_rider then
 							player:set_detach()
-							player:set_eye_offset({x=0, y=0, z=0}, {x=0, y=0, z=0})
+							player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
 							dragon.transport_rider = nil
 						end
 						-- Найти и удалить визуальную модель игрока
