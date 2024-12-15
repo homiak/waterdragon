@@ -4,6 +4,136 @@
 
 local S = waterdragon.S
 
+local vec_add, vec_dir, vec_dist, vec_divide, vec_len, vec_multi, vec_normal,
+	vec_round, vec_sub = vector.add, vector.direction, vector.distance, vector.divide,
+	vector.length, vector.multiply, vector.normalize, vector.round, vector.subtract
+
+local dir2yaw = minetest.dir_to_yaw
+
+
+local sin = math.sin
+local cos = math.cos
+
+function waterdragon.get_dropped_food(self, item, radius)
+	local pos = self.object:get_pos()
+	if not pos then return end
+
+	local objects = minetest.get_objects_inside_radius(pos, radius or self.tracking_range)
+	for _, object in ipairs(objects) do
+		local ent = object:get_luaentity()
+		if ent
+		and ent.name == "__builtin:item"
+		and ent.itemstring
+		and ((item and ent.itemstring:match(item))
+		or self:follow_item(ItemStack(ent.itemstring))) then
+			return object, object:get_pos()
+		end
+	end
+end
+
+function waterdragon.add_food_particle(self, item_name)
+	local pos, yaw = self.object:get_pos(), self.object:get_yaw()
+	if not pos then return end
+	local head = self.head_data
+	local offset_h = (head and head.pivot_h) or self.width
+	local offset_v = (head and head.pivot_v) or self.height
+	local head_pos = {
+		x = pos.x + sin(yaw) * -offset_h,
+		y = pos.y + offset_v,
+		z = pos.z + cos(yaw) * offset_h
+	}
+	local random = math.random
+	local def = minetest.registered_items[item_name]
+	local image = def.inventory_image
+	if def.tiles then
+		image = def.tiles[1].name or def.tiles[1]
+	end
+	if image then
+		local crop = "^[sheet:4x4:" .. random(4) .. "," .. random(4)
+		minetest.add_particlespawner({
+			pos = head_pos,
+			time = 0.5,
+			amount = 12,
+			collisiondetection = true,
+			collision_removal = true,
+			vel = {min = {x = -1, y = 1, z = -1}, max = {x = 1, y = 2, z = 1}},
+			acc = {x = 0, y = -9.8, z = 0},
+			size = {min = 1, max = 2},
+			texture = image .. crop
+		})
+	end
+end
+
+-- Add this at the top with other local variables
+local dragon_eating_cooldowns = {}
+
+-- Add this function
+local function can_eat(self)
+    local id = self.wtd_id or tostring(self.object)
+    local current_time = minetest.get_gametime()
+    
+    if not dragon_eating_cooldowns[id] then
+        dragon_eating_cooldowns[id] = 0
+    end
+    
+    if current_time < dragon_eating_cooldowns[id] then
+        return false
+    end
+    
+    -- Set cooldown for 1 second
+    dragon_eating_cooldowns[id] = current_time + 1
+    return true
+end
+
+function waterdragon.eat_dropped_item(self, item)
+	local pos = self.object:get_pos()
+	if not pos then return end
+
+	local food = item or waterdragon.get_dropped_food(self, nil, self.width + 1)
+
+	local food_ent = food and food:get_luaentity()
+	if food_ent then
+		if not can_eat(self) then
+			return false
+		end
+	
+		local food_pos = food:get_pos()
+		local stack = ItemStack(food_ent.itemstring)
+		
+		-- Apply same effects as when player feeds Dragon
+		local scale = self.growth_scale or 1
+		if self.hp < (self.max_health * scale) then
+			self:heal(self.max_health / 5)
+		end
+		if self.hunger and self.hunger < (self.max_health * 0.4) * scale then
+			self.hunger = self.hunger + 5
+			self:memorize("hunger", self.hunger)
+		end
+		if stack:get_name():find("cooked") then
+			self.food = (self.food or 0) + 1
+		end
+		if self.food and self.food >= 15 and self.age then
+			self.food = 0
+			self:increase_age()
+		end
+	
+		if stack and stack:get_count() > 1 then
+			stack:take_item()
+			food_ent.itemstring = stack:to_string()
+		else
+			food:remove()
+		end
+	
+		self.object:set_yaw(dir2yaw(vec_dir(pos, food_pos)))
+		waterdragon.add_food_particle(self, stack:get_name())
+	
+		if self.on_eat_drop then
+			self:on_eat_drop()
+		end
+		return true
+	end
+end
+
 local creative = minetest.settings:get_bool("creative_mode")
 
 local function is_value_in_table(tbl, val)
@@ -17,11 +147,8 @@ end
 
 local light_blocks = {}
 
-function waterdragon.register_node(name, def)
-	minetest.register_node(name, def)
-end
 
-waterdragon.register_node("waterdragon:light_source", {
+minetest.register_node("waterdragon:light_source", {
 	description = "Light Source (from Waterdragon mod)",
 	drawtype = "airlike",
 	paramtype = "light",
@@ -299,6 +426,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 	step_func = function(self, dtime, moveresult)
 		waterdragon.dragon_step(self, dtime, moveresult)
 		on_dragon_step(self, dtime)
+		waterdragon.eat_dropped_item(self, item)
 	end,
 	on_rightclick = function(self, clicker)
 		waterdragon.dragon_rightclick(self, clicker)

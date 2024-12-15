@@ -1319,6 +1319,7 @@ modding.register_utility("waterdragon:attack", function(self, target)
 		-- If the Water Dragon is not allowed to fly
 		return
 	end
+	if self.target == self.object then return end
 	local is_landed = true
 	local init = false
 	local takeoff_init = false
@@ -2078,47 +2079,47 @@ waterdragon.scottish_dragon_behavior = {
 }
 
 modding.register_utility("waterdragon:water_dive", function(self, player)
-    local function func(_self)
-        if not player or not player:get_pos() then return true end
-        
-        -- Check if player is already mounted on ANY Scottish Dragon
-        for _, entity in pairs(minetest.luaentities) do
-            if entity.name == "waterdragon:scottish_dragon" and 
-               entity.rider and 
-               entity.rider:get_player_name() == player:get_player_name() then
-                return true  -- Exit utility if player is mounted anywhere
-            end
-        end
-        
-        if self.rider then return true end
-        
-        local pos = _self.object:get_pos()
-        if not pos then return end
-        local player_pos = player:get_pos()
-        
-        if not _self:get_action() then
-            local target_pos = {
-                x = player_pos.x,
-                y = player_pos.y + 2,
-                z = player_pos.z
-            }
-            
-            local dist = vector.distance(pos, player_pos)
-            if dist < 3 then
-                -- Double check again before mounting
-                for _, entity in pairs(minetest.luaentities) do
-                    if entity.name == "waterdragon:scottish_dragon" and 
-                       entity.rider and 
-                       entity.rider:get_player_name() == player:get_player_name() then
-                        return true
-                    end
-                end
-                waterdragon.attach_player(self, player)
-                return true
-            end
-            
-            waterdragon.action_fly(self, target_pos, 2, "waterdragon:fly_simple", 1, "dive")
-        end
-    end
-    self:set_utility(func)
+	local function func(_self)
+		if not player or not player:get_pos() then return true end
+
+		-- Check if player is already mounted on ANY Scottish Dragon
+		for _, entity in pairs(minetest.luaentities) do
+			if entity.name == "waterdragon:scottish_dragon" and
+				entity.rider and
+				entity.rider:get_player_name() == player:get_player_name() then
+				return true -- Exit utility if player is mounted anywhere
+			end
+		end
+
+		if self.rider then return true end
+
+		local pos = _self.object:get_pos()
+		if not pos then return end
+		local player_pos = player:get_pos()
+
+		if not _self:get_action() then
+			local target_pos = {
+				x = player_pos.x,
+				y = player_pos.y + 2,
+				z = player_pos.z
+			}
+
+			local dist = vector.distance(pos, player_pos)
+			if dist < 3 then
+				-- Double check again before mounting
+				for _, entity in pairs(minetest.luaentities) do
+					if entity.name == "waterdragon:scottish_dragon" and
+						entity.rider and
+						entity.rider:get_player_name() == player:get_player_name() then
+						return true
+					end
+				end
+				waterdragon.attach_player(self, player)
+				return true
+			end
+
+			waterdragon.action_fly(self, target_pos, 2, "waterdragon:fly_simple", 1, "dive")
+		end
+	end
+	self:set_utility(func)
 end)
