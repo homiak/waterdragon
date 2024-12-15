@@ -122,6 +122,7 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     step_func = function(self, dtime, moveresult)
         waterdragon.dragon_step(self, dtime, moveresult)
         dragon_stay_behavior(self)
+        waterdragon.eat_dropped_item(self, item)
     end,
     on_rightclick = function(self, clicker)
         waterdragon.dragon_rightclick(self, clicker)

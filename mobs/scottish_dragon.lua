@@ -210,6 +210,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 	end,
 	step_func = function(self, dtime)
 		waterdragon.scottish_dragon_step(self, dtime)
+		waterdragon.eat_dropped_item(self, item)
 		if self.has_pegasus_fire then
 			self.fire_timer = (self.fire_timer or 0) + dtime
 

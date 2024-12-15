@@ -1765,7 +1765,7 @@ modding.register_utility("waterdragon:follow_player", function(self, player)
 		local dist = vec_dist(pos, tgt_pos)
 		local dist_to_ground = modding.sensor_floor(_self, 8, true)
 		if not _self:get_action() then
-			if dist < clamp(8 * scale, 2, 12) then
+			if dist < clamp(8 * scale, 5, 12) then
 				if dist_to_ground > 2 then
 					waterdragon.action_hover(_self, 2, "hover")
 				else
@@ -1776,7 +1776,7 @@ modding.register_utility("waterdragon:follow_player", function(self, player)
 				if ((height_diff > 8 or dist_to_ground > 2) and self.fly_allowed) then
 					modding.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
 				else
-					modding.action_move(_self, tgt_pos, 3, "modding:context_based_steering", 0.5, "walk")
+					modding.action_move(_self, tgt_pos, 3, "modding:context_based_steering", 1, "walk")
 				end
 			end
 		end

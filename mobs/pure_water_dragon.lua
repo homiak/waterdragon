@@ -98,6 +98,25 @@ function waterdragon.eat_dropped_item(self, item)
 		end
 	
 		local food_pos = food:get_pos()
+		local pos = self.object:get_pos()
+		
+		-- Check if Dragon is free to move to food
+		if not self.rider and not self:get_action() and not self.target then
+			local dist = vector.distance(pos, food_pos)
+			
+			-- If food is not in immediate reach, move to it
+			if dist > 2 then
+				if self.is_flying then
+					-- Use fly movement if Dragon is already flying
+					waterdragon.action_fly(self, food_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+				else
+					-- Use walking movement if Dragon is on ground
+					modding.action_move(self, food_pos, 3, "modding:obstacle_avoidance", 1, "walk")
+				end
+				return false
+			end
+		end
+	
 		local stack = ItemStack(food_ent.itemstring)
 		
 		-- Apply same effects as when player feeds Dragon
