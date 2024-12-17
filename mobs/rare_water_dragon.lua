@@ -103,12 +103,12 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         pivot_v = 0.75,
         tail = {
             { pos = { x = 0, y = -0.06, z = 0.6 }, rot = { x = 225, y = 180, z = 1 } },
-            { pos = { x = 0, y = 1.45, z = 0 },  rot = { x = 0, y = 0, z = 1 } },
-            { pos = { x = 0, y = 1.6, z = 0 },   rot = { x = 0, y = 0, z = 1 } }
+            { pos = { x = 0, y = 1.45, z = 0 },    rot = { x = 0, y = 0, z = 1 } },
+            { pos = { x = 0, y = 1.6, z = 0 },     rot = { x = 0, y = 0, z = 1 } }
         },
         head = {
-            { pitch_offset = 0,  bite_angle = -10, pitch_factor = 0.11, pos = { x = 0, y = 1.15, z = 0 },  rot = { x = 0, y = 0, z = 0 } },
-            { pitch_offset = -5, bite_angle = 10,  pitch_factor = 0.11, pos = { x = 0, y = 0.65, z = 0 },  rot = { x = 0, y = 0, z = 0 } },
+            { pitch_offset = 0,  bite_angle = -10, pitch_factor = 0.11, pos = { x = 0, y = 1.15, z = 0 },    rot = { x = 0, y = 0, z = 0 } },
+            { pitch_offset = -5, bite_angle = 10,  pitch_factor = 0.11, pos = { x = 0, y = 0.65, z = 0 },    rot = { x = 0, y = 0, z = 0 } },
             { pitch_offset = -5, bite_angle = 5,   pitch_factor = 0.22, pos = { x = 0, y = 0.65, z = 0.05 }, rot = { x = 0, y = 0, z = 0 } }
         },
         jaw = { pos = { y = 0.15, z = -0.29 } }
@@ -123,6 +123,53 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         waterdragon.dragon_step(self, dtime, moveresult)
         dragon_stay_behavior(self)
         waterdragon.eat_dropped_item(self, item)
+        -- Add to waterdragon.dragon_step function
+        if self:timer(1) then                                -- Check every second
+            local scale = self.growth_scale or 1
+            local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
+
+            if self.hunger and self.hunger < hunger_threshold then
+                if self.owner then
+                    -- Notify owner about hunger
+                    minetest.chat_send_player(self.owner, "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
+
+                    -- Start aggressive behavior if owner doesn't feed for 30 seconds
+                    if not self.hunger_warning_time then
+                        self.hunger_warning_time = minetest.get_gametime()
+                    elseif minetest.get_gametime() - self.hunger_warning_time > 30 then
+                        -- Reset warning time
+                        self.hunger_warning_time = nil
+
+                        -- Find nearby targets
+                        local pos = self.object:get_pos()
+                        if pos then
+                            for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+                                if obj:is_player() or (obj:get_luaentity() and
+                                        obj:get_luaentity().name ~= self.name) then
+                                    self._target = obj
+                                    break
+                                end
+                            end
+                        end
+                    end
+                else
+                    -- Wild hungry Dragon - attack immediately
+                    local pos = self.object:get_pos()
+                    if pos then
+                        for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+                            if obj:is_player() or (obj:get_luaentity() and
+                                    obj:get_luaentity().name ~= self.name) then
+                                self._target = obj
+                                break
+                            end
+                        end
+                    end
+                end
+            else
+                -- Reset warning time if Dragon is fed
+                self.hunger_warning_time = nil
+            end
+        end
     end,
     on_rightclick = function(self, clicker)
         waterdragon.dragon_rightclick(self, clicker)

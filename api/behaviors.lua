@@ -1840,6 +1840,11 @@ waterdragon.dragon_behavior = {
 	{ -- Sleep
 		utility = "waterdragon:sleep",
 		get_score = function(self)
+			-- Don't sleep if transporting or has rider
+			if self.transport_rider or self.rider then
+				return 0
+			end
+
 			if self.owner then
 				if is_night then
 					return 0.2, { self }

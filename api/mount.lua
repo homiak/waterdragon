@@ -747,10 +747,10 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                 end
             else
                 if _self.touching_ground then
-                    waterdragon.action_takeoff(_self, 20)
+                    waterdragon.action_land(_self)
+                    modding.action_move(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "modding:obstacle_avoidance", 1)
                 else
-                    waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
-                        "waterdragon:fly_simple", 0.5)
+                    waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "waterdragon:fly_simple", 0.5)
                 end
             end
             return
