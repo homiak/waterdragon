@@ -328,6 +328,7 @@ for color in pairs(waterdragon.colors_pure_water) do
 					end
 				end
 			end
+
 			local name = modding.get_node_def(pos).name
 			local progress = self.progress or 0
 			if minetest.get_item_group(name, "water") > 0

@@ -22,20 +22,20 @@ local function create_fire_sphere(pos, radius)
     for x = -radius, radius do
         for y = -radius, radius do
             for z = -radius, radius do
-                local check_pos = vector.add(pos, {x=x, y=y, z=z})
+                local check_pos = vector.add(pos, { x = x, y = y, z = z })
                 if vector.distance(pos, check_pos) <= radius then
                     local node = minetest.get_node(check_pos)
-                    if node.name ~= "air" and node.name ~= "ignore" and 
-                       not minetest.is_protected(check_pos, "") then
-                        minetest.set_node(check_pos, {name="air"})
+                    if node.name ~= "air" and node.name ~= "ignore" and
+                        not minetest.is_protected(check_pos, "") then
+                        minetest.set_node(check_pos, { name = "air" })
                         minetest.add_particlespawner({
                             amount = 1,
                             time = 0.1,
                             minpos = check_pos,
                             maxpos = check_pos,
-                            minvel = {x=-1, y=0, z=-1},
-                            maxvel = {x=1, y=2, z=1},
-                            minacc = {x=0, y=0, z=0},
+                            minvel = { x = -1, y = 0, z = -1 },
+                            maxvel = { x = 1, y = 2, z = 1 },
+                            minacc = { x = 0, y = 0, z = 0 },
                             minexptime = 1,
                             maxexptime = 2,
                             minsize = 2,
@@ -48,7 +48,6 @@ local function create_fire_sphere(pos, radius)
             end
         end
     end
-    
 end
 
 -- Add this function to create the traveling fireball
@@ -57,7 +56,7 @@ local function launch_fire_sphere(start_pos, direction)
     local pos = vector.new(start_pos)
     local distance = 0
     local sphere_radius = 20
-    
+
     -- Create traveling fireball particles
     local function spawn_fire_trail()
         minetest.add_particlespawner({
@@ -65,9 +64,9 @@ local function launch_fire_sphere(start_pos, direction)
             time = 0.002,
             minpos = pos,
             maxpos = pos,
-            minvel = {x=-0.5, y=-0.5, z=-0.5},
-            maxvel = {x=0.5, y=0.5, z=0.5},
-            minacc = {x=0, y=0, z=0},
+            minvel = { x = -0.5, y = -0.5, z = -0.5 },
+            maxvel = { x = 0.5, y = 0.5, z = 0.5 },
+            minacc = { x = 0, y = 0, z = 0 },
             minexptime = 0.5,
             maxexptime = 1,
             minsize = 3,
@@ -75,7 +74,6 @@ local function launch_fire_sphere(start_pos, direction)
             texture = "waterdragon_fireball_particle.png",
             glow = 14
         })
-        
     end
 
     -- Move the fireball and check for collisions
@@ -789,6 +787,24 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
 
     self:halt()
 
+    local pos = self.object:get_pos()
+    local is_air_below = true
+
+    for i = 1, 8 do
+        local check_pos = { x = pos.x, y = pos.y - i, z = pos.z }
+        local node = minetest.get_node(check_pos)
+        if node.name ~= "air" then
+            is_air_below = false
+            break
+        end
+    end
+
+    local velocity = self.object:get_velocity()
+    if is_air_below and velocity and velocity.y < 0 and self._anim == "walk" or self._anim == "stand" or self._anim == "walk_water" or self._anim == "stand_water" then
+        waterdragon.action_takeoff(self, 2)
+        is_landed = false
+        self.is_flying = true
+    end
     local func = function(_self)
         local player = _self.rider
         if not player or not player:get_pos() then return true end
@@ -842,9 +858,11 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
             else
                 if _self.touching_ground then
                     waterdragon.action_land(_self)
-                    modding.action_move(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "modding:obstacle_avoidance", 1)
+                    modding.action_move(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
+                        "modding:obstacle_avoidance", 1)
                 else
-                    waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5, "waterdragon:fly_simple", 0.5)
+                    waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
+                        "waterdragon:fly_simple", 0.5)
                 end
             end
             return
@@ -1214,7 +1232,28 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
                 visual_size = { x = 0, y = 0, z = 0 },
             })
         end
+        local pos = self.object:get_pos()
+        local is_air_below = true
 
+        for i = 1, 8 do
+            local check_pos = { x = pos.x, y = pos.y - i, z = pos.z }
+            local node = minetest.get_node(check_pos)
+            if node.name ~= "air" then
+                is_air_below = false
+                break
+            end
+        end
+
+        local velocity = self.object:get_velocity()
+        if is_air_below and velocity and velocity.y < 0 and (self._anim == "walk" or self._anim == "stand" or self._anim == "bite") then
+            waterdragon.action_takeoff(self, 2)
+            is_landed = false
+            self.is_flying = true
+        end
+
+
+        local yaw = self.object:get_yaw()
+        self:move_head(yaw)
         if control.aux1 then
             if not view_held then
                 if view_point == 2 then
@@ -1374,12 +1413,12 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
         if control.jump and control.left and self.has_pegasus_fire and self.fire >= 3 then
             local pos = self.object:get_pos()
             if pos then
-                pos.y = pos.y + 2  -- Adjust for dragon's head height
+                pos.y = pos.y + 2 -- Adjust for dragon's head height
                 local direction = vector.normalize(look_dir)
                 launch_fire_sphere(pos, direction)
-                self.fire = self.fire - 3  -- Consume 3 fire charges
+                self.fire = self.fire - 3 -- Consume 3 fire charges
                 self:memorize("fire", self.fire)
-                
+
                 -- Add visual/sound feedback
                 minetest.sound_play("waterdragon_fireball", {
                     pos = pos,
