@@ -992,12 +992,12 @@ function waterdragon.rare_water_breath(self, pos2)
 		local particle_origin2 = {
 			x = pos.x + dir.x * (self.growth_scale * 5) + vel.x,
 			y = pos.y + dir.y * (self.growth_scale * 5) + vel.y + 2,
-			z = pos.z + dir.z * (self.growth_scale * 4) + vel.z
+			z = pos.z + dir.z * (self.growth_scale * 5) + vel.z
 		}
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
 			minetest.add_particlespawner({
-				amount = 200,
+				amount = 100,
 				time = 0.0005,
 				collisiondetection = true,
 				collision_removal = true,
@@ -1345,7 +1345,7 @@ waterdragon.wtd_api = {
 		local tgt_angle
 		local open_angle = pi / 4
 		if self.jaw_init then
-			local end_anim = self._anim:find("pure_water") or floor(rot.x) == deg(-open_angle)
+			local end_anim = self._anim:find("_water") or floor(rot.x) == deg(-open_angle)
 			if end_anim
 				or self.roar_anim_length <= 0 then
 				self.jaw_init = false
@@ -1547,7 +1547,7 @@ waterdragon.scottish_wtd_api = {
 		local tgt_angle
 		local open_angle = pi / 4
 		if self.jaw_init then
-			local end_anim = self._anim:find("pure_water") or floor(rot.x) == deg(-open_angle)
+			local end_anim = self._anim:find("_water") or floor(rot.x) == deg(-open_angle)
 			if end_anim
 				or self.roar_anim_length <= 0 then
 				self.jaw_init = false
@@ -1987,6 +1987,7 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
+	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
 	if not self.gender then
 		local genders = { "male", "female" }
@@ -2412,7 +2413,6 @@ function waterdragon.scottish_action_fly_and_throw(self, rider)
 				local rider_obj = self.rider
 				waterdragon.detach_player(self, rider_obj)
 
-				local dragon_pos = self.object:get_pos()
 				local yaw = self.object:get_yaw()
 				local throw_dir = {
 					x = -math.sin(yaw),
@@ -2575,12 +2575,10 @@ function waterdragon.dragon_rightclick(self, clicker)
 	end
 end
 
---------------------
--- Special things --
---------------------
+------------------
+-- Specialities --
+------------------
 
-
--- Rare Water Dragon special thing... --
 
 minetest.register_node("waterdragon:healing_water", {
 	description = "Healing Water",
@@ -2732,7 +2730,6 @@ function throw_rider(self)
 end
 
 -- Dragon Chat System --
-local S = waterdragon.S
 
 -- Storage for active chat sessions and cooldowns
 local active_chats = {}
@@ -2742,7 +2739,7 @@ local player_cooldowns = {}
 local command_cooldowns = {
 	attack = 10,
 	fly = 5,
-	water_breath = 15,
+	fire = 8,
 	roar = 20,
 	transport = 20
 }
@@ -2784,27 +2781,27 @@ local dragon_dialogue = {
 		},
 
 		["how much stamina do you have"] = {
-			"My stamina level is: ",
-			"My stamina level is: ",
-			"My stamina level is: "
+			"My stamina level is:",
+			"My stamina level is:",
+			"My stamina level is:"
 		},
 
 		["how much breath do you have"] = {
-			"My breath level is: ",
-			"My breath level is: ",
-			"My breath level is: "
+			"My breath level is:",
+			"My breath level is:",
+			"My breath level is:"
 		},
 
 		["how much health do you have"] = {
-			"My health level is: ",
-			"My health level is: ",
-			"My health level is: "
+			"My health level is:",
+			"My health level is:",
+			"My health level is:"
 		},
 
 		["how hungry are you"] = {
-			"My hunger level is: ",
-			"My hunger level is: ",
-			"My hunger level is: "
+			"My hunger level is:",
+			"My hunger level is:",
+			"My hunger level is:"
 		},
 
 		["tell me about yourself"] = {
@@ -2814,9 +2811,15 @@ local dragon_dialogue = {
 		},
 
 		["what can you do"] = {
-			"*The Dragon's eyes gleam with ancient power* I possess many abilities, young one. I can take flight through the skies - simply ask me to 'fly'. If you prove worthy, you may even ride upon my back - just ask to 'ride'. When we soar together, know that I can 'land' at your word, or 'take me to' any destination you desire. Should you need my presence, ask me to 'follow', or bid me 'stay' to guard a place. And yes, *the Dragon's throat rumbles* I can demonstrate my voice with a mighty 'roar'. If you spot an enemy, simply tell me to 'attack' while looking at them.",
+			"I possess many abilities, young one. I can take flight through the skies - simply ask me to 'fly'. If you prove worthy, you may even ride upon my back - just ask to 'ride'. When we soar together, know that I can 'land' at your word, or 'take me to' any destination you desire. Should you need my presence, ask me to 'follow', or bid me 'stay' to guard a place. And yes, I can demonstrate my voice with a mighty 'roar'. If you spot an enemy, simply tell me to 'attack' while looking at them.",
 			"The powers of ancient times flow through me. I can carry you through the skies - ask me to 'fly' or to 'ride'. My water breath brings doom to our foes - command 'water breath' or point me to 'attack' them. I will 'follow' your path or 'stay' at your word, and can 'land' when our flight is done. If you seek a specific place, simply tell me to 'take me to' your destination. And should you wish to hear my true voice, ask me to 'roar'.",
-			"*The Dragon's scales shimmer with power* My abilities are yours to command, seeker. Bid me 'fly' and I shall soar, or ask to 'ride' upon my back. Have me 'attack' those you face. I shall 'follow' where you lead or 'stay' where you wish. If you need to reach a distant place, tell me to 'take me to' your destination. When we need return to earth, simply ask me to 'land'. And yes, *the Dragon's eyes glint* I can 'roar' to shake the very skies."
+			"My abilities are yours to command, seeker. Bid me 'fly' and I shall soar, or ask to 'ride' upon my back. Have me 'attack' those you face. I shall 'follow' where you lead or 'stay' where you wish. If you need to reach a distant place, tell me to 'take me to' your destination. When we need return to earth, simply ask me to 'land'. And yes, I can 'roar' to shake the very skies."
+		},
+
+		["what do you think of humans"] = {
+			"Your kind are like ripples on water - brief, yet capable of creating great change. Some I find worthy of respect.",
+			"Humans are interesting creatures. Short-lived but ambitious, capable of both great wisdom and great foolishness.",
+			"I have watched your kind grow from simple tool-users to builders of great cities. You can be worthy allies when you prove yourself."
 		}
 	},
 
@@ -2827,6 +2830,9 @@ local dragon_dialogue = {
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
 					return false, "I take orders only from my chosen companion."
+				end
+				if dragon.transport_rider then
+					return false, "I cannot fly now because I am taking you on my back"
 				end
 				if not check_cooldown(player:get_player_name(), "fly") then
 					return false, "I must rest before taking flight again."
@@ -2897,7 +2903,10 @@ local dragon_dialogue = {
 			response = "*The Dragon lowers its head, allowing you to mount*",
 			action = function(dragon, player)
 				if dragon.rider then
-					return false, "I already carry another."
+					return false, "I already have a rider."
+				end
+				if dragon.transport_rider then
+					return false, "I already have a rider."
 				end
 
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
@@ -2924,6 +2933,103 @@ local dragon_dialogue = {
 			end
 		},
 
+		["stop"] = {
+			name = "stop",
+			response = "*The Dragon awaits your next command*",
+			action = function(dragon, player)
+				local continuous_actions = {}
+				if not dragon or not dragon.object then return false end
+
+				local action_stopped = false
+
+				-- Stop continuous breath attack if active
+				if dragon.wtd_id and continuous_actions[dragon.wtd_id] then
+					continuous_actions[dragon.wtd_id] = nil
+					action_stopped = true
+				end
+
+				-- Stop transport if active
+				if dragon.transport_rider then
+					if player:get_player_name() then
+						player:set_detach()
+						player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+					end
+					dragon.transport_rider = nil
+					action_stopped = true
+				end
+
+				-- Return appropriate message based on if anything was stopped
+				if not action_stopped then
+					return false, "I am not performing any command to stop."
+				end
+
+				return true
+			end
+		},
+		["fire"] = {
+			name = "fire",
+			response = "*The Dragon begins to breathe ancient water*",
+			action = function(dragon, player)
+				local continuous_actions = {}
+				-- Check attack stamina
+				if dragon.attack_stamina <= 0 then
+					return false, "I must rest to regain my breath power."
+				end
+
+				if not check_cooldown(player:get_player_name(), "attack") then
+					return false, "I need more time to recover my strength of water breathing."
+				end
+
+				-- Start continuous breathing
+				continuous_actions[dragon.wtd_id] = function()
+					if not dragon or not dragon.object then return end
+
+					-- Check attack stamina again
+					if dragon.attack_stamina <= 0 then
+						continuous_actions[dragon.wtd_id] = nil
+						if dragon.owner then
+							minetest.chat_send_player(dragon.owner, "Dragon: *I must rest my breath*")
+						end
+						return
+					end
+
+					local current_yaw = dragon.object:get_yaw()
+					local current_dir = minetest.yaw_to_dir(current_yaw)
+					local current_pos = dragon.object:get_pos()
+
+					if not current_pos then return end
+
+					local visual_size = dragon.object:get_properties().visual_size
+					local eye_offset = {
+						x = 0,
+						y = 4.5 * visual_size.y,
+						z = 0
+					}
+
+					local eye_correction = vector.multiply(current_dir, eye_offset.z * 0.125)
+					current_pos = vector.add(current_pos, eye_correction)
+					current_pos.y = current_pos.y + eye_offset.y
+
+					local tpos = vector.add(current_pos, vector.multiply(current_dir, 64))
+
+					dragon:breath_attack(tpos)
+					dragon:animate(dragon._anim .. "_water")
+
+					-- Reduce attack_stamina
+					dragon.attack_stamina = dragon.attack_stamina - 1
+					dragon:memorize("attack_stamina", dragon.attack_stamina)
+
+					-- Continue if still have stamina
+					if continuous_actions[dragon.wtd_id] then
+						minetest.after(0.1, continuous_actions[dragon.wtd_id])
+					end
+				end
+
+				-- Start the continuous action
+				continuous_actions[dragon.wtd_id]()
+				return true
+			end
+		},
 		["follow"] = {
 			name = "follow",
 			response = "I shall accompany you on your journey.",
@@ -2995,7 +3101,7 @@ local dragon_dialogue = {
 				if not check_cooldown(player:get_player_name(), "roar") then
 					return false, "My voice needs rest."
 				end
-				
+
 				minetest.sound_play("waterdragon_water_dragon_random_3", {
 					object = dragon.object,
 					gain = 1.0,
@@ -3077,7 +3183,7 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
 				if self.transport_rider then
 					local rider_name = self.transport_rider:get_player_name()
 					if rider_name then
-						minetest.chat_send_player(rider_name, "Dragon: *I need to rest my wings. I'll walk for a while.*")
+						minetest.chat_send_player(rider_name, "Dragon: I need to rest my wings. I'll walk for a while.")
 					end
 				end
 			end
@@ -3091,7 +3197,7 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
 			if self.transport_rider then
 				local rider_name = self.transport_rider:get_player_name()
 				if rider_name then
-					minetest.chat_send_player(rider_name, "Dragon: *I feel rested now. Let's take to the skies!*")
+					minetest.chat_send_player(rider_name, "Dragon: I feel rested now. Let's take to the skies!")
 				end
 			end
 		end
@@ -3273,6 +3379,7 @@ local function handle_transport(dragon, player, message)
 			y = 115 * scale,
 			z = -280 * scale
 		}, { x = 0, y = 0, z = 0 })
+		dragon.transport_rider = true
 	end
 
 	-- Начинаем полет
@@ -3287,7 +3394,30 @@ local function handle_transport(dragon, player, message)
 	else
 		waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 0.5, "fly")
 	end
+	-- Add after flight starts and before arrival handler
+	minetest.after(0.1, function()
+		local function check_sneak()
+			if not dragon or not dragon.object or not dragon.object:get_pos() then return end
 
+			if player:get_player_control().sneak and dragon.transport_rider then
+				player:set_detach()
+				player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+				waterdragon.action_land(dragon)
+				if dragon.rider then
+					waterdragon.detach_player(dragon, player)
+				end
+				dragon.transport_rider = false
+				minetest.chat_send_player(player:get_player_name(), "Dragon: *Journey interrupted*")
+				return
+			end
+
+			if dragon.transport_rider then
+				minetest.after(0.1, check_sneak)
+			end
+		end
+
+		check_sneak()
+	end)
 	-- По прибытии
 	minetest.after(distance / 10 + 2, function()
 		if dragon and dragon.object and dragon.object:get_pos() then
@@ -3296,10 +3426,22 @@ local function handle_transport(dragon, player, message)
 				player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
 			end
 			waterdragon.action_land(dragon)
+			if dragon.rider then
+			waterdragon.detach_player(dragon, player)
+			end
+			dragon.transport_rider = false
 			minetest.chat_send_player(player:get_player_name(), "Dragon: We have arrived")
 		end
 	end)
-
+	if player:get_player_control().sneak and dragon.transport_rider then
+		if player:get_player_name() then
+			player:set_detach()
+			player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+		end
+		waterdragon.action_land(dragon)
+		waterdragon.detach_player(dragon, player)
+		dragon.transport_rider = false
+	end
 	-- Проверяем усталость каждую секунду
 	local function check_stamina()
 		if not dragon or not dragon.object or not dragon.object:get_pos() then
@@ -3350,13 +3492,13 @@ local function process_dragon_chat(name, message)
 	end
 	if message:find("stamina") then
 		local response = dragon_dialogue.conversations["how much stamina do you have"][math.random(3)]
-		response = response .. " (" .. (dragon.flight_stamina or 0) .. "/900)"
+		response = response .. " " .. (dragon.flight_stamina or 0) .. "/300"
 		minetest.chat_send_player(name, "Dragon: " .. response)
 		return true
 	end
 	if message:find("hungry") then
 		local response = dragon_dialogue.conversations["how hungry are you"][math.random(3)]
-		response = response .. " (" .. (dragon.hunger or 0) .. "/" .. (dragon.max_hunger) .. ")"
+		response = response .. " " .. (dragon.hunger or 0) .. "/" .. (dragon.max_hunger)
 		minetest.chat_send_player(name, "Dragon: " .. response)
 		return true
 	end
@@ -3365,13 +3507,13 @@ local function process_dragon_chat(name, message)
 		local scale = dragon.growth_scale or 1
 		local max_health = dragon.max_health * scale
 		local response = dragon_dialogue.conversations["how much health do you have"][math.random(3)]
-		response = response .. " (" .. (dragon.hp or 0) .. "/" .. max_health .. ")"
+		response = response .. " " .. (dragon.hp or 0) .. "/" .. max_health
 		minetest.chat_send_player(name, "Dragon: " .. response)
 		return true
 	end
 	if message:find("breath") then
 		local response = dragon_dialogue.conversations["how much breath do you have"][math.random(3)]
-		response = response .. " (" .. (dragon.attack_stamina or 0) .. "/" .. dragon.attack_stamina .. ")"
+		response = response .. " " .. (dragon.attack_stamina or 0) .. "/" .. dragon.attack_stamina
 		minetest.chat_send_player(name, "Dragon: " .. response)
 		return true
 	end
@@ -3381,7 +3523,8 @@ local function process_dragon_chat(name, message)
 		if success then
 			minetest.chat_send_player(name, "Dragon: *The Dragon's eyes glow as it studies the destination*")
 		else
-			minetest.chat_send_player(name, "Dragon: " .. error_msg)
+			-- Проверяем error_msg перед использованием
+			minetest.chat_send_player(name, "Dragon: " .. (error_msg or "I cannot make this journey right now."))
 		end
 		return true
 	end
