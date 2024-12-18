@@ -8,6 +8,100 @@ waterdragon.mounted_player_data = {}
 local abs = math.abs
 local ceil = math.ceil
 
+-- Special fire abilities
+
+local function create_fire_sphere(pos, radius)
+    if not minetest.get_modpath("pegasus") then return end
+    minetest.sound_play("waterdragon_fireball_crash", {
+        pos = pos,
+        gain = 1.0,
+        max_hear_distance = 20,
+        loop = false
+    })
+    -- Remove blocks in sphere shape
+    for x = -radius, radius do
+        for y = -radius, radius do
+            for z = -radius, radius do
+                local check_pos = vector.add(pos, {x=x, y=y, z=z})
+                if vector.distance(pos, check_pos) <= radius then
+                    local node = minetest.get_node(check_pos)
+                    if node.name ~= "air" and node.name ~= "ignore" and 
+                       not minetest.is_protected(check_pos, "") then
+                        minetest.set_node(check_pos, {name="air"})
+                        minetest.add_particlespawner({
+                            amount = 1,
+                            time = 0.1,
+                            minpos = check_pos,
+                            maxpos = check_pos,
+                            minvel = {x=-1, y=0, z=-1},
+                            maxvel = {x=1, y=2, z=1},
+                            minacc = {x=0, y=0, z=0},
+                            minexptime = 1,
+                            maxexptime = 2,
+                            minsize = 2,
+                            maxsize = 4,
+                            texture = "waterdragon_fire_2.png",
+                            glow = 14
+                        })
+                    end
+                end
+            end
+        end
+    end
+    
+end
+
+-- Add this function to create the traveling fireball
+local function launch_fire_sphere(start_pos, direction)
+    if not minetest.get_modpath("pegasus") then return end
+    local pos = vector.new(start_pos)
+    local distance = 0
+    local sphere_radius = 20
+    
+    -- Create traveling fireball particles
+    local function spawn_fire_trail()
+        minetest.add_particlespawner({
+            amount = 20,
+            time = 0.002,
+            minpos = pos,
+            maxpos = pos,
+            minvel = {x=-0.5, y=-0.5, z=-0.5},
+            maxvel = {x=0.5, y=0.5, z=0.5},
+            minacc = {x=0, y=0, z=0},
+            minexptime = 0.5,
+            maxexptime = 1,
+            minsize = 3,
+            maxsize = 5,
+            texture = "waterdragon_fireball_particle.png",
+            glow = 14
+        })
+        
+    end
+
+    -- Move the fireball and check for collisions
+    local function move_sphere()
+        if distance >= 40 then
+            create_fire_sphere(pos, sphere_radius)
+            return
+        end
+
+        local next_pos = vector.add(pos, vector.multiply(direction, 4))
+        local node = minetest.get_node(next_pos)
+
+        if node.name ~= "air" then
+            create_fire_sphere(pos, sphere_radius)
+            return
+        end
+
+        pos = next_pos
+        distance = distance + 1
+        spawn_fire_trail()
+        minetest.after(0.001, move_sphere)
+    end
+
+    move_sphere()
+end
+
 function breathe_pegasus_fire(self)
     if not minetest.get_modpath("pegasus") then return end
     if not self.fire_breathing then return end
@@ -1277,7 +1371,24 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     { x = 0, y = 0, z = 0 })
             end
         end
-
+        if control.jump and control.left and self.has_pegasus_fire and self.fire >= 3 then
+            local pos = self.object:get_pos()
+            if pos then
+                pos.y = pos.y + 2  -- Adjust for dragon's head height
+                local direction = vector.normalize(look_dir)
+                launch_fire_sphere(pos, direction)
+                self.fire = self.fire - 3  -- Consume 3 fire charges
+                self:memorize("fire", self.fire)
+                
+                -- Add visual/sound feedback
+                minetest.sound_play("waterdragon_fireball", {
+                    pos = pos,
+                    gain = 1.0,
+                    max_hear_distance = 20,
+                    loop = false
+                })
+            end
+        end
         if control.sneak or _self.hp == 0
             or player:get_player_name() ~= _self.owner then
             waterdragon.detach_player(_self, player)
