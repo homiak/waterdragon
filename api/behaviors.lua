@@ -1648,6 +1648,10 @@ function summon_fire_dragon(self)
 end
 
 modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
+	if target:get_luaentity() and (target:get_luaentity().name == "waterdragon:pure_water_dragon" or target:get_luaentity().name == "waterdragon:rare_water_dragon" or target:get_luaentity().name == "pegasus:pegasus" or target:get_luaentity().name == "waterdragon:scottish_dragon") then
+		self._target = nil
+		return true
+	end
 	local fire_attack_timer = 0
 	local is_fire_attack = true
 
@@ -1784,6 +1788,27 @@ modding.register_utility("waterdragon:follow_player", function(self, player)
 	self:set_utility(func)
 end)
 
+local function check_owner_falling(player)
+	if not player or not player:get_pos() then return false end
+	local pos = player:get_pos()
+
+	-- Check player's downward velocity
+	local velocity = player:get_velocity()
+	if not velocity or velocity.y > -3 then -- Only rescue if falling faster than -3
+		return false
+	end
+
+	-- Check if there's air below the player
+	for i = 1, 15 do
+		local check_pos = { x = pos.x, y = pos.y - i, z = pos.z }
+		local node = minetest.get_node(check_pos)
+		if node.name ~= "air" then
+			return false
+		end
+	end
+	return true
+end
+
 -- Utility Stack --
 
 waterdragon.dragon_behavior = {
@@ -1799,7 +1824,7 @@ waterdragon.dragon_behavior = {
 			local pos = self.object:get_pos()
 			if not pos then return end
 			local stance = (self.owner and self.stance) or "aggressive"
-			local skip = self.age < 20 or stance == "passive"
+			local skip = self.age < 15 or stance == "passive"
 			if skip then return 0 end -- Young/Passive Water Dragons don't attack
 			local target = self._target
 			if not target then
@@ -1903,6 +1928,60 @@ waterdragon.dragon_behavior = {
 			return 0
 		end
 	},
+	{ -- Rescue owner if falling
+		utility = "waterdragon:guardian_dive",
+		get_score = function(self)
+			if not self.owner then return 0 end
+			if not self.fly_allowed then return 0 end
+
+			local owner = minetest.get_player_by_name(self.owner)
+			if not owner then return 0 end
+
+			if check_owner_falling(owner) then
+				return 1.0, { self } -- Highest priority when owner is falling
+			end
+
+			return 0
+		end
+	},
+	{ -- Water rescue behavior
+		utility = "waterdragon:water_dive",
+		get_score = function(self)
+			if not self.owner then return 0 end
+			local owner = minetest.get_player_by_name(self.owner)
+			if not owner or not owner:get_pos() then return 0 end
+
+			for _, entity in pairs(minetest.luaentities) do
+				if entity.name == "waterdragon:rare_water_dragon" or entity.name == "waterdragon:pure_water_dragon" and
+					entity.rider and
+					entity.rider:get_player_name() == self.owner then
+					return 0 -- Owner already mounted, don't attempt rescue
+				end
+			end
+
+			local pos = owner:get_pos()
+			local node = minetest.get_node(pos)
+
+			-- Check if owner is in water
+			if minetest.get_item_group(node.name, "water") == 0 then
+				return 0
+			end
+
+			-- Check distance to nearest air block
+			for i = 1, 30 do
+				local check_pos = {
+					x = pos.x,
+					y = pos.y + i,
+					z = pos.z
+				}
+				if minetest.get_node(check_pos).name == "air" then
+					return 0
+				end
+			end
+
+			return 1, { self, owner }
+		end
+	},
 	{ -- Mounted
 		utility = "waterdragon:mount",
 		get_score = function(self)
@@ -1972,6 +2051,22 @@ waterdragon.scottish_dragon_behavior = {
 			return 0
 		end
 	},
+	{ -- Rescue owner if falling
+		utility = "waterdragon:guardian_dive",
+		get_score = function(self)
+			if not self.owner then return 0 end
+			if not self.fly_allowed then return 0 end
+
+			local owner = minetest.get_player_by_name(self.owner)
+			if not owner then return 0 end
+
+			if check_owner_falling(owner) then
+				return 1.0, { self } -- Highest priority when owner is falling
+			end
+
+			return 0
+		end
+	},
 	{ -- Water rescue behavior
 		utility = "waterdragon:water_dive",
 		get_score = function(self)
@@ -2026,10 +2121,6 @@ waterdragon.scottish_dragon_behavior = {
 					self._target = nil
 					return 0
 				end
-			end
-			if stance ~= "neutral" then
-				self._target = nil
-				return 0
 			end
 			local name = target:is_player() and target:get_player_name()
 			if name then
@@ -2126,5 +2217,48 @@ modding.register_utility("waterdragon:water_dive", function(self, player)
 			waterdragon.action_fly(self, target_pos, 2, "waterdragon:fly_simple", 1, "dive")
 		end
 	end
+	self:set_utility(func)
+end)
+
+modding.register_utility("waterdragon:guardian_dive", function(self)
+	local function func(_self)
+		if _self.rider then return true end
+
+		-- Get owner
+		local owner = _self.owner and minetest.get_player_by_name(_self.owner)
+		if not owner then return true end
+
+		-- Check if owner is still falling
+		if not check_owner_falling(owner) then
+			return true
+		end
+
+		local pos = _self.object:get_pos()
+		if not pos then return true end
+
+		local owner_pos = owner:get_pos()
+		local dist = vector.distance(pos, owner_pos)
+
+		-- If close enough, mount owner
+		if dist <= 10 then
+			waterdragon.attach_player(_self, owner)
+			return true
+		end
+
+		-- Move to falling owner
+
+		local target_pos = {
+			x = owner_pos.x,
+			y = owner_pos.y,
+			z = owner_pos.z
+		}
+		self.fly_allowed = true
+		waterdragon.action_fly(_self, target_pos, 3, "waterdragon:fly_simple", 1, "fly")
+		if dist <= 8 then
+			waterdragon.attach_player(_self, owner)
+			return true
+		end
+	end
+
 	self:set_utility(func)
 end)

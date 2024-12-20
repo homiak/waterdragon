@@ -133,7 +133,6 @@ modding.register_mob("waterdragon:rare_water_dragon", {
                     -- Notify owner about hunger
                     minetest.chat_send_player(self.owner, "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
 
-                    -- Start aggressive behavior if owner doesn't feed for 30 seconds
                     if not self.hunger_warning_time then
                         self.hunger_warning_time = minetest.get_gametime()
                     elseif minetest.get_gametime() - self.hunger_warning_time > 30 then
@@ -215,8 +214,11 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         if self.punch_data.count >= 6 then
             -- Reset the counter
             self.punch_data.count = 0
-            if self.rider then return end
             -- Make the dragon attack the puncher
+            if puncher == self.rider then
+                waterdragon.detach_player(self, puncher)
+                self.fly_allowed = true
+            end
             self._target = puncher
             local tgt_pos = puncher:get_pos()
             self:breath_attack(tgt_pos)

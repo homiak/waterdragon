@@ -253,7 +253,6 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		end
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
-		if puncher == self.rider then return end
 		-- Initialize punch tracking
 		if not self.punch_data then
 			self.punch_data = { count = 0, last_punch_time = 0, attacker = nil }
@@ -274,12 +273,23 @@ modding.register_mob("waterdragon:scottish_dragon", {
 
 		-- If punched 6 times within 30 seconds, attack the puncher
 		if self.punch_data.count >= 6 then
-			-- Reset the counter
-			self.punch_data.count = 0
-			if self.rider then return end
+			if puncher == self.owner then
+				if self.rider then
+				waterdragon.detach_player(self, puncher)
+				end
+				if self.passenger then
+					waterdragon.detach_passenger(self, self.passenger)
+				end
+				self.fly_allowed = true
+			end
+			
+
 			-- Make the dragon attack the puncher
+
 			self._target = puncher
 			self:initiate_utility("waterdragon:scottish_dragon_attack", puncher)
+			-- Reset the counter
+			self.punch_data.count = 0
 		end
 		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
