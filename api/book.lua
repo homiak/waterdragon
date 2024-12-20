@@ -223,23 +223,106 @@ local book_pages = {
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-	{ -- Steel Page 2
-		{ -- Forge Instructions
-			element_type = "image",
-			offset = { x = 1.5, y = 0.5 },
-			size = { x = 5, y = 10 },
-			text = "waterdragon_book_img_forge_instructions.png"
-		},
-		{ -- Forge Label
+	{ -- Steel Page 2 Instructions
+		{
 			element_type = "label",
+			font_size = 20,
+			offset = { x = 3.5, y = 1 },
+			text = "Step 1",
+		},
+		{
+			element_type = "image",
+			offset = { x = 0.5, y = 2 }, -- Centered on left page
+			size = { x = 7, y = 6 },
+			text = "waterdragon_book_scr1.png",
+			unlock_key = "draconic_steel",
+		},
+		{
+			element_type = "image",
+			offset = { x = 8.5, y = 2 }, -- Centered on right page
+			size = { x = 7, y = 5 },
+			text = "waterdragon_book_scr2.png",
+			unlock_key = "draconic_steel",
+		},
+		{
+			element_type = "label",
+			font_size = 20,
+			offset = { x = 11.5, y = 1 },
+			text = "Step 2",
+		},
+		{ -- Next Page
+			element_type = "image_button",
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
+		},
+		{ -- Last Page
+			element_type = "image_button",
 			font_size = 24,
-			offset = { x = 2, y = 0.5 },
-			text = "Constructing a Forge:"
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+		}
+	},
+	{ -- Steel Page 3 Instructions
+		{
+			element_type = "label",
+			font_size = 20,
+			offset = { x = 3.5, y = 1 },
+			text = "Step 3",
+		},
+		{
+			element_type = "image",
+			offset = { x = 0.5, y = 2 }, -- Centered on left page
+			size = { x = 7, y = 5 },
+			text = "waterdragon_book_scr3.png",
+			unlock_key = "draconic_steel",
+		},
+		{
+			element_type = "label",
+			font_size = 20,
+			offset = { x = 11.5, y = 1 },
+			text = "Step 4",
+		},
+		{
+			element_type = "image",
+			offset = { x = 8.5, y = 2 }, -- Centered on right page
+			size = { x = 7, y = 5 },
+			text = "waterdragon_book_scr4.png",
+			unlock_key = "draconic_steel",
+		},
+		{ -- Next Page
+			element_type = "image_button",
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false"
+		},
+		{ -- Last Page
+			element_type = "image_button",
+			font_size = 24,
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
+		}
+	},
+	{ -- Steel Page 4 Instructions
+		{
+			element_type = "label",
+			font_size = 20,
+			offset = { x = 3.5, y = 1 },
+			text = "Step 5",
+		},
+		{
+			element_type = "image",
+			offset = { x = 0.5, y = 2 }, -- Centered on left page
+			size = { x = 7, y = 5 },
+			text = "waterdragon_book_scr5.png",
+			unlock_key = "draconic_steel",
 		},
 		{ -- Page 2
 			element_type = "label",
 			font_size = 24,
-			offset = { x = 8, y = 0.5 },
+			offset = { x = 8, y = 1.5 },
 			file = "waterdragon_book_steel3.txt"
 		},
 		{ -- Next Page
@@ -250,12 +333,13 @@ local book_pages = {
 		},
 		{ -- Last Page
 			element_type = "image_button",
+			font_size = 24,
 			offset = { x = 1, y = 9 },
 			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_last.png;btn_last;;true;false"
 		}
 	},
-	{ -- Steel Page 3
+	{ -- Steel Page 5
 		{ -- Main Page
 			element_type = "label",
 			font_size = 24,
