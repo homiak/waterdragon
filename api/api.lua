@@ -1302,7 +1302,7 @@ waterdragon.wtd_api = {
 		if self.growth_scale < 0.25 then
 			eyes = "waterdragon_" .. dragon_type .. "_eyes_child_" .. self.eye_color .. ".png"
 		end
-		if self._anim == "sleep" then
+		if self.get_action("sleep") then
 			self.object:set_properties({
 				textures = { "(" .. texture .. modifier .. ")" }
 			})
@@ -1981,6 +1981,7 @@ function waterdragon.dragon_activate(self)
 	if self.name == "waterdragon:pure_water_dragon" then
 		dragon_type = "pure_water"
 	end
+	self.eyes_peeled = self:recall("eyes_peeled") or false
 	generate_texture(self)
 	self.eye_color = self:recall("eye_color")
 	if not self.eye_color then

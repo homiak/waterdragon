@@ -858,20 +858,33 @@ end
 -- Sleep
 
 modding.register_utility("waterdragon:sleep", function(self)
-	local function func(_self)
-		if not _self:get_action() then
-			_self.object:set_yaw(_self.object:get_yaw())
-			modding.action_idle(_self, 3, "sleep")
-		end
-		-- Increment flight stamina while sleeping
-		minetest.after(1, function()
-			if _self.flight_stamina < 300 then
-				_self.flight_stamina = math.min(_self.flight_stamina * 2, 300)
-				func(_self) -- Call again to keep the loop going each second
-			end
-		end)
-	end
-	self:set_utility(func)
+    local function func(_self)
+        -- Check time of day
+        local time = (minetest.get_timeofday() or 0) * 24000
+        local is_night = time > 19500 or time < 4500
+
+        -- Set eyes state based on time
+        if is_night then
+            self.eyes_open = false
+        else
+            self.eyes_open = true
+        end
+        self:memorize("eyes_open", self.eyes_open)
+
+        if not _self:get_action() then
+            _self.object:set_yaw(_self.object:get_yaw())
+            modding.action_idle(_self, 3, "sleep")
+        end
+        
+        -- Increment flight stamina while sleeping
+        minetest.after(1, function()
+            if _self.flight_stamina < 300 then
+                _self.flight_stamina = math.min(_self.flight_stamina * 2, 300)
+                func(_self)
+            end
+        end)
+    end
+    self:set_utility(func)
 end)
 
 -- Wander

@@ -61,7 +61,20 @@ local function get_dragon_formspec(self)
 	local stamina = self.flight_stamina / 900 * 100
 	local breath = self.attack_stamina / 100 * 100
 	-- Visuals
-	local frame_range = self.animations["stand"].range
+	local frame_range
+	if self._anim and self.animations[self._anim] then
+		frame_range = self.animations[self._anim].range
+	else
+		frame_range = self.animations["stand"].range
+	end
+
+	local frame_speed
+	if self._anim and self.animations[self._anim] then
+		frame_speed = self.animations[self._anim].speed
+	else
+		frame_speed = self.animations["stand"].speed
+	end
+
 	local frame_loop = frame_range.x .. "," .. frame_range.y
 	local texture = self:get_props().textures[1]
 	local health_ind = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png"
@@ -84,7 +97,7 @@ local function get_dragon_formspec(self)
 		"label[6.8,0.8;" .. correct_name(self.name) .. " (" .. correct_name(self.gender) .. ")]",
 		"label[7,1.5;" .. current_age .. " " .. S("Year(s) Old") .. "]",
 		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or S("Set Name")) .. "]",
-		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]",
+		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";" .. frame_speed .. "]",
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
@@ -136,13 +149,13 @@ function get_customize_formspec(self)
 		}
 	elseif self.name == "waterdragon:scottish_dragon" then
 		form = {
-            "formspec_version[4]",
-            "size[12,6]",
-            "dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow,Purple;1]",
-            "label[5.1,0.8;Eye Colour]",
-            "model[1.5,1.7;10,7;mob_mesh;" ..
-            self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
-        }
+			"formspec_version[4]",
+			"size[12,6]",
+			"dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow,Purple;1]",
+			"label[5.1,0.8;Eye Colour]",
+			"model[1.5,1.7;10,7;mob_mesh;" ..
+			self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
+		}
 	end
 
 	return table.concat(form, "")
@@ -407,7 +420,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local name = player:get_player_name()
 		local ent = form_objref[name]
 		if not ent or not ent.object then return end
-		
+
 		-- Handle Scottish Dragon
 		if ent.name == "waterdragon:scottish_dragon" then
 			if fields.drp_eyes then
@@ -418,7 +431,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					["Yellow"] = "yellow",
 					["Purple"] = "purple",
 				}
-				
+
 				if eyes[fields.drp_eyes] and ent.object:get_properties() then
 					ent.scottish_eye_colour = eyes[fields.drp_eyes]
 					local base_texture = "waterdragon_scottish_dragon.png"
@@ -432,11 +445,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				return
 			end
 		end
-		
+
 		-- Handle Water Dragons
 		if ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon" then
 			local type = (ent.name == "waterdragon:pure_water_dragon") and "pure_water" or "rare_water"
-			
+
 			local wings = {
 				rare_water = {
 					["Red"] = "#d20000",
@@ -467,7 +480,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					["Yellow"] = "yellow"
 				}
 			}
-			
+
 			-- Check for wing color changes
 			if fields.drp_wing and wings[type] and wings[type][fields.drp_wing] then
 				if ent.object:get_properties() then
@@ -476,7 +489,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					waterdragon.generate_texture(ent, true)
 				end
 			end
-			
+
 			-- Check for eye color changes
 			if fields.drp_eyes and eyes[type] and eyes[type][fields.drp_eyes] then
 				if ent.object:get_properties() then
@@ -485,13 +498,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					ent:update_emission(true)
 				end
 			end
-			
+
 			-- Show formspec again only if entity still exists
 			if ent.object:get_pos() then
 				minetest.show_formspec(name, "waterdragon:customize", get_customize_formspec(ent))
 			end
 		end
-		
+
 		if fields.quit or fields.key_enter then
 			form_objref[name] = nil
 		end
