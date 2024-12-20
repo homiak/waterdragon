@@ -2015,6 +2015,7 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
+	self.armour = self:recall("armour") or false
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
 	if not self.gender then

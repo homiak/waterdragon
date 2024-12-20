@@ -173,14 +173,13 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     on_rightclick = function(self, clicker)
         waterdragon.dragon_rightclick(self, clicker)
         local item = clicker:get_wielded_item()
-        local item_name = item:get_name()
-        if minetest.get_item_group(item_name, "water_dragon_armour") > 0 then
-            local armour_def = minetest.registered_items[item_name]
-            if armour_def and armour_def.on_use then
-                self:memorize("armour", self.armour)
-                return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
-            end
-        end
+		local item_name = item:get_name()
+		if minetest.get_item_group(item_name, "wtd_armour") > 0 then
+			local armour_def = minetest.registered_items[item_name]
+			if armour_def and armour_def.on_use then
+				return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
+			end
+		end
     end,
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if puncher == self.rider then return end

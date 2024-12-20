@@ -241,11 +241,10 @@ modding.register_mob("waterdragon:scottish_dragon", {
 		end
 	end,
 	on_rightclick = function(self, clicker)
-		if clicker == self.rider then return end
 		waterdragon.scottish_dragon_rightclick(self, clicker)
 		local item = clicker:get_wielded_item()
 		local item_name = item:get_name()
-		if minetest.get_item_group(item_name, "water_dragon_armour") > 0 then
+		if minetest.get_item_group(item_name, "wtd_armour") > 0 then
 			local armour_def = minetest.registered_items[item_name]
 			if armour_def and armour_def.on_use then
 				return armour_def.on_use(item, clicker, { type = "object", ref = self.object })

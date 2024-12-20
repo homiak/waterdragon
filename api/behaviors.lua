@@ -1173,6 +1173,103 @@ modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, 
 end)
 
 
+-- Water Dragon breaking
+
+
+modding.register_utility("waterdragon:wtd_breaking", function(self, player)
+	self.fly_allowed = true
+	local center = self.object:get_pos()
+	if not center then return end
+	local taming = 0
+	local feed_timer = 15
+	local throw_timer = 3 -- Timer for throwing the player
+
+	local function func(_self)
+		if not player or not player:get_pos() then
+			return true
+		end
+
+		local name = player:get_player_name()
+		local item = player:get_wielded_item()
+		local item_name = item:get_name()
+		local def = minetest.registered_items[item_name]
+		local has_meat = minetest.get_item_group(item_name, "meat") == 1 or
+			minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
+
+		-- Check if player has bowed and has meat
+		if not has_bowed_to_dragon(name, self) or not has_meat then
+			throw_timer = throw_timer - _self.dtime
+			if throw_timer <= 0 then
+				minetest.chat_send_player(name,
+					S("The Water Dragon has thrown you off because you must or bow to it or hold meat in hand"))
+				waterdragon.detach_player(_self, player)
+				return true
+			end
+		end
+
+		local pos = _self.object:get_pos()
+		if not pos then return end
+
+		-- Player Interaction
+		if player:get_player_control().sneak then
+			waterdragon.detach_player(_self, player)
+			return true
+		end
+
+		feed_timer = feed_timer - _self.dtime
+		if feed_timer <= 0 then
+			if has_meat then
+				if not minetest.is_creative_enabled(player) then
+					item:take_item()
+					player:set_wielded_item(item)
+				end
+				-- Add particle effects
+				local particle_pos = vector.add(pos, vector.multiply(vector.normalize(self.object:get_velocity()), 12))
+				minetest.add_particlespawner({
+					amount = 3,
+					time = 0.1,
+					minpos = particle_pos,
+					maxpos = particle_pos,
+					minvel = { x = -1, y = 1, z = -1 },
+					maxvel = { x = 1, y = 2, z = 1 },
+					minacc = { x = 0, y = -5, z = 0 },
+					maxacc = { x = 0, y = -9, z = 0 },
+					minexptime = 1,
+					maxexptime = 1,
+					minsize = 4,
+					maxsize = 6,
+					collisiondetection = true,
+					vertical = false,
+					texture = def.inventory_image,
+				})
+
+				taming = taming + 10
+				minetest.chat_send_player(name,
+					S("The Water Dragon ate some ") .. def.description .. "! Taming progress: " .. taming .. "%")
+
+				if taming >= 100 then
+					minetest.chat_send_player(name, S("The Water Dragon has been tamed!"))
+					_self.owner = _self:memorize("owner", player:get_player_name())
+					return true
+				end
+			end
+			feed_timer = 10
+		end
+
+		-- Flying behavior while taming
+		if not _self:get_action() then
+			if _self.touching_ground then
+				waterdragon.action_takeoff(_self)
+			else
+				local pos2 = _self:get_wander_pos_3d(6, 9)
+				waterdragon.action_fly(_self, pos2, 3, "waterdragon:fly_simple", 0.6)
+			end
+		end
+	end
+	self:set_utility(func)
+end)
+
+
 -- Attack
 
 
@@ -1954,6 +2051,16 @@ waterdragon.dragon_behavior = {
 				return 1.0, { self } -- Highest priority when owner is falling
 			end
 
+			return 0
+		end
+	},
+	{ -- Taming
+		utility = "waterdragon:wtd_breaking",
+		get_score = function(self)
+			if self.rider
+				and not self.owner then
+				return 0.9, { self, self.rider }
+			end
 			return 0
 		end
 	},

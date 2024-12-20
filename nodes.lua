@@ -1,9 +1,10 @@
 -----------
 -- Nodes --
 -----------
-local S = waterdragon.S
 
 -- Local Utilities --
+
+local S = waterdragon.S
 
 local stair_queue = {}
 
@@ -163,7 +164,6 @@ register_node("waterdragon:bone_pile_wet", {
     sounds = waterdragon.sounds.wood
 })
 
-local S = waterdragon.S
 local random = math.random
 
 local steel_ingot = "default:steel_ingot"
@@ -677,7 +677,7 @@ function update_forge_form(meta, forge_type)
 end
 
 minetest.register_craftitem("waterdragon:scottish_dragon_steel_ingot", {
-    description = S("Scottish Dragon Steel Ingot"),
+    description = S("Scottish Dragon-Forged Steel Ingot"),
     inventory_image = "waterdragon_scottish_dragon_steel_ingot.png",
 })
 

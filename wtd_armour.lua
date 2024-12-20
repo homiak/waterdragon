@@ -54,7 +54,6 @@ minetest.register_on_joinplayer(function(player)
                     local props = obj:get_properties()
                     props.textures[1] = player_armor_state[name].texture
                     obj:set_properties(props)
-                    minetest.chat_send_player(name, "Your Water Dragon's armor has been restored.")
                     player_armor_state[name] = nil
                     break
                 end
@@ -73,13 +72,12 @@ waterdragon.register_mob_armour = function(name, def)
     minetest.register_craftitem(itemname, {
         description = def.description or ("Water Dragon Armour: " .. name .. " (Protection: " .. def.protection .. ")"),
         inventory_image = def.inventory_image,
-        groups = { water_dragon_armour = 1 },
+        groups = { wtd_armour = 1 },
 
         on_use = function(itemstack, user, pointed_thing)
             if pointed_thing.type == "object" then
                 local obj = pointed_thing.ref
                 local ent = obj:get_luaentity()
-                ent.armour = ent.armour or false
                 if ent and ent.name == def.mob_name then
                     ent.armour = {
                         name = name,
@@ -90,7 +88,7 @@ waterdragon.register_mob_armour = function(name, def)
                     props.textures[1] = def.dragon_armour_texture
                     obj:set_properties(props)
                     itemstack:take_item()
-                    ent.armour = true
+                    ent:memorize("armour", ent.armour)
                     return itemstack
                 end
             end
