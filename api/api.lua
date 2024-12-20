@@ -1302,15 +1302,42 @@ waterdragon.wtd_api = {
 		if self.growth_scale < 0.25 then
 			eyes = "waterdragon_" .. dragon_type .. "_eyes_child_" .. self.eye_color .. ".png"
 		end
-		if self.get_action("sleep") then
+		local time = (minetest.get_timeofday() or 0) * 24000
+        local is_night = time > 19500 or time < 4500
+		if self:get_action("sleep") then
+			local eyes_texture
+			if is_night then
+				-- Если ночь, устанавливаем текстуру глаз с peeled
+				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. "_peeled.png"
+			else
+				-- Если не ночь, используем обычную текстуру глаз
+				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
+			end
+			
 			self.object:set_properties({
-				textures = { "(" .. texture .. modifier .. ")" }
+				textures = { "(" .. texture .. modifier .. ")^" .. eyes_texture }
 			})
-		else
+		elseif not self:get_action("sleep") then
+			local eyes_texture
+			if is_night and self.eyes_peeled then
+				-- Если ночь и eyes_peeled, устанавливаем peeled текстуру глаз
+				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. "_peeled.png"
+			else
+				-- В остальных случаях используем обычные глаза
+				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
+			end
+			
 			self.object:set_properties({
-				textures = { "(" .. texture .. modifier .. ")^" .. eyes }
+				textures = { "(" .. texture .. modifier .. ")^" .. eyes_texture }
 			})
 		end
+		
+		if is_night and self:get_action("sleep") then
+			self.eyes_peeled = true
+		else
+			self.eyes_peeled = false
+		end
+		
 	end,
 	-- Dynamic Animation Methods
 	tilt_to = function(self, tyaw, rate)
