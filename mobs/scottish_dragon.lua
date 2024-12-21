@@ -283,7 +283,7 @@ modding.register_mob("waterdragon:scottish_dragon", {
 			end
 			
 
-			-- Make the dragon attack the puncher
+			-- Make the Dragon attack the puncher
 
 			self._target = puncher
 			self:initiate_utility("waterdragon:scottish_dragon_attack", puncher)
@@ -325,7 +325,7 @@ modding.register_mob_spawn("waterdragon:scottish_dragon", {
 	min_group = 1,
 	max_group = 2,
 	biomes = biomes,
-	nodes = { "group:leaves" }
+	nodes = { "group:snow" }
 })
 
 

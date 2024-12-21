@@ -23,7 +23,7 @@ water_register_stairs (Register Stairs) bool true
 water_unique_color_chance (Unique Colour Chance) int 65
 
 #   Scottish Dragon Spawn Rate, the setting changes the spawn rate of the Scottish Dragons
-scottish_dragon_spawn_rate (Scottish Dragon Spawn Rate) int 300 100 500
+scottish_dragon_spawn_rate (Scottish Dragon Spawn Rate) int 100 
 
 
 

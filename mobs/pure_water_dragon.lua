@@ -457,6 +457,20 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 				return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
 			end
 		end
+		-- Allow mounting wild Water Dragons
+		if not self.rider and item_name == "" then
+			if self.owner and clicker:get_player_control().sneak then
+				self:show_formspec(clicker)
+			else
+				waterdragon.attach_player(self, clicker)
+				-- If wild Dragon, start breaking utility
+				if not self.owner then
+					if self.object and self.object:get_luaentity() then
+						self:initiate_utility("waterdragon:wtd_breaking", self)
+					end
+				end
+			end
+		end
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if puncher == self.rider then return end

@@ -1907,13 +1907,30 @@ minetest.register_craftitem("waterdragon:scottish_dragon_crate", {
 								new_ent.scottish_id = bound_id
 								new_ent.hp = stored_data.hp
 								new_ent.nametag = stored_data.name
-								new_ent.name_tag = stored_data.name
+								new_ent.scottish_eye_colour = stored_data.scottish_eye_colour
+								new_ent.order = stored_data.order
+								new_ent.stance = stored_data.stance
+								new_ent.hunger = stored_data.hunger
+								new_ent.fly_allowed = stored_data.fly_allowed
+								new_ent.flight_stamina = stored_data.flight_stamina
+								
 								if new_ent.memorize then
 									new_ent:memorize("owner", new_ent.owner)
 									new_ent:memorize("scottish_id", new_ent.scottish_id)
 									new_ent:memorize("hp", new_ent.hp)
 									new_ent:memorize("nametag", new_ent.nametag)
-									new_ent:memorize("name_tag", new_ent.name_tag)
+									new_ent:memorize("scottish_eye_colour", new_ent.scottish_eye_colour)
+									new_ent:memorize("order", new_ent.order)
+									new_ent:memorize("stance", new_ent.stance)
+									new_ent:memorize("hunger", new_ent.hunger)
+									new_ent:memorize("fly_allowed", new_ent.fly_allowed)
+									new_ent:memorize("flight_stamina", new_ent.flight_stamina)
+									
+
+									if minetest.get_modpath("pegasus") then
+										new_ent:memorize("fire", new_ent.fire)
+									end
+									
 								end
 								if new_ent.nametag ~= "" then
 									new_dragon:set_properties({ nametag = new_ent.nametag })

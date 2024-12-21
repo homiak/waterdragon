@@ -1303,7 +1303,7 @@ waterdragon.wtd_api = {
 			eyes = "waterdragon_" .. dragon_type .. "_eyes_child_" .. self.eye_color .. ".png"
 		end
 		local time = (minetest.get_timeofday() or 0) * 24000
-        local is_night = time > 19500 or time < 4500
+		local is_night = time > 19500 or time < 4500
 		if self:get_action("sleep") then
 			local eyes_texture
 			if is_night then
@@ -1313,7 +1313,7 @@ waterdragon.wtd_api = {
 				-- Если не ночь, используем обычную текстуру глаз
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
 			end
-			
+
 			self.object:set_properties({
 				textures = { "(" .. texture .. modifier .. ")^" .. eyes_texture }
 			})
@@ -1326,18 +1326,17 @@ waterdragon.wtd_api = {
 				-- В остальных случаях используем обычные глаза
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
 			end
-			
+
 			self.object:set_properties({
 				textures = { "(" .. texture .. modifier .. ")^" .. eyes_texture }
 			})
 		end
-		
+
 		if is_night and self:get_action("sleep") then
 			self.eyes_peeled = true
 		else
 			self.eyes_peeled = false
 		end
-		
 	end,
 	-- Dynamic Animation Methods
 	tilt_to = function(self, tyaw, rate)
@@ -2821,6 +2820,9 @@ local dragon_dialogue = {
 			"My breath level is:"
 		},
 
+		["thank you"] = {
+			"You are welcome. If you have something to ask, just ask me!"
+		},
 		["how much health do you have"] = {
 			"My health level is:",
 			"My health level is:",
@@ -2941,6 +2943,9 @@ local dragon_dialogue = {
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
 					return false, "I only carry my chosen rider."
 				end
+				if not dragon.owner then
+					return false, "I only carry my chosen rider."
+				end
 
 				waterdragon.attach_player(dragon, player)
 				return true
@@ -2954,7 +2959,18 @@ local dragon_dialogue = {
 				if dragon.is_landed then
 					return false, "I am already on the ground."
 				end
-				dragon:action_flight_to_land()
+				function action_flight_to_land(self)
+					if not self:get_action() then
+						modding.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
+					end
+					if self.touching_ground then
+						waterdragon.action_land(self)
+						return true
+					end
+					return false
+				end
+
+				action_flight_to_land(dragon)
 				if dragon.touching_ground then
 					waterdragon.action_land(dragon)
 				end
@@ -3117,6 +3133,87 @@ local dragon_dialogue = {
 				end
 
 				dragon.fly_allowed = false
+				return true
+			end
+		},
+		["come here"] = {
+			name = "come",
+			response = "*The Dragon spreads its wings and flies towards you*",
+			action = function(dragon, player)
+				local function flying_to_owner(self, player)
+					-- Get owner position
+					local owner_pos = player:get_pos()
+					if not owner_pos then return end
+
+					-- First fly towards owner
+					local pos = self.object:get_pos()
+					local dist = vector.distance(pos, owner_pos)
+
+					if dist > 5 then
+						waterdragon.action_fly(self, owner_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+						return true
+					end
+					return false
+				end
+				if dragon.owner and dragon.owner ~= player:get_player_name() then
+					return false, "I take orders only from my chosen companion."
+				end
+
+				flying_to_owner(dragon, player)
+				return true
+			end
+		},
+
+		["you can do it"] = {
+			name = "cheer",
+			response = "*The Dragon roars proudly*",
+			action = function(dragon, player)
+				if not dragon._target then
+					return false, "I am not in battle right now."
+				end
+
+				-- Boost Dragon's damage temporarily
+				local old_damage = dragon.damage
+				dragon.damage = dragon.damage * 1.5
+				dragon.hp = dragon.hp * 1.5
+				dragon.flight_stamina = dragon.flight_stamina * 1.5
+
+				-- Visual effects
+				local pos = dragon.object:get_pos()
+				if pos then
+					minetest.add_particlespawner({
+						amount = 30,
+						time = 1,
+						minpos = { x = pos.x - 1, y = pos.y, z = pos.z - 1 },
+						maxpos = { x = pos.x + 1, y = pos.y + 2, z = pos.z + 1 },
+						minvel = { x = -1, y = 0, z = -1 },
+						maxvel = { x = 1, y = 2, z = 1 },
+						minacc = { x = 0, y = 0, z = 0 },
+						maxacc = { x = 0, y = 1, z = 0 },
+						minexptime = 1,
+						maxexptime = 2,
+						minsize = 2,
+						maxsize = 4,
+						texture = "waterdragon_particle_green.png",
+						glow = 14
+					})
+				end
+
+				-- Reset damage after 5 seconds
+				minetest.after(5, function()
+					if dragon and dragon.object then
+						dragon.damage = old_damage
+					end
+				end)
+
+				-- Play roar sound
+				minetest.sound_play("waterdragon_water_dragon_random_3", {
+					object = dragon.object,
+					gain = 1.0,
+					max_hear_distance = 32,
+					pitch = 1.2
+				})
+
 				return true
 			end
 		},
@@ -3456,7 +3553,7 @@ local function handle_transport(dragon, player, message)
 			end
 			waterdragon.action_land(dragon)
 			if dragon.rider then
-			waterdragon.detach_player(dragon, player)
+				waterdragon.detach_player(dragon, player)
 			end
 			dragon.transport_rider = false
 			minetest.chat_send_player(player:get_player_name(), "Dragon: We have arrived")

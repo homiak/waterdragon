@@ -716,7 +716,7 @@ minetest.register_on_generated(function(minp, maxp)
 end)
 
 minetest.register_node("waterdragon:scottish_dragon_dragonstone_block", {
-	description = S("Scottish Dragon Dragonstone Block"),
+	description = S("Scottish Dragonstone Block"),
 	tiles = { "waterdragon_scottish_dragon_forge_bottom.png" },
 	groups = { cracky = 1 },
 	is_ground_content = false,

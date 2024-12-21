@@ -124,14 +124,15 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         dragon_stay_behavior(self)
         waterdragon.eat_dropped_item(self, item)
         -- Add to waterdragon.dragon_step function
-        if self:timer(1) then                                -- Check every second
+        if self:timer(1) then                                        -- Check every second
             local scale = self.growth_scale or 1
             local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
 
             if self.hunger and self.hunger < hunger_threshold then
                 if self.owner then
                     -- Notify owner about hunger
-                    minetest.chat_send_player(self.owner, "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
+                    minetest.chat_send_player(self.owner,
+                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
 
                     if not self.hunger_warning_time then
                         self.hunger_warning_time = minetest.get_gametime()
@@ -173,13 +174,25 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     on_rightclick = function(self, clicker)
         waterdragon.dragon_rightclick(self, clicker)
         local item = clicker:get_wielded_item()
-		local item_name = item:get_name()
-		if minetest.get_item_group(item_name, "wtd_armour") > 0 then
-			local armour_def = minetest.registered_items[item_name]
-			if armour_def and armour_def.on_use then
-				return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
-			end
-		end
+        local item_name = item:get_name()
+        if minetest.get_item_group(item_name, "wtd_armour") > 0 then
+            local armour_def = minetest.registered_items[item_name]
+            if armour_def and armour_def.on_use then
+                return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
+            end
+        end
+        -- Allow mounting wild Water Dragons
+        if not self.rider and item_name == "" then
+            if self.owner and clicker:get_player_control().sneak then
+                self:show_formspec(clicker)
+            else
+                waterdragon.attach_player(self, clicker)
+                -- If wild Dragon, start breaking utility
+                if not self.owner then
+                    self:initiate_utility("waterdragon:wtd_breaking", clicker)
+                end
+            end
+        end
     end,
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if puncher == self.rider then return end
@@ -337,14 +350,13 @@ function rescue_pegasus(rescuer, pegasus)
         end
         for t = 1, flight_duration do
             minetest.after(t, function()
-                local current_pos = rescuer:get_pos()
                 local progress = t / flight_duration
                 local new_pos = {
                     x = start_pos.x + (rescue_pos.x - start_pos.x) * progress,
                     y = smooth_flight(t),
                     z = start_pos.z + (rescue_pos.z - start_pos.z) * progress
                 }
-                waterdragon.action_fly(rescuer, new_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+                waterdragon.action_fly(pegasus, new_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
             end)
         end
         minetest.after(flight_duration + 1, function()

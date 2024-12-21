@@ -4,6 +4,51 @@
 
 local S = waterdragon.S
 
+-- Defend owner
+
+local function has_tamed_dragons(player_name)
+    for _, obj in pairs(minetest.luaentities) do
+        -- Check if object exists before getting entity
+        if obj and obj.get_luaentity then
+            local ent = obj:get_luaentity()
+            if ent and (ent.name == "waterdragon:scottish_dragon" or 
+                       ent.name == "waterdragon:pure_water_dragon" or
+                       ent.name == "waterdragon:rare_water_dragon") and
+               ent.owner == player_name then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Add this function to behaviors.lua
+local function defend_owner(attacker, target)
+    if not target:is_player() then return false end
+    
+    local target_name = target:get_player_name()
+    if not has_tamed_dragons(target_name) then return false end
+    
+    -- Get all tamed Dragons of the target player
+    for _, obj in pairs(minetest.luaentities) do
+        local ent = obj:get_luaentity()
+        if ent and (ent.name == "waterdragon:scottish_dragon" or 
+                   ent.name == "waterdragon:pure_water_dragon" or
+                   ent.name == "waterdragon:rare_water_dragon") and
+           ent.owner == target_name then
+            -- Perform repel action
+            waterdragon.action_repel(ent)
+        end
+    end
+    
+    -- Make attacker choose new target
+    if attacker and attacker:get_luaentity() then
+        attacker:get_luaentity()._target = nil
+    end
+    
+    return true
+end
+
 -- Slam
 
 local function new_water_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
@@ -232,20 +277,6 @@ local function shared_owner(obj1, obj2)
 		return obj1.owner and obj2.owner and obj1.owner == obj2.owner
 	end
 	return false
-end
-
-local function get_target_group(target, radius)
-	local pos = target:get_pos()
-	local objects = minetest.get_objects_in_area(vec_sub(pos, radius or 8), vec_add(pos, radius or 8))
-	local group = {}
-	for _, object in ipairs(objects) do
-		local ent = object and object:get_luaentity()
-		if ent
-			and not ent._ignore then
-			table.insert(group, object)
-		end
-	end
-	return group
 end
 
 local function find_target(self, list)
@@ -876,11 +907,10 @@ modding.register_utility("waterdragon:sleep", function(self)
             modding.action_idle(_self, 3, "sleep")
         end
         
-        -- Increment flight stamina while sleeping
         minetest.after(1, function()
             if _self.flight_stamina < 300 then
-                _self.flight_stamina = math.min(_self.flight_stamina * 2, 300)
-                func(_self)
+                _self.flight_stamina = math.min(_self.flight_stamina + (_self.flight_stamina * 0.2), 300)
+                func(_self) 
             end
         end)
     end
@@ -1931,6 +1961,7 @@ waterdragon.dragon_behavior = {
 	{ -- Attack
 		utility = "waterdragon:attack",
 		get_score = function(self)
+			
 			local pos = self.object:get_pos()
 			if not pos then return end
 			local stance = (self.owner and self.stance) or "aggressive"
@@ -1948,6 +1979,11 @@ waterdragon.dragon_behavior = {
 					or shared_owner(self, target) then
 					self._target = nil
 					return 0
+				end
+			end
+			if target and target:is_player() then
+				if defend_owner(self.object, target) then
+					return 0 -- Stop attack if target is protected
 				end
 			end
 			local scale = self.growth_scale
