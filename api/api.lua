@@ -2008,6 +2008,7 @@ function waterdragon.dragon_activate(self)
 		dragon_type = "pure_water"
 	end
 	self.eyes_peeled = self:recall("eyes_peeled") or false
+	self.pegasus_rescue_initialized = self.pegasus_rescue_initialized or false
 	generate_texture(self)
 	self.eye_color = self:recall("eye_color")
 	if not self.eye_color then
@@ -3015,66 +3016,74 @@ local dragon_dialogue = {
 			name = "fire",
 			response = "*The Dragon begins to breathe ancient water*",
 			action = function(dragon, player)
-				local continuous_actions = {}
-				-- Check attack stamina
-				if dragon.attack_stamina <= 0 then
-					return false, "I must rest to regain my breath power."
-				end
-
-				if not check_cooldown(player:get_player_name(), "attack") then
-					return false, "I need more time to recover my strength of water breathing."
-				end
-
-				-- Start continuous breathing
-				continuous_actions[dragon.wtd_id] = function()
-					if not dragon or not dragon.object then return end
-
-					-- Check attack stamina again
+				-- Проверяем тип дракона
+				local dragon_name = dragon.object and dragon.object:get_luaentity() and dragon.object:get_luaentity().name
+				if dragon_name == "waterdragon:rare_water_dragon" or dragon_name == "waterdragon:pure_water_dragon" then
+					local continuous_actions = {}
+		
+					-- Check attack stamina
 					if dragon.attack_stamina <= 0 then
-						continuous_actions[dragon.wtd_id] = nil
-						if dragon.owner then
-							minetest.chat_send_player(dragon.owner, "Dragon: *I must rest my breath*")
+						return false, "I must rest to regain my breath power."
+					end
+		
+					if not check_cooldown(player:get_player_name(), "attack") then
+						return false, "I need more time to recover my strength of water breathing."
+					end
+		
+					-- Start continuous breathing
+					continuous_actions[dragon.wtd_id] = function()
+						if not dragon or not dragon.object then return end
+		
+						-- Check attack stamina again
+						if dragon.attack_stamina <= 0 then
+							continuous_actions[dragon.wtd_id] = nil
+							if dragon.owner then
+								minetest.chat_send_player(dragon.owner, "Dragon: *I must rest my breath*")
+							end
+							return
 						end
-						return
+		
+						local current_yaw = dragon.object:get_yaw()
+						local current_dir = minetest.yaw_to_dir(current_yaw)
+						local current_pos = dragon.object:get_pos()
+		
+						if not current_pos then return end
+		
+						local visual_size = dragon.object:get_properties().visual_size
+						local eye_offset = {
+							x = 0,
+							y = 4.5 * visual_size.y,
+							z = 0
+						}
+		
+						local eye_correction = vector.multiply(current_dir, eye_offset.z * 0.125)
+						current_pos = vector.add(current_pos, eye_correction)
+						current_pos.y = current_pos.y + eye_offset.y
+		
+						local tpos = vector.add(current_pos, vector.multiply(current_dir, 64))
+		
+						dragon:breath_attack(tpos)
+						dragon:animate(dragon._anim .. "_water")
+		
+						-- Reduce attack_stamina
+						dragon.attack_stamina = dragon.attack_stamina - 1
+						dragon:memorize("attack_stamina", dragon.attack_stamina)
+		
+						-- Continue if still have stamina
+						if continuous_actions[dragon.wtd_id] then
+							minetest.after(0.1, continuous_actions[dragon.wtd_id])
+						end
 					end
-
-					local current_yaw = dragon.object:get_yaw()
-					local current_dir = minetest.yaw_to_dir(current_yaw)
-					local current_pos = dragon.object:get_pos()
-
-					if not current_pos then return end
-
-					local visual_size = dragon.object:get_properties().visual_size
-					local eye_offset = {
-						x = 0,
-						y = 4.5 * visual_size.y,
-						z = 0
-					}
-
-					local eye_correction = vector.multiply(current_dir, eye_offset.z * 0.125)
-					current_pos = vector.add(current_pos, eye_correction)
-					current_pos.y = current_pos.y + eye_offset.y
-
-					local tpos = vector.add(current_pos, vector.multiply(current_dir, 64))
-
-					dragon:breath_attack(tpos)
-					dragon:animate(dragon._anim .. "_water")
-
-					-- Reduce attack_stamina
-					dragon.attack_stamina = dragon.attack_stamina - 1
-					dragon:memorize("attack_stamina", dragon.attack_stamina)
-
-					-- Continue if still have stamina
-					if continuous_actions[dragon.wtd_id] then
-						minetest.after(0.1, continuous_actions[dragon.wtd_id])
-					end
+		
+					-- Start the continuous action
+					continuous_actions[dragon.wtd_id]()
+					return true
+				elseif dragon_name == "waterdragon:scottish_dragon" then
+					return true
 				end
-
-				-- Start the continuous action
-				continuous_actions[dragon.wtd_id]()
-				return true
 			end
 		},
+		
 		["follow"] = {
 			name = "follow",
 			response = "I shall accompany you on your journey.",

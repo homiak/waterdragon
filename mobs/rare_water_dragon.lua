@@ -123,7 +123,6 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         waterdragon.dragon_step(self, dtime, moveresult)
         dragon_stay_behavior(self)
         waterdragon.eat_dropped_item(self, item)
-        -- Add to waterdragon.dragon_step function
         if self:timer(1) then                                        -- Check every second
             local scale = self.growth_scale or 1
             local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger

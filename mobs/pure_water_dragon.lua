@@ -446,6 +446,52 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 		waterdragon.dragon_step(self, dtime, moveresult)
 		on_dragon_step(self, dtime)
 		waterdragon.eat_dropped_item(self, item)
+		if self:timer(1) then                                        -- Check every second
+            local scale = self.growth_scale or 1
+            local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
+
+            if self.hunger and self.hunger < hunger_threshold then
+                if self.owner then
+                    -- Notify owner about hunger
+                    minetest.chat_send_player(self.owner,
+                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
+
+                    if not self.hunger_warning_time then
+                        self.hunger_warning_time = minetest.get_gametime()
+                    elseif minetest.get_gametime() - self.hunger_warning_time > 30 then
+                        -- Reset warning time
+                        self.hunger_warning_time = nil
+
+                        -- Find nearby targets
+                        local pos = self.object:get_pos()
+                        if pos then
+                            for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+                                if obj:is_player() or (obj:get_luaentity() and
+                                        obj:get_luaentity().name ~= self.name) then
+                                    self._target = obj
+                                    break
+                                end
+                            end
+                        end
+                    end
+                else
+                    -- Wild hungry Dragon - attack immediately
+                    local pos = self.object:get_pos()
+                    if pos then
+                        for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+                            if obj:is_player() or (obj:get_luaentity() and
+                                    obj:get_luaentity().name ~= self.name) then
+                                self._target = obj
+                                break
+                            end
+                        end
+                    end
+                end
+            else
+                -- Reset warning time if Dragon is fed
+                self.hunger_warning_time = nil
+            end
+        end
 	end,
 	on_rightclick = function(self, clicker)
 		waterdragon.dragon_rightclick(self, clicker)

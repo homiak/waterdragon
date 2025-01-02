@@ -28,21 +28,7 @@ local function create_fire_sphere(pos, radius)
                     if node.name ~= "air" and node.name ~= "ignore" and
                         not minetest.is_protected(check_pos, "") then
                         minetest.set_node(check_pos, { name = "air" })
-                        minetest.add_particlespawner({
-                            amount = 1,
-                            time = 0.1,
-                            minpos = check_pos,
-                            maxpos = check_pos,
-                            minvel = { x = -1, y = 0, z = -1 },
-                            maxvel = { x = 1, y = 2, z = 1 },
-                            minacc = { x = 0, y = 0, z = 0 },
-                            minexptime = 1,
-                            maxexptime = 2,
-                            minsize = 2,
-                            maxsize = 4,
-                            texture = "waterdragon_fire_2.png",
-                            glow = 14
-                        })
+                        
                     end
                 end
             end
@@ -543,8 +529,8 @@ local function passenger_form(player)
     local formspec = {
         "size[6,3.476]",
         "real_coordinates[true]",
-        "label[0.25,1;" .. name .. " " .. S("would like to ride as a passenger]"),
-        "button_exit[0,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
+        "label[0.25,1;" .. name .. " would like to ride as a passenger]",
+		"button_exit[0.25,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
         "button_exit[3.5,1.3;2.3,0.8;btn_decline_pssngr;Decline]",
     }
     return table.concat(formspec, "")
@@ -770,14 +756,13 @@ function waterdragon.set_utility(self, utility_name, ...)
 end
 
 modding.register_utility("waterdragon:mount", function(self, clicker)
-    if clicker then
+
         local name = clicker:get_player_name()
         local inv = minetest.get_inventory({ type = "player", name = name })
         if waterdragon.contains_book(inv) then
             waterdragon.add_page(inv, "mounting")
             waterdragon.add_page(inv, "waterdragons")
         end
-    end
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 3
@@ -1413,7 +1398,7 @@ modding.register_utility("waterdragon:scottish_dragon_mount", function(self)
         if control.jump and control.left and self.has_pegasus_fire and self.fire >= 3 then
             local pos = self.object:get_pos()
             if pos then
-                pos.y = pos.y + 2 -- Adjust for dragon's head height
+                pos.y = pos.y + 2
                 local direction = vector.normalize(look_dir)
                 launch_fire_sphere(pos, direction)
                 self.fire = self.fire - 3 -- Consume 3 fire charges
