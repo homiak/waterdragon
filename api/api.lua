@@ -2015,6 +2015,7 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
+	self.is_patrolling = self.is_patrolling or false
 	self.armour = self:recall("armour") or false
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
@@ -2796,6 +2797,127 @@ local function check_cooldown(player_name, command)
 	return true
 end
 
+-- Dragon Parade --
+
+local wand_users = {}
+local patrolling_dragons = {}
+
+minetest.register_craftitem("waterdragon:patrol_wand", {
+    description = S("Dragon Patrol Wand"),
+    inventory_image = "waterdragon_patrol_wand.png",
+    on_use = function(itemstack, user, pointed_thing)
+        local name = user:get_player_name()
+        if pointed_thing.type ~= "node" then return end
+
+        local pos = pointed_thing.under
+        if not wand_users[name] then
+            wand_users[name] = {pos1 = pos}
+            minetest.chat_send_player(name, "Position 1 set to: " .. minetest.pos_to_string(pos))
+        else
+            wand_users[name].pos2 = pos
+            minetest.chat_send_player(name, "Position 2 set to: " .. minetest.pos_to_string(pos))
+            minetest.chat_send_player(name, "Region set. Talk to your Dragon to start patrol")
+        end
+    end
+})
+
+local function start_dragon_patrol(dragon, pos1, pos2, method)
+	if not dragon or dragon.object:get_pos() then
+		return false
+	end
+    local patrol_points = {
+        pos1,
+        {x=pos1.x, y=pos1.y, z=pos2.z},
+        pos2,
+        {x=pos2.x, y=pos2.y, z=pos1.z},
+        pos1
+    }
+    dragon.is_patrolling = true
+    -- Set patrol height for flying
+    if method == "fly" then
+        for i, point in ipairs(patrol_points) do
+            point.y = point.y + 10
+        end
+    end
+
+    patrolling_dragons[dragon] = {
+        points = patrol_points,
+        current_point = 1,
+        method = method,
+        original_pos = dragon.object:get_pos()
+    }
+end
+
+local function stop_dragon_patrol(dragon)
+	if not dragon or dragon.object:get_pos() then
+		return false
+	end
+    if patrolling_dragons[dragon] then
+        if dragon.rider then
+            waterdragon.detach_player(dragon, dragon.rider)
+        end
+        patrolling_dragons[dragon] = nil
+        return true
+    end
+    return false
+end
+
+local function move_dragon(dragon, patrol_info, dtime)
+	if not dragon or dragon.object:get_pos() then
+		return false
+	end
+    local target = patrol_info.points[patrol_info.current_point]
+    local pos = dragon.object:get_pos()
+    local distance = vector.distance(pos, target)
+
+    if distance < 0.5 then
+        patrol_info.current_point = patrol_info.current_point % (#patrol_info.points - 1) + 1
+        target = patrol_info.points[patrol_info.current_point]
+    end
+
+    local direction = vector.direction(pos, target)
+    local speed = patrol_info.method == "fly" and 8 or 4
+    
+    dragon.object:set_yaw(minetest.dir_to_yaw(direction))
+    
+    if patrol_info.method == "fly" then
+        dragon:animate("fly")
+        dragon:set_gravity(0)
+        waterdragon.action_fly(dragon, target, 3, "waterdragon:obstacle_avoidance", 0.8, "fly")
+    else
+        dragon:animate("walk")
+        dragon:set_gravity(-9.8)
+        modding.action_move(dragon, target, 3, "modding:obstacle_avoidance", 1, "walk")
+    end
+end
+
+minetest.register_globalstep(function(dtime)
+    for dragon, patrol_info in pairs(patrolling_dragons) do
+        if not dragon.object:get_pos() then
+            patrolling_dragons[dragon] = nil
+        else
+            move_dragon(dragon, patrol_info, dtime)
+        end
+    end
+end)
+
+minetest.register_chatcommand("stop_patrol", {
+    description = "Stops the patrol of the nearest Dragon",
+    func = function(name)
+        local player = minetest.get_player_by_name(name)
+        if not player then return false, "Player not found" end
+
+        local player_pos = player:get_pos()
+        for dragon, _ in pairs(patrolling_dragons) do
+            if vector.distance(player_pos, dragon.object:get_pos()) < 15 then
+                stop_dragon_patrol(dragon)
+                return true, "Dragon patrol stopped"
+            end
+        end
+        return false, "No patrolling Dragons found nearby"
+    end
+})
+
 -- Dragon dialogue options
 local dragon_dialogue = {
 	greetings = {
@@ -3008,6 +3130,11 @@ local dragon_dialogue = {
 					action_stopped = true
 				end
 
+				if dragon.is_patrolling then
+					stop_dragon_patrol(dragon)
+					dragon.is_patrolling = false
+					action_stopped = true
+				end
 				-- Return appropriate message based on if anything was stopped
 				if not action_stopped then
 					return false, "I am not performing any command to stop."
@@ -3230,6 +3357,35 @@ local dragon_dialogue = {
 					pitch = 1.2
 				})
 
+				return true
+			end
+		},
+		["patrol"] = {
+			name = "patrol",
+			response = "*The Dragon prepares to patrol*",
+			action = function(dragon, player)
+				local name = player:get_player_name()
+				
+				if not wand_users[name] or not wand_users[name].pos1 or not wand_users[name].pos2 then
+					return false, "Set patrol area with the Patrol Wand first"
+				end
+				
+				-- Ask for patrol method
+				minetest.show_formspec(name, "waterdragon:patrol_method",
+					"size[4,3]" ..
+					"button_exit[0.5,0.5;3,1;fly;Fly Patrol]" ..
+					"button_exit[0.5,1.5;3,1;walk;Ground Patrol]")
+					
+				minetest.register_on_player_receive_fields(function(player, formname, fields)
+					if formname == "waterdragon:patrol_method" then
+						if fields.fly or fields.walk then
+							local method = fields.fly and "fly" or "walk"
+							start_dragon_patrol(dragon, wand_users[name].pos1, wand_users[name].pos2, method)
+							wand_users[name] = nil
+						end
+						return true
+					end
+				end)
 				return true
 			end
 		},
