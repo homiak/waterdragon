@@ -2876,7 +2876,6 @@ local function move_dragon(dragon, patrol_info, dtime)
     end
 
     local direction = vector.direction(pos, target)
-    local speed = patrol_info.method == "fly" and 8 or 4
     
     dragon.object:set_yaw(minetest.dir_to_yaw(direction))
     
@@ -2990,7 +2989,7 @@ local dragon_dialogue = {
 					return false, "I take orders only from my chosen companion."
 				end
 				if dragon.transport_rider then
-					return false, "I cannot fly now because I am taking you on my back"
+					return false, "I can't fly now because I am taking you on my back"
 				end
 				if not check_cooldown(player:get_player_name(), "fly") then
 					return false, "I must rest before taking flight again."
