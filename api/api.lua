@@ -2224,6 +2224,8 @@ function waterdragon.dragon_step(self, dtime)
 		self:do_growth()
 		-- Misc
 		self.time_from_last_sound = self.time_from_last_sound + 1
+		self.anim_frame = -1
+		self._anim = nil -- Initialize animation state as nil to be set by animate function
 		if self.time_in_horn then
 			self.growth_timer = self.growth_timer - self.time_in_horn / 2
 			self.time_in_horn = nil
@@ -2564,6 +2566,8 @@ function waterdragon.action_fly_and_throw(self, rider)
 end
 
 function waterdragon.dragon_rightclick(self, clicker)
+	if not clicker then return end
+	if not self.object:get_pos() then return end
 	local name = clicker:get_player_name()
 	local inv = minetest.get_inventory({ type = "player", name = name })
 	if waterdragon.contains_book(inv) then
@@ -3017,73 +3021,76 @@ local dragon_dialogue = {
 			response = "*The Dragon begins to breathe ancient water*",
 			action = function(dragon, player)
 				-- Проверяем тип дракона
-				local dragon_name = dragon.object and dragon.object:get_luaentity() and dragon.object:get_luaentity().name
+				local dragon_name = dragon.object and dragon.object:get_luaentity() and
+				dragon.object:get_luaentity().name
 				if dragon_name == "waterdragon:rare_water_dragon" or dragon_name == "waterdragon:pure_water_dragon" then
 					local continuous_actions = {}
-		
+
 					-- Check attack stamina
 					if dragon.attack_stamina <= 0 then
 						return false, "I must rest to regain my breath power."
 					end
-		
+
 					if not check_cooldown(player:get_player_name(), "attack") then
 						return false, "I need more time to recover my strength of water breathing."
 					end
-		
+
 					-- Start continuous breathing
 					continuous_actions[dragon.wtd_id] = function()
 						if not dragon or not dragon.object then return end
-		
+
 						-- Check attack stamina again
 						if dragon.attack_stamina <= 0 then
 							continuous_actions[dragon.wtd_id] = nil
+							dragon:animate("stand") -- Reset to default animation
 							if dragon.owner then
 								minetest.chat_send_player(dragon.owner, "Dragon: *I must rest my breath*")
 							end
 							return
 						end
-		
+
 						local current_yaw = dragon.object:get_yaw()
 						local current_dir = minetest.yaw_to_dir(current_yaw)
 						local current_pos = dragon.object:get_pos()
-		
+
 						if not current_pos then return end
-		
+
 						local visual_size = dragon.object:get_properties().visual_size
 						local eye_offset = {
 							x = 0,
 							y = 4.5 * visual_size.y,
 							z = 0
 						}
-		
+
 						local eye_correction = vector.multiply(current_dir, eye_offset.z * 0.125)
 						current_pos = vector.add(current_pos, eye_correction)
 						current_pos.y = current_pos.y + eye_offset.y
-		
+
 						local tpos = vector.add(current_pos, vector.multiply(current_dir, 64))
-		
+
 						dragon:breath_attack(tpos)
-						dragon:animate(dragon._anim .. "_water")
-		
+						dragon:animate((dragon._anim or "stand") .. "_water") -- Use "stand" as fallback if _anim is nil
+
 						-- Reduce attack_stamina
 						dragon.attack_stamina = dragon.attack_stamina - 1
 						dragon:memorize("attack_stamina", dragon.attack_stamina)
-		
+
 						-- Continue if still have stamina
 						if continuous_actions[dragon.wtd_id] then
 							minetest.after(0.1, continuous_actions[dragon.wtd_id])
 						end
 					end
-		
+
 					-- Start the continuous action
 					continuous_actions[dragon.wtd_id]()
 					return true
 				elseif dragon_name == "waterdragon:scottish_dragon" then
+					breathe_pegasus_fire(dragon)
 					return true
 				end
 			end
 		},
-		
+
 		["follow"] = {
 			name = "follow",
 			response = "I shall accompany you on your journey.",
@@ -3542,7 +3549,7 @@ local function handle_transport(dragon, player, message)
 					waterdragon.detach_player(dragon, player)
 				end
 				dragon.transport_rider = false
-				minetest.chat_send_player(player:get_player_name(), "Dragon: *Journey interrupted*")
+				minetest.chat_send_player(player:get_player_name(), "Dragon: Journey interrupted")
 				return
 			end
 

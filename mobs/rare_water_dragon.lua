@@ -171,8 +171,11 @@ modding.register_mob("waterdragon:rare_water_dragon", {
         end
     end,
     on_rightclick = function(self, clicker)
+        if not clicker then return end -- Add this check first
+
         waterdragon.dragon_rightclick(self, clicker)
         local item = clicker:get_wielded_item()
+        if not item then return end
         local item_name = item:get_name()
         if minetest.get_item_group(item_name, "wtd_armour") > 0 then
             local armour_def = minetest.registered_items[item_name]

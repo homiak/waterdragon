@@ -28,7 +28,6 @@ local function create_fire_sphere(pos, radius)
                     if node.name ~= "air" and node.name ~= "ignore" and
                         not minetest.is_protected(check_pos, "") then
                         minetest.set_node(check_pos, { name = "air" })
-                        
                     end
                 end
             end
@@ -530,7 +529,7 @@ local function passenger_form(player)
         "size[6,3.476]",
         "real_coordinates[true]",
         "label[0.25,1;" .. name .. " would like to ride as a passenger]",
-		"button_exit[0.25,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
+        "button_exit[0.25,1.3;2.3,0.8;btn_accept_pssngr;Accept]",
         "button_exit[3.5,1.3;2.3,0.8;btn_decline_pssngr;Decline]",
     }
     return table.concat(formspec, "")
@@ -755,14 +754,7 @@ function waterdragon.set_utility(self, utility_name, ...)
     end
 end
 
-modding.register_utility("waterdragon:mount", function(self, clicker)
-
-        local name = clicker:get_player_name()
-        local inv = minetest.get_inventory({ type = "player", name = name })
-        if waterdragon.contains_book(inv) then
-            waterdragon.add_page(inv, "mounting")
-            waterdragon.add_page(inv, "waterdragons")
-        end
+modding.register_utility("waterdragon:mount", function(self)
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 3
@@ -917,6 +909,7 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
 
             if is_landed then
                 _self:set_gravity(-9.8)
+                _self.head_tracking = nil
                 anim = "stand"
                 if _self.flight_stamina <= 50 then
                     local rider_name = _self.rider:get_player_name()
@@ -928,9 +921,13 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                         anim = "fly"
                         if _self.touching_ground then
                             waterdragon.action_land(_self)
-                            anim = "sleep"
+                            anim = "stand"
                             _self:set_vertical_velocity(0)
                             _self:set_forward_velocity(0)
+                        end
+                        if _self.flight_stamina >= 100 then
+                            waterdragon.action_takeoff(_self, 1)
+                            is_landed = false
                             return
                         end
                     end
@@ -1012,6 +1009,9 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                 anim = "fly_to_land"
             else
                 _self:set_gravity(0)
+                anim = "hover"
+                
+                
 
                 if control.up and _self.moveresult and _self.moveresult.collisions and not control.down and not control.LMB then
                     for _, collision in ipairs(_self.moveresult.collisions) do
@@ -1024,10 +1024,16 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                             end
                         end
                     end
+                    anim = "fly"
+                    if _self.pitch_fly then
+                        _self:set_vertical_velocity(12 * look_dir.y)
+                    end
+                    _self:set_forward_velocity(24)
+                else
+                    _self:set_vertical_velocity(0)
+                    _self:set_forward_velocity(0)
                 end
-
-
-
+                _self:tilt_to(look_yaw, 2)
 
                 if is_wall_clinging then
                     local yaw = _self.object:get_yaw()
@@ -1097,7 +1103,8 @@ modding.register_utility("waterdragon:mount", function(self, clicker)
                             is_landed = true
                         end
                     else
-                        if control.up then
+                        
+                        if control.up or (not self.attack_disabled and self.attack_stamina > 0) then  -- Added condition here
                             anim = "fly"
                             if _self.pitch_fly then
                                 _self:set_vertical_velocity(12 * look_dir.y)
