@@ -1,4 +1,40 @@
 local special_dragon_names = {
+    ["Keallach"] = { health_bonus = 215, damage_bonus = 12, speed_bonus = 4, effect = "powerful" },
+    ["Ceardach"] = { health_bonus = 200, damage_bonus = 10, speed_bonus = 3, effect = "powerful" },
+    ["Gillean"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Aon-Adharc"] = { health_bonus = 220, damage_bonus = 13, speed_bonus = 4, effect = "powerful" },
+    ["Glenfinnan"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
+    ["Tasglann"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 3, effect = "powerful" },
+    ["Breannan"] = { health_bonus = 225, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Teine"] = { health_bonus = 235, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Deighean"] = { health_bonus = 200, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
+    ["Kearnach"] = { health_bonus = 240, damage_bonus = 15, speed_bonus = 3, effect = "powerful" },
+    ["Teannarach"] = { health_bonus = 210, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Creagneach"] = { health_bonus = 250, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Cridheach-Teine"] = { health_bonus = 225, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Deanach"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
+    ["Teanndraigh"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 3, effect = "powerful" },
+    ["Gleanach"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Kirnach"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
+    ["Tearlach"] = { health_bonus = 250, damage_bonus = 15, speed_bonus = 3, effect = "powerful" },
+    ["Dreaghal"] = { health_bonus = 230, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Galarach"] = { health_bonus = 215, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
+    ["Draighean"] = { health_bonus = 220, damage_bonus = 13, speed_bonus = 3, effect = "powerful" },
+    ["Cailleach"] = { health_bonus = 205, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
+    ["Aonach"] = { health_bonus = 240, damage_bonus = 15, speed_bonus = 3, effect = "powerful" },
+    ["Creagach"] = { health_bonus = 225, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Braonach"] = { health_bonus = 235, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Teathnach"] = { health_bonus = 200, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
+    ["Dreaganach"] = { health_bonus = 250, damage_bonus = 15, speed_bonus = 4, effect = "powerful" },
+    ["Cranach"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 3, effect = "powerful" },
+    ["Teangach"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 4, effect = "powerful" },
+    ["Dallachan"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 3, effect = "powerful" },
+    ["Kaldallan"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
+    ["Tarraingeach"] = { health_bonus = 220, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
+    ["Keangalach"] = { health_bonus = 215, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
+    ["Braethain"] = { health_bonus = 235, damage_bonus = 14, speed_bonus = 3, effect = "powerful" },
+    ["Fionnach"] = { health_bonus = 250, damage_bonus = 15, speed_bonus = 3, effect = "powerful" },
+    ["Caillteach"] = { health_bonus = 200, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
     ["Avalon"] = {
         health_bonus = 150,
         damage_bonus = 10,
@@ -47,25 +83,7 @@ local special_dragon_names = {
         speed_bonus = 8,
         effect = "powerful"
     },
-    ["Loch Ness"] = {
-        health_bonus = 180,
-        damage_bonus = 10,
-        speed_bonus = 8,
-        effect = "powerful"
-    },
-    ["Uisge"] = {
-        health_bonus = 150,
-        damage_bonus = 5,
-        speed_bonus = 4,
-        effect = "powerful"
-    },
-    ["Loch Rannoch"] = {
-        health_bonus = 190,
-        damage_bonus = 10,
-        speed_bonus = 8,
-        effect = "powerful"
-    },
-    ["Kelpie"] = {
+    ["Rannoch"] = {
         health_bonus = 190,
         damage_bonus = 10,
         speed_bonus = 8,
@@ -155,6 +173,60 @@ local special_dragon_names = {
         health_multiplier = 0.3,
         damage_multiplier = 0.2,
         speed_multiplier = 0.45,
+        effect = "cute"
+    },
+    ["Fluffy"] = {
+        health_multiplier = 0.35,
+        damage_multiplier = 0.3,
+        speed_multiplier = 0.4,
+        effect = "cute"
+    },
+    ["Ducky"] = {
+        health_multiplier = 0.3,
+        damage_multiplier = 0.2,
+        speed_multiplier = 0.45,
+        effect = "cute"
+    },
+    ["Waddles"] = {
+        health_multiplier = 0.25,
+        damage_multiplier = 0.3,
+        speed_multiplier = 0.35,
+        effect = "cute"
+    },
+    ["Puddle"] = {
+        health_multiplier = 0.4,
+        damage_multiplier = 0.2,
+        speed_multiplier = 0.5,
+        effect = "cute"
+    },
+    ["Pebble"] = {
+        health_multiplier = 0.3,
+        damage_multiplier = 0.25,
+        speed_multiplier = 0.4,
+        effect = "cute"
+    },
+    ["Snuggles"] = {
+        health_multiplier = 0.35,
+        damage_multiplier = 0.2,
+        speed_multiplier = 0.45,
+        effect = "cute"
+    },
+    ["Puffy"] = {
+        health_multiplier = 0.3,
+        damage_multiplier = 0.15,
+        speed_multiplier = 0.5,
+        effect = "cute"
+    },
+    ["Twinkle"] = {
+        health_multiplier = 0.4,
+        damage_multiplier = 0.3,
+        speed_multiplier = 0.35,
+        effect = "cute"
+    },
+    ["Tiny"] = {
+        health_multiplier = 0.3,
+        damage_multiplier = 0.2,
+        speed_multiplier = 0.4,
         effect = "cute"
     }
 }

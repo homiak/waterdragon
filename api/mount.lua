@@ -746,14 +746,6 @@ minetest.register_chatcommand("autopilot", {
     end
 })
 
-function waterdragon.set_utility(self, utility_name, ...)
-    if type(modding.registered_utilities[utility_name]) == "function" then
-        modding.registered_utilities[utility_name](self, ...)
-    else
-        minetest.log("error", "Attempt to set non-existent utility: " .. utility_name)
-    end
-end
-
 modding.register_utility("waterdragon:mount", function(self)
     local is_landed = modding.sensor_floor(self, 5, true) < 4
     local view_held = false
