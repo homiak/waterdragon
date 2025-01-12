@@ -3082,7 +3082,7 @@ local dragon_dialogue = {
 			name = "land",
 			response = "*The Dragon begins descending gracefully*",
 			action = function(dragon, player)
-				if dragon.is_landed then
+				if dragon.is_landed or dragon.touching_ground then
 					return false, "I am already on the ground."
 				end
 				function action_flight_to_land(self)
@@ -3091,15 +3091,13 @@ local dragon_dialogue = {
 					end
 					if self.touching_ground then
 						waterdragon.action_land(self)
+						self.is_landed = true
 						return true
 					end
 					return false
 				end
 
 				action_flight_to_land(dragon)
-				if dragon.touching_ground then
-					waterdragon.action_land(dragon)
-				end
 				return true
 			end
 		},
@@ -3132,6 +3130,10 @@ local dragon_dialogue = {
 				if dragon.is_patrolling then
 					stop_dragon_patrol(dragon)
 					dragon.is_patrolling = false
+					action_stopped = true
+				end
+				if dragon._target then
+					dragon._target = nil
 					action_stopped = true
 				end
 				-- Return appropriate message based on if anything was stopped
@@ -3320,26 +3322,7 @@ local dragon_dialogue = {
 				dragon.hp = dragon.hp * 1.5
 				dragon.flight_stamina = dragon.flight_stamina * 1.5
 
-				-- Visual effects
-				local pos = dragon.object:get_pos()
-				if pos then
-					minetest.add_particlespawner({
-						amount = 30,
-						time = 1,
-						minpos = { x = pos.x - 1, y = pos.y, z = pos.z - 1 },
-						maxpos = { x = pos.x + 1, y = pos.y + 2, z = pos.z + 1 },
-						minvel = { x = -1, y = 0, z = -1 },
-						maxvel = { x = 1, y = 2, z = 1 },
-						minacc = { x = 0, y = 0, z = 0 },
-						maxacc = { x = 0, y = 1, z = 0 },
-						minexptime = 1,
-						maxexptime = 2,
-						minsize = 2,
-						maxsize = 4,
-						texture = "waterdragon_particle_green.png",
-						glow = 14
-					})
-				end
+				
 
 				-- Reset damage after 5 seconds
 				minetest.after(5, function()

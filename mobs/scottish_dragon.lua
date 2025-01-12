@@ -220,41 +220,90 @@ modding.register_mob("waterdragon:scottish_dragon", {
 			end
 		end
 		self:memorize("fire", self.fire)
-		if self:timer(1) then                                        -- Check every second
+		if self:timer(1) then                            -- Check every second
             local scale = self.growth_scale or 1
             local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
 
             if self.hunger and self.hunger < hunger_threshold then
+                local pos = self.object:get_pos()
                 if self.owner then
-                    -- Notify owner about hunger
+                    -- Прирученный дракон
                     minetest.chat_send_player(self.owner,
-                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Feed him or he can attack you!")
+                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Help him find food!")
 
-                    if not self.hunger_warning_time then
-                        self.hunger_warning_time = minetest.get_gametime()
-                    elseif minetest.get_gametime() - self.hunger_warning_time > 30 then
-                        -- Reset warning time
-                        self.hunger_warning_time = nil
+                    -- Попытка найти мясо в ближайших объектах
+                    local found_meat = false
+                    if pos then
+                        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
+                            local luaentity = obj:get_luaentity()
+                            if luaentity and luaentity.name ~= self.name and luaentity.groups and luaentity.groups.meat then
+                                -- Телепортируем мясо к дракону
+                                obj:set_pos(vector.add(pos, { x = 0, y = 1, z = 0 }))
+                                found_meat = true
+                                break
+                            end
+                        end
+                    end
 
-                        -- Find nearby targets
-                        local pos = self.object:get_pos()
-                        if pos then
-                            for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
-                                if obj:is_player() or (obj:get_luaentity() and
-                                        obj:get_luaentity().name ~= self.name) then
-                                    self._target = obj
-                                    break
+                    -- Если мясо не найдено, проверяем у ближайшего игрока
+                    if not found_meat then
+                        for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 60)) do
+                            if obj:is_player() then
+                                local inv = obj:get_inventory()
+                                if inv then
+                                    for _, stack in ipairs(inv:get_list("main")) do
+                                        if minetest.get_item_group(stack:get_name(), "meat") > 0 then
+                                            -- Удаляем мясо из инвентаря игрока и создаём его объект возле дракона
+                                            inv:remove_item("main", stack:get_name())
+                                            minetest.add_item(vector.add(pos, { x = 0, y = 1, z = 0 }), stack:get_name())
+                                            found_meat = true
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            if found_meat then break end
+                        end
+                    end
+
+                    -- Если мясо не найдено у игрока, ищем в ближайших сундуках
+                    if not found_meat then
+                        local node_pos = minetest.find_node_near(pos, 60, { "default:chest" })
+                        if node_pos then
+                            local meta = minetest.get_meta(node_pos)
+                            local inv = meta:get_inventory()
+                            if inv then
+                                for _, stack in ipairs(inv:get_list("main")) do
+                                    if minetest.get_item_group(stack:get_name(), "meat") > 0 then
+                                        -- Удаляем мясо из сундука и создаём его объект возле дракона
+                                        inv:remove_item("main", stack:get_name())
+                                        minetest.add_item(vector.add(pos, { x = 4, y = 1, z = 0 }), stack:get_name())
+                                        found_meat = true
+                                        break
+                                    end
                                 end
                             end
                         end
                     end
+
+                    -- Если еда всё равно не найдена, предупреждаем владельца
+                    if not found_meat and not self.hunger_warning_time then
+                        self.hunger_warning_time = minetest.get_gametime()
+                    elseif not found_meat and minetest.get_gametime() - self.hunger_warning_time > 30 then
+                        self.hunger_warning_time = nil
+                        -- Нападаем на ближайшую цель
+                        for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
+                            if (obj:get_luaentity() and obj:get_luaentity().name ~= self.name) and not obj:is_player() then
+                                self._target = obj
+                                break
+                            end
+                        end
+                    end
                 else
-                    -- Wild hungry Dragon - attack immediately
-                    local pos = self.object:get_pos()
+                    -- Дикий дракон
                     if pos then
                         for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
-                            if obj:is_player() or (obj:get_luaentity() and
-                                    obj:get_luaentity().name ~= self.name) then
+                            if obj:is_player() or (obj:get_luaentity() and obj:get_luaentity().name ~= self.name) then
                                 self._target = obj
                                 break
                             end
@@ -262,10 +311,10 @@ modding.register_mob("waterdragon:scottish_dragon", {
                     end
                 end
             else
-                -- Reset warning time if Dragon is fed
+                -- Сбрасываем время предупреждения, если дракон насытился
                 self.hunger_warning_time = nil
             end
-        end
+		end
 	end,
 	get_staticdata = function(self)
 		local data = {

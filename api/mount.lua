@@ -373,6 +373,9 @@ function waterdragon.attach_player(self, player)
         or not player:is_player() then
         return
     end
+    if not self.object or not self.object:get_pos() then
+        return
+    end
     local scale = self.growth_scale or 1
     -- Attach Player
     player:set_attach(self.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })

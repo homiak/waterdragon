@@ -306,7 +306,7 @@ function apply_name_bonuses(self)
             elseif modifiers.effect == "cute" then
                 minetest.chat_send_player(self.owner, 
                     "Your Dragon " .. self.nametag .. 
-                    " is adorable but very weak! You can better give him a more powerful name such as Deaglan or Calleach")
+                    " is adorable but very weak! You can better give him a more powerful name such as Braonach or Kirnach")
             end
         end
     end)
