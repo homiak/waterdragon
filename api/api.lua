@@ -420,6 +420,25 @@ local wing_colors = {
 	},
 }
 
+local horn_colors = {
+    -- Pure Water
+    pure_water = {
+        "#d20000", -- Red  
+        "#d92e00", -- Orange
+        "#edad00", -- Yellow
+        "#07084f", -- Dark Blue
+        "#2deded"  -- Cyan
+    },
+    -- Rare Water
+    rare_water = {
+        "#d20000", -- Red
+        "#d92e00", -- Orange
+        "#edad00", -- Yellow
+        "#07084f", -- Dark Blue 
+        "#2deded"  -- Cyan
+    },
+}
+
 local function generate_texture(self, force)
 	waterdragon.set_color_string(self)
 	local def = minetest.registered_entities[self.name]
@@ -432,8 +451,17 @@ local function generate_texture(self, force)
 		self.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. color .. ")"
 		self:memorize("wing_overlay", self.wing_overlay)
 	end
+	self.horn_overlay = self:recall("horn_overlay") or nil
+    if not self.horn_overlay then
+        local horn_color = horn_colors[self.color][random(#horn_colors[self.color])]
+        self.horn_overlay = "(waterdragon_horn_fade.png^[multiply:" .. horn_color .. ")"
+        self:memorize("horn_overlay", self.horn_overlay)
+	end
+	
 	if self:get_props().textures[1]:find("wing_fade") and not force then return end
+	if self:get_props().textures[1]:find("horn_fade") and not force then return end
 	textures[1] = textures[1] .. "^" .. self.wing_overlay
+	textures[1] = textures[1] .. "^" .. self.horn_overlay
 	self:set_texture(1, textures)
 end
 
@@ -1287,6 +1315,9 @@ waterdragon.wtd_api = {
 		texture = textures[1]
 		if self.wing_overlay then
 			texture = texture .. "^" .. self.wing_overlay
+		end
+		if self.horn_overlay then
+			texture = texture .. "^" .. self.horn_overlay
 		end
 		self._glow_level = level
 		local color = math.ceil(level / minetest.LIGHT_MAX * 255)
@@ -2977,7 +3008,53 @@ local dragon_dialogue = {
 			"Your kind are like ripples on water - brief, yet capable of creating great change. Some I find worthy of respect.",
 			"Humans are interesting creatures. Short-lived but ambitious, capable of both great wisdom and great foolishness.",
 			"I have watched your kind grow from simple tool-users to builders of great cities. You can be worthy allies when you prove yourself."
-		}
+		},
+		["who are your enemies"] = {
+			"Those who threaten the balance of these waters and skies are my enemies.",
+			"I stand against the chaos-bringers, the despoilers of nature, and those who would harm the innocent.",
+			"Enemies? I have faced shadowy creatures from other realms and mortals who dared to challenge the sanctity of my domain."
+		},
+		
+		["why do you help me"] = {
+			"I sense potential within you. The bond between Dragon and human is rare but powerful.",
+			"Not all humans earn my aid, but your actions speak louder than words. I see a kindred spirit.",
+			"I help those who respect the balance of the world. You have proven yourself worthy of my trust... so far."
+		},
+		
+		["how old are you"] = {
+			"I was born when the first waters flowed upon this land. Time holds little meaning to me.",
+			"I am as old as the winds that carry whispers across the seas. Ancient, but ever present."
+		},
+		
+		["what do you eat"] = {
+			"My sustenance comes from the energies of water and the skies, though I enjoy the occasional offering of fresh meat.",
+			"I feed on the vitality of my domain. A meal of fish or wild game is a welcome gift, but not a necessity.",
+			"My kind does not require sustenance as you do, though I appreciate tributes from those I bond with."
+		},
+		
+		["can you teach me magic"] = {
+			"Magic is not something I can teach—it is something you must discover within yourself.",
+			"I can guide you, but the true essence of magic lies in your connection to the world.",
+			"Magic flows through all things. If you are attuned, you may learn by observing my actions."
+		},
+		
+		["do you have a family"] = {
+			"My kin are scattered across realms, guardians of their own domains.",
+			"Family? We Dragons are solitary by nature, but I have crossed paths with others of my lineage.",
+			"The bonds of Dragonkind are different from those of humans. My family is the sky, the water, and the earth."
+		},
+		
+		["what is your purpose"] = {
+			"To guard the waters, to preserve the balance, and to guide those worthy of my wisdom.",
+			"My purpose is to maintain the harmony of the realms I traverse.",
+			"I exist to protect and to remind others of the ancient forces that shaped this world."
+		},
+		
+		["where do you come from"] = {
+			"I emerged from the first waters, born of magic and the elements.",
+			"My origins lie in a realm where water and sky merge into endless horizons.",
+			"I come from a place older than memory, where dragons first learned to fly and waters sang their songs."
+		},
 	},
 
 	commands = {
@@ -3054,7 +3131,7 @@ local dragon_dialogue = {
 				return false, "I see no worthy targets in that direction."
 			end
 		},
-
+		
 		["ride"] = {
 			name = "ride",
 			response = "*The Dragon lowers its head, allowing you to mount*",
@@ -3146,7 +3223,7 @@ local dragon_dialogue = {
 		},
 		["fire"] = {
 			name = "fire",
-			response = "*The Dragon begins to breathe ancient water*",
+			response = "*The Dragon begins to breathe water*",
 			action = function(dragon, player)
 				-- Проверяем тип дракона
 				local dragon_name = dragon.object and dragon.object:get_luaentity() and
@@ -3463,7 +3540,7 @@ modding.register_movement_method("waterdragon:obstacle_avoidance", function(self
 				if self.transport_rider then
 					local rider_name = self.transport_rider:get_player_name()
 					if rider_name then
-						minetest.chat_send_player(rider_name, "Dragon: I need to rest my wings. I'll walk for a while.")
+						minetest.chat_send_player(rider_name, (dragon.nametag or "Dragon") .. ": I need to rest my wings. I'll walk for a while.")
 					end
 				end
 			end
@@ -3611,12 +3688,12 @@ end)
 
 local function handle_transport(dragon, player, message)
 	if dragon.owner and dragon.owner ~= player:get_player_name() then
-		return false, "I take orders only from my chosen companion."
+		return false, (dragon.nametag or "Dragon") .. ": I take orders only from my chosen companion."
 	end
 	if not dragon.owner then return end
 	-- Проверяем cooldown
 	if not check_cooldown(player:get_player_name(), "transport") then
-		return false, "I need rest before such a journey."
+		return false, (dragon.nametag or "Dragon") .. ": I need rest before such a journey."
 	end
 
 	-- Получаем координаты из сообщения
@@ -3628,12 +3705,12 @@ local function handle_transport(dragon, player, message)
 
 	-- Проверяем координаты
 	if not (x and y and z) then
-		return false, "Tell me where to fly using: take me to X Y Z"
+		return false, (dragon.nametag or "Dragon") .. ": Tell me where to fly using: take me to X Y Z"
 	end
 
 	x, y, z = tonumber(x), tonumber(y), tonumber(z)
 	if not (x and y and z) then
-		return false, "Those don't look like valid coordinates."
+		return false, (dragon.nametag or "Dragon") .. ": Those don't look like valid coordinates."
 	end
 
 	local destination = { x = x, y = y, z = z }
@@ -3642,12 +3719,12 @@ local function handle_transport(dragon, player, message)
 		return false, "Cannot start flight."
 	end
 	if not dragon.object:get_pos() then
-		return false, "I cannot determine my position."
+		return false, (dragon.nametag or "Dragon") .. ": I cannot determine my position."
 	end
 	-- Проверяем дистанцию
 	local distance = vector.distance(start_pos, destination)
 	if distance > 100000 then
-		return false, "That's too far for me to fly."
+		return false, (dragon.nametag or "Dragon") .. ": That's too far for me to fly."
 	end
 
 	-- Если игрок еще не на драконе, сажаем его
@@ -3668,7 +3745,7 @@ local function handle_transport(dragon, player, message)
 		minetest.after(1, function()
 			if dragon and dragon.object and dragon.object:get_pos() then
 				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 0.5, "fly")
-				minetest.chat_send_player(player:get_player_name(), "Dragon: I feel rested now. Let's take to the skies!")
+				minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
 			end
 		end)
 	else
@@ -3687,7 +3764,7 @@ local function handle_transport(dragon, player, message)
 					waterdragon.detach_player(dragon, player)
 				end
 				dragon.transport_rider = false
-				minetest.chat_send_player(player:get_player_name(), "Dragon: Journey interrupted")
+				minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": Journey interrupted")
 				return
 			end
 
@@ -3710,7 +3787,7 @@ local function handle_transport(dragon, player, message)
 				waterdragon.detach_player(dragon, player)
 			end
 			dragon.transport_rider = false
-			minetest.chat_send_player(player:get_player_name(), "Dragon: We have arrived")
+			minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": We have arrived")
 		end
 	end)
 	if player:get_player_control().sneak and dragon.transport_rider then
@@ -3730,7 +3807,7 @@ local function handle_transport(dragon, player, message)
 
 		if dragon.flight_stamina <= 100 then
 			minetest.chat_send_player(player:get_player_name(),
-				"Dragon: I need to rest my wings. I will walk for a while.")
+				(dragon.nametag or "Dragon") .. ": I need to rest my wings. I will walk for a while.")
 			waterdragon.action_land(dragon)
 
 			minetest.after(10, function()
@@ -3766,20 +3843,21 @@ local function process_dragon_chat(name, message)
 
 	-- Handle exit command
 	if message == "bye" or message == "goodbye" or message == "farewell" then
-		minetest.chat_send_player(name, "Dragon: " .. dragon_dialogue.farewell[math.random(#dragon_dialogue.farewell)])
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.farewell[math.random(#dragon_dialogue.farewell)])
 		active_chats[name] = nil
 		return true
 	end
 	if message:find("stamina") then
 		local response = dragon_dialogue.conversations["how much stamina do you have"][math.random(3)]
 		response = response .. " " .. (dragon.flight_stamina or 0) .. "/300"
-		minetest.chat_send_player(name, "Dragon: " .. response)
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response)
 		return true
 	end
 	if message:find("hungry") then
 		local response = dragon_dialogue.conversations["how hungry are you"][math.random(3)]
 		response = response .. " " .. (dragon.hunger or 0) .. "/" .. (dragon.max_hunger)
-		minetest.chat_send_player(name, "Dragon: " .. response)
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response)
+
 		return true
 	end
 
@@ -3788,23 +3866,24 @@ local function process_dragon_chat(name, message)
 		local max_health = dragon.max_health * scale
 		local response = dragon_dialogue.conversations["how much health do you have"][math.random(3)]
 		response = response .. " " .. (dragon.hp or 0) .. "/" .. max_health
-		minetest.chat_send_player(name, "Dragon: " .. response)
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response)
+
 		return true
 	end
 	if message:find("breath") then
 		local response = dragon_dialogue.conversations["how much breath do you have"][math.random(3)]
 		response = response .. " " .. (dragon.attack_stamina or 0) .. "/" .. dragon.attack_stamina
-		minetest.chat_send_player(name, "Dragon: " .. response)
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response)
 		return true
 	end
 	-- Handle transport command
 	if message:find("take me to") then
 		local success, error_msg = handle_transport(dragon, player, message)
 		if success then
-			minetest.chat_send_player(name, "Dragon: *The Dragon's eyes glow as it studies the destination*")
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": *The Dragon's eyes glow as it studies the destination*")
 		else
 			-- Проверяем error_msg перед использованием
-			minetest.chat_send_player(name, "Dragon: " .. (error_msg or "I cannot make this journey right now."))
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot make this journey right now."))
 		end
 		return true
 	end
@@ -3814,9 +3893,9 @@ local function process_dragon_chat(name, message)
 		if message == cmd_name then
 			local success, error_msg = cmd.action(dragon, player)
 			if success then
-				minetest.chat_send_player(name, "Dragon: " .. cmd.response)
+				minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. cmd.response)
 			else
-				minetest.chat_send_player(name, "Dragon: " .. (error_msg or "I cannot do that now."))
+				minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot do that now."))
 			end
 			return true
 		end
@@ -3825,13 +3904,13 @@ local function process_dragon_chat(name, message)
 	-- Handle conversations
 	for topic, responses in pairs(dragon_dialogue.conversations) do
 		if message:find(topic) then
-			minetest.chat_send_player(name, "Dragon: " .. responses[math.random(#responses)])
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. responses[math.random(#responses)])
 			return true
 		end
 	end
 
 	-- Handle unknown input
-	minetest.chat_send_player(name, "Dragon: " .. dragon_dialogue.unknown[math.random(#dragon_dialogue.unknown)])
+	minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.unknown[math.random(#dragon_dialogue.unknown)])
 	return true
 end
 

@@ -142,8 +142,10 @@ function get_customize_formspec(self)
 			"size[12,6]",
 			"dropdown[0.5,1.1;3,0.6;drp_wing;Dark Blue,Orange,Red,Yellow,Cyan;1]",
 			"label[1.1,0.8;Wing Colour]",
+
 			"dropdown[4.5,1.1;3,0.6;drp_eyes;Blue,Red,Orange,Yellow;1]",
 			"label[5.1,0.8;Eye Colour]",
+
 			"model[1.5,1.7;10,7;mob_mesh;" ..
 			self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";15]"
 		}
@@ -186,6 +188,22 @@ local function get_scottish_dragon_formspec(self)
 		fly_allowed = "Flight Not Allowed"
 		fly_image = "waterdragon_forms_flight_disallowed.png"
 	end
+	local frame_range
+	if self._anim and self.animations[self._anim] then
+		frame_range = self.animations[self._anim].range
+	else
+		frame_range = self.animations["stand"].range
+	end
+
+	local frame_speed
+	if self._anim and self.animations[self._anim] then
+		frame_speed = self.animations[self._anim].speed
+	else
+		frame_speed = self.animations["stand"].speed
+	end
+
+	local frame_loop = frame_range.x .. "," .. frame_range.y
+	local texture = self:get_props().textures[1]
 	local form = {
 		"formspec_version[4]",
 		"size[16,10]",
@@ -193,7 +211,7 @@ local function get_scottish_dragon_formspec(self)
 		"background[0,0;16,10;waterdragon_forms_bg_b.png]",
 		"label[6.8,0.8;" .. correct_name(self.name) .. "]",
 		"button[6.75,8.75;2.6,0.5;btn_wtd_name;" .. (self.nametag or "Set Name") .. "]",
-		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;false;" .. frame_loop .. ";15]",
+		"model[3,1.7;10,7;mob_mesh;" .. self.mesh .. ";" .. texture .. ";-10,-130;false;true;" .. frame_loop .. ";" .. frame_speed .. "]",
 		"image[1.1,1.3;1,1;" .. health_ind .. "]",
 		"image[1.1,3.3;1,1;" .. hunger_ind .. "]",
 		"image[1.1,5.3;1,1;" .. stamina_ind .. "]",
