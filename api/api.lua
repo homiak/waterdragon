@@ -420,25 +420,6 @@ local wing_colors = {
 	},
 }
 
-local horn_colors = {
-    -- Pure Water
-    pure_water = {
-        "#d20000", -- Red  
-        "#d92e00", -- Orange
-        "#edad00", -- Yellow
-        "#07084f", -- Dark Blue
-        "#2deded"  -- Cyan
-    },
-    -- Rare Water
-    rare_water = {
-        "#d20000", -- Red
-        "#d92e00", -- Orange
-        "#edad00", -- Yellow
-        "#07084f", -- Dark Blue 
-        "#2deded"  -- Cyan
-    },
-}
-
 local function generate_texture(self, force)
 	waterdragon.set_color_string(self)
 	local def = minetest.registered_entities[self.name]
@@ -451,17 +432,8 @@ local function generate_texture(self, force)
 		self.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. color .. ")"
 		self:memorize("wing_overlay", self.wing_overlay)
 	end
-	self.horn_overlay = self:recall("horn_overlay") or nil
-    if not self.horn_overlay then
-        local horn_color = horn_colors[self.color][random(#horn_colors[self.color])]
-        self.horn_overlay = "(waterdragon_horn_fade.png^[multiply:" .. horn_color .. ")"
-        self:memorize("horn_overlay", self.horn_overlay)
-	end
-	
 	if self:get_props().textures[1]:find("wing_fade") and not force then return end
-	if self:get_props().textures[1]:find("horn_fade") and not force then return end
 	textures[1] = textures[1] .. "^" .. self.wing_overlay
-	textures[1] = textures[1] .. "^" .. self.horn_overlay
 	self:set_texture(1, textures)
 end
 
@@ -1315,9 +1287,6 @@ waterdragon.wtd_api = {
 		texture = textures[1]
 		if self.wing_overlay then
 			texture = texture .. "^" .. self.wing_overlay
-		end
-		if self.horn_overlay then
-			texture = texture .. "^" .. self.horn_overlay
 		end
 		self._glow_level = level
 		local color = math.ceil(level / minetest.LIGHT_MAX * 255)
@@ -3131,7 +3100,7 @@ local dragon_dialogue = {
 				return false, "I see no worthy targets in that direction."
 			end
 		},
-		
+
 		["ride"] = {
 			name = "ride",
 			response = "*The Dragon lowers its head, allowing you to mount*",
