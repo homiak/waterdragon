@@ -1730,7 +1730,7 @@ minetest.register_craftitem("waterdragon:draconic_tooth", {
 		use_count = use_count + 1
 		if use_count == 100 then
 			local player_name = user:get_player_name()
-			local success = waterdragon.give_privilege(player_name, "dragon_uisge")
+			local success = waterdragon.give_privilege(player_name, "draigh_uisge")
 			if success then
 				minetest.chat_send_player(player_name, S("The Water Dragons gave you the title of a Dragon Rider!"))
 			end

@@ -89,12 +89,6 @@ local special_dragon_names = {
         speed_bonus = 8,
         effect = "powerful"
     },
-    ["Leviathan"] = {
-        health_bonus = 180,
-        damage_bonus = 4,
-        speed_bonus = 8,
-        effect = "powerful"
-    },
     ["Kerran"] = {
         health_bonus = 210,
         damage_bonus = 10,

@@ -1307,10 +1307,8 @@ waterdragon.wtd_api = {
 		if self:get_action("sleep") then
 			local eyes_texture
 			if is_night then
-				-- Если ночь, устанавливаем текстуру глаз с peeled
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. "_peeled.png"
 			else
-				-- Если не ночь, используем обычную текстуру глаз
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
 			end
 
@@ -1755,7 +1753,7 @@ end)
 -- Commands --
 --------------
 
-minetest.register_privilege("Dragon Uisge", {
+minetest.register_privilege("draigh_uisge", {
 	description = "Allows Player to force Water Dragons",
 	give_to_singleplayer = false,
 	give_to_admin = false
@@ -1813,7 +1811,7 @@ minetest.register_chatcommand("call_wtd", {
 minetest.register_chatcommand("set_wtd_owner", {
 	description = S("Sets owner of pointed Water Dragon"),
 	params = "<name>",
-	privs = { dragon_uisge = true },
+	privs = { draigh_uisge = true },
 	func = function(name, params)
 		local player = minetest.get_player_by_name(name)
 		local param_name = params:match("%S+")
