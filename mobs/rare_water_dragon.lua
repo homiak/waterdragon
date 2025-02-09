@@ -35,7 +35,7 @@ end
 
 local colors = { "rare_water" }
 
-modding.register_mob("waterdragon:rare_water_dragon", {
+mobforge.register_mob("waterdragon:rare_water_dragon", {
     max_health = 1600,
     max_hunger = 500,
     max_breath = 0,
@@ -252,7 +252,7 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if puncher == self.rider then return end
         if time_from_last_punch < 0.66 or (self.passenger and puncher == self.passenger) or (self.rider and puncher == self.rider) then return end
-        modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+        mobforge.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if not self.is_landed then
             self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
         end
@@ -349,7 +349,7 @@ modding.register_mob("waterdragon:rare_water_dragon", {
     end
 })
 
-modding.register_spawn_item("waterdragon:rare_water_dragon", {
+mobforge.register_spawn_item("waterdragon:rare_water_dragon", {
     description = S("Creative Rare Water Dragon Egg"),
     inventory_image = "waterdragon_creative_egg_rare_water.png"
 })

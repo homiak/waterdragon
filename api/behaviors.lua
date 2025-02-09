@@ -118,7 +118,7 @@ minetest.register_on_mods_loaded(function()
 end)
 
 local function new_scottish_dragon_on_punch(self, puncher, time_from_last_punch, tool_capabilities, dir, damage)
-	modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	mobforge.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, dir)
 
 	if self.hp > 0 and not self.rider and not self._target and not self.is_flying then
 		-- Initialize punch_count if it doesn't exist
@@ -169,9 +169,9 @@ waterdragon.scottish_dragon_targets = {}
 minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_entities) do
 		local is_mobkit = (def.logic ~= nil or def.brainfuc ~= nil)
-		local is_modding = def._modding_mob
+		local is_mobforge = def._mobforge_mob
 		if is_mobkit
-			or is_modding
+			or is_mobforge
 			or def._cmi_is_mob then
 			if name ~= "waterdragon:pure_water_dragon" then
 				table.insert(waterdragon.pure_water_dragon_targets, name)
@@ -237,7 +237,7 @@ end
 
 check_time()
 
-local moveable = modding.is_pos_moveable
+local moveable = mobforge.is_pos_moveable
 function is_target_flying(target)
 	if not target or not target:get_pos() then return end
 	local pos = target:get_pos()
@@ -245,8 +245,8 @@ function is_target_flying(target)
 	local node = minetest.get_node(pos)
 	if not node then return false end
 	if minetest.get_item_group(node.name, "igniter") > 0
-		or modding.get_node_def(node.name).drawtype == "liquid"
-		or modding.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then
+		or mobforge.get_node_def(node.name).drawtype == "liquid"
+		or mobforge.get_node_def(vec_raise(pos, -1)).drawtype == "liquid" then
 		return false
 	end
 	local flying = true
@@ -256,7 +256,7 @@ function is_target_flying(target)
 			y = pos.y - i,
 			z = pos.z
 		}
-		if modding.get_node_def(fly_pos).walkable then
+		if mobforge.get_node_def(fly_pos).walkable then
 			flying = false
 			break
 		end
@@ -266,8 +266,8 @@ end
 
 local function shared_owner(obj1, obj2)
 	if not obj1 or not obj2 then return false end
-	obj1 = modding.is_valid(obj1)
-	obj2 = modding.is_valid(obj2)
+	obj1 = mobforge.is_valid(obj1)
+	obj2 = mobforge.is_valid(obj2)
 	if obj1
 		and obj2
 		and obj1:get_luaentity()
@@ -281,21 +281,21 @@ end
 
 local function find_target(self, list)
 	local owner = self.owner and minetest.get_player_by_name(self.owner)
-	local targets = modding.get_nearby_players(self)
+	local targets = mobforge.get_nearby_players(self)
 	if #targets > 0 then -- If there are players nearby
 		local target = targets[random(#targets)]
 		local is_creative = target:is_player() and minetest.is_creative_enabled(target)
 		local is_owner = owner and target == owner
 		if is_creative or is_owner then targets = {} end
 	end
-	targets = (#targets < 1 and list and modding.get_nearby_objects(self, list)) or targets
+	targets = (#targets < 1 and list and mobforge.get_nearby_objects(self, list)) or targets
 	if #targets < 1 then return end
 	return targets[random(#targets)]
 end
 
 -- Movement Methods --
 
-modding.register_movement_method("waterdragon:fly_pathfind", function(self)
+mobforge.register_movement_method("waterdragon:fly_pathfind", function(self)
 	if not self.fly_allowed then
 		return
 	end
@@ -311,7 +311,7 @@ modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 		if not pos then return end
 		steer_timer = (steer_timer > 0 and steer_timer - _self.dtime) or 0.25
 		if #path > 0 then steer_timer = 1 end
-		steer_to = (steer_timer <= 0 and modding.get_context_steering(self, goal, 8)) or steer_to
+		steer_to = (steer_timer <= 0 and mobforge.get_context_steering(self, goal, 8)) or steer_to
 		-- Return true when goal is reached
 		if vec_dist(pos, goal) < wayp_threshold then
 			_self:halt()
@@ -321,7 +321,7 @@ modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 		local goal_dir = steer_to or vec_dir(pos, goal)
 		if steer_to then
 			if #path < 2 then
-				path = modding.find_path(_self, pos, goal, _self.width, _self.height, 200, false, true) or {}
+				path = mobforge.find_path(_self, pos, goal, _self.width, _self.height, 200, false, true) or {}
 			end
 		end
 		if #path > 1 then
@@ -340,7 +340,7 @@ modding.register_movement_method("waterdragon:fly_pathfind", function(self)
 	return func
 end)
 
-modding.register_movement_method("waterdragon:fly_simple", function(self)
+mobforge.register_movement_method("waterdragon:fly_simple", function(self)
 	local steer_to
 	local steer_timer = 0.25
 	local width = self.width
@@ -357,7 +357,7 @@ modding.register_movement_method("waterdragon:fly_simple", function(self)
 		end
 		-- Calculate Movement
 		steer_timer = (steer_timer > 0 and steer_timer - self.dtime) or 0.25
-		steer_to = (steer_timer <= 0 and modding.get_context_steering(self, goal, 4)) or steer_to
+		steer_to = (steer_timer <= 0 and mobforge.get_context_steering(self, goal, 4)) or steer_to
 		local speed = abs(_self.speed or 2) * speed_factor or 0.5
 		local turn_rate = abs(_self.turn_rate or 7)
 		-- Apply Movement
@@ -523,7 +523,7 @@ function waterdragon.action_pursue(self, target, timeout, method, speed_factor, 
 			goal = tgt_pos
 		end
 		if timer <= 0
-			or _self:move_to(goal, method or "modding:obstacle_avoidance", speed_factor or 0.5) then
+			or _self:move_to(goal, method or "mobforge:obstacle_avoidance", speed_factor or 0.5) then
 			_self:halt()
 			return true
 		end
@@ -734,7 +734,7 @@ function waterdragon.action_slam(self)
 				if tgt_pos then
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
-					if (modding.is_alive(ent)
+					if (mobforge.is_alive(ent)
 							and not ent._ignore)
 						or is_player then
 						local dir = vec_dir(pos, tgt_pos)
@@ -802,7 +802,7 @@ function waterdragon.action_repel(self)
 					local is_player = object:is_player()
 					local ent = object:get_luaentity()
 
-					if is_player or (ent and modding.is_alive(ent) and not ent._ignore) then
+					if is_player or (ent and mobforge.is_alive(ent) and not ent._ignore) then
 						local obj_pos = object:get_pos()
 						local dir = vec_dir(pos, obj_pos)
 
@@ -859,7 +859,7 @@ function waterdragon.action_punch(self)
 				if tgt_pos then
 					local ent = object:get_luaentity()
 					local is_player = object:is_player()
-					if (modding.is_alive(ent)
+					if (mobforge.is_alive(ent)
 							and not ent._ignore)
 						or is_player then
 						_self:punch_target(object, _self.damage)
@@ -888,7 +888,7 @@ end
 
 -- Sleep
 
-modding.register_utility("waterdragon:sleep", function(self)
+mobforge.register_utility("waterdragon:sleep", function(self)
     local function func(_self)
         -- Check time of day
         local time = (minetest.get_timeofday() or 0) * 24000
@@ -904,7 +904,7 @@ modding.register_utility("waterdragon:sleep", function(self)
 
         if not _self:get_action() then
             _self.object:set_yaw(_self.object:get_yaw())
-            modding.action_idle(_self, 3, "sleep")
+            mobforge.action_idle(_self, 3, "sleep")
         end
         
         minetest.after(1, function()
@@ -919,7 +919,7 @@ end)
 
 -- Wander
 
-modding.register_utility("waterdragon:wander", function(self)
+mobforge.register_utility("waterdragon:wander", function(self)
 	local center = self.object:get_pos()
 	if not center then return end
 	local function func(_self)
@@ -928,19 +928,19 @@ modding.register_utility("waterdragon:wander", function(self)
 			if move then
 				local pos2 = _self:get_wander_pos(3, 6)
 				if vec_dist(pos2, center) > 16 then
-					modding.action_idle(_self, random(2, 5))
+					mobforge.action_idle(_self, random(2, 5))
 				else
-					modding.action_move(_self, pos2, 4, "modding:obstacle_avoidance", 0.5)
+					mobforge.action_move(_self, pos2, 4, "mobforge:obstacle_avoidance", 0.5)
 				end
 			else
-				modding.action_idle(_self, random(2, 5))
+				mobforge.action_idle(_self, random(2, 5))
 			end
 		end
 	end
 	self:set_utility(func)
 end)
 
-modding.register_utility("waterdragon:die", function(self)
+mobforge.register_utility("waterdragon:die", function(self)
 	local timer = 1.5
 	local init = false
 	local die = "waterdragon_death"
@@ -952,7 +952,7 @@ modding.register_utility("waterdragon:die", function(self)
 				max_hear_distance = 20,
 				loop = false
 			})
-			modding.action_fallover(_self)
+			mobforge.action_fallover(_self)
 			init = true
 		end
 		timer = timer - _self.dtime
@@ -981,7 +981,7 @@ modding.register_utility("waterdragon:die", function(self)
 				},
 				glow = 1
 			})
-			modding.drop_items(_self)
+			mobforge.drop_items(_self)
 			_self.object:remove()
 		end
 	end
@@ -990,7 +990,7 @@ end)
 
 -- Wander Flight
 
-modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
+mobforge.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 	if not self.fly_allowed then
 		-- If the Water Dragon is not allowed to fly
 		return
@@ -1003,7 +1003,7 @@ modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 		if not pos then return end
 		height_timer = height_timer - self.dtime
 		if height_timer <= 0 then
-			local dist2floor = modding.sensor_floor(_self, 10, true)
+			local dist2floor = mobforge.sensor_floor(_self, 10, true)
 			center.y = center.y + (10 - dist2floor)
 			height_timer = 4
 		end
@@ -1014,13 +1014,13 @@ modding.register_utility("waterdragon:aerial_wander", function(self, speed_x)
 		if not _self:get_action() then
 			local move_dir = (vec_dist(pos, center) > 56 * speed_x and vec_dir(pos, center)) or nil
 			local pos2 = _self:get_wander_pos_3d(ceil(8 * speed_x), ceil(12 * speed_x), move_dir)
-			modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
+			mobforge.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
 		end
 	end
 	self:set_utility(func)
 end)
 
-modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
+mobforge.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 	if not self.fly_allowed then
 		-- If the Water Dragon is not allowed to fly
 		return
@@ -1028,7 +1028,7 @@ modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 	local center = self.nest_position or self.object:get_pos()
 	if not center then return end
 	local center_fly = { x = center.x, y = center.y + 12, z = center.z }
-	local dist2floor = modding.sensor_floor(self, 10, true)
+	local dist2floor = mobforge.sensor_floor(self, 10, true)
 	center.y = center.y - dist2floor
 	local is_landed = true
 	local landing = (dist2floor > 4 and true) or false
@@ -1057,9 +1057,9 @@ modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 					waterdragon.action_land(self)
 					landing = false
 				else
-					dist2floor = modding.sensor_floor(_self, 10, true)
+					dist2floor = mobforge.sensor_floor(_self, 10, true)
 					pos2.y = pos2.y - dist2floor
-					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
+					mobforge.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
 					_self:animate("fly")
 				end
 				return
@@ -1069,23 +1069,23 @@ modding.register_utility("waterdragon:fly_and_roost", function(self, speed_x)
 				if random(5) < 2 then
 					local pos2 = _self:get_wander_pos(3, 6)
 					if vec_dist(pos2, center) > 16 then
-						modding.action_idle(_self, random(2, 5))
+						mobforge.action_idle(_self, random(2, 5))
 					else
-						modding.action_move(_self, pos2, 4, "modding:obstacle_avoidance", 0.5)
+						mobforge.action_move(_self, pos2, 4, "mobforge:obstacle_avoidance", 0.5)
 					end
 				else
-					modding.action_idle(_self, random(2, 5))
+					mobforge.action_idle(_self, random(2, 5))
 				end
 			else
 				local pos2 = _self:get_wander_pos_3d(ceil(8 * speed_x), ceil(12 * speed_x), vec_dir(pos, center_fly))
-				modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
+				mobforge.action_move(_self, pos2, 3, "waterdragon:fly_simple", speed_x or 0.5, "fly")
 			end
 		end
 	end
 	self:set_utility(func)
 end)
 
-modding.register_utility("waterdragon:fly_to_land", function(self)
+mobforge.register_utility("waterdragon:fly_to_land", function(self)
 	local landed = false
 	local function func(_self)
 		if not _self:get_action() then
@@ -1096,9 +1096,9 @@ modding.register_utility("waterdragon:fly_to_land", function(self)
 			else
 				local pos2 = _self:get_wander_pos_3d(3, 6)
 				if pos2 then
-					local dist2floor = modding.sensor_floor(_self, 10, true)
+					local dist2floor = mobforge.sensor_floor(_self, 10, true)
 					pos2.y = pos2.y - dist2floor
-					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
+					mobforge.action_move(_self, pos2, 3, "waterdragon:fly_simple", 0.6, "fly")
 					_self:animate("fly")
 				end
 			end
@@ -1109,7 +1109,7 @@ end)
 
 -- Scottish Dragon Breaking
 
-modding.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
+mobforge.register_utility("waterdragon:scottish_dragon_breaking", function(self, player)
 	self.fly_allowed = true
 	local center = self.object:get_pos()
 	if not center then return end
@@ -1206,7 +1206,7 @@ end)
 -- Water Dragon breaking
 
 
-modding.register_utility("waterdragon:wtd_breaking", function(self, player)
+mobforge.register_utility("waterdragon:wtd_breaking", function(self, player)
 	self.fly_allowed = true
 	local center = self.object:get_pos()
 	if not center then return end
@@ -1454,7 +1454,7 @@ minetest.register_entity("waterdragon:wing_horn", {
 
 
 
-modding.register_utility("waterdragon:attack", function(self, target)
+mobforge.register_utility("waterdragon:attack", function(self, target)
 	if not self.fly_allowed then
 		-- If the Water Dragon is not allowed to fly
 		return
@@ -1507,7 +1507,7 @@ modding.register_utility("waterdragon:attack", function(self, target)
 
 		if not _self:get_action() then
 			if not init then
-				local dist2floor = modding.sensor_floor(_self, 7, true)
+				local dist2floor = mobforge.sensor_floor(_self, 7, true)
 				if dist2floor > 6 or waterdragon.is_target_flying(target) then
 					is_landed = false
 				end
@@ -1526,7 +1526,7 @@ modding.register_utility("waterdragon:attack", function(self, target)
 					if waterdragon.is_target_flying(target) then
 						pos2 = { x = pos.x, y = pos.y - 7, z = pos.z }
 					end
-					modding.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
+					mobforge.action_move(_self, pos2, 3, "waterdragon:fly_simple", 1, "fly")
 				else
 					waterdragon.action_land(_self)
 					land_init = false
@@ -1566,10 +1566,10 @@ modding.register_utility("waterdragon:attack", function(self, target)
 				end
 			else
 				if is_landed then
-					waterdragon.action_pursue(_self, target, 2, "modding:obstacle_avoidance", 0.75, "walk_slow")
+					waterdragon.action_pursue(_self, target, 2, "mobforge:obstacle_avoidance", 0.75, "walk_slow")
 				else
 					tgt_pos.y = tgt_pos.y + 14
-					modding.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
+					mobforge.action_move(_self, tgt_pos, 5, "waterdragon:fly_simple", 1, "fly")
 				end
 			end
 		end
@@ -1743,7 +1743,7 @@ function summon_fire_dragon(self)
 	if self.hp > 100 or self.fire < 3 then return end
 
 	-- First hover and breathe fire
-	modding.action_idle(self, 3, "hover")
+	mobforge.action_idle(self, 3, "hover")
 	self.fire_breathing = true
 	breathe_pegasus_fire(self)
 
@@ -1787,7 +1787,7 @@ function summon_fire_dragon(self)
 	end)
 end
 
-modding.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
+mobforge.register_utility("waterdragon:scottish_dragon_attack", function(self, target)
 	if target:get_luaentity() and (target:get_luaentity().name == "waterdragon:pure_water_dragon" or target:get_luaentity().name == "waterdragon:rare_water_dragon" or target:get_luaentity().name == "pegasus:pegasus" or target:get_luaentity().name == "waterdragon:scottish_dragon") then
 		self._target = nil
 		return true
@@ -1845,7 +1845,7 @@ modding.register_utility("waterdragon:scottish_dragon_attack", function(self, ta
 			else
 				if dist > 14 then
 					_self:animate("fly")
-					_self:move_to(tgt_pos, "modding:obstacle_avoidance", 4)
+					_self:move_to(tgt_pos, "mobforge:obstacle_avoidance", 4)
 				else
 					waterdragon.action_flight_attack(_self, target, 12)
 				end
@@ -1860,7 +1860,7 @@ end)
 
 -- Tamed Behavior --
 
-modding.register_utility("waterdragon:stay", function(self)
+mobforge.register_utility("waterdragon:stay", function(self)
 	local function func(_self)
 		local order = _self.order
 		if not order or order ~= "stay" then
@@ -1876,19 +1876,19 @@ modding.register_utility("waterdragon:stay", function(self)
 			_self.object:set_velocity({ x = 0, y = 0, z = 0 })
 			_self.object:set_acceleration({ x = 0, y = 0, z = 0 })
 			if not _self:get_action() then
-				modding.action_idle(_self, 2, "hover")
+				mobforge.action_idle(_self, 2, "hover")
 			end
 		else
 			_self.object:set_acceleration({ x = 0, y = -9.81, z = 0 })
 			if not _self:get_action() then
-				modding.action_idle(_self, 2, "stand")
+				mobforge.action_idle(_self, 2, "stand")
 			end
 		end
 	end
 	self:set_utility(func)
 end)
 
-modding.register_utility("waterdragon:follow_player", function(self, player)
+mobforge.register_utility("waterdragon:follow_player", function(self, player)
 	local function func(_self)
 		local order = _self.order
 		if not order
@@ -1907,20 +1907,20 @@ modding.register_utility("waterdragon:follow_player", function(self, player)
 			return true
 		end
 		local dist = vec_dist(pos, tgt_pos)
-		local dist_to_ground = modding.sensor_floor(_self, 8, true)
+		local dist_to_ground = mobforge.sensor_floor(_self, 8, true)
 		if not _self:get_action() then
 			if dist < clamp(8 * scale, 5, 12) then
 				if dist_to_ground > 2 then
 					waterdragon.action_hover(_self, 2, "hover")
 				else
-					modding.action_idle(_self, 2, "stand")
+					mobforge.action_idle(_self, 2, "stand")
 				end
 			else
 				local height_diff = tgt_pos.y - pos.y
 				if ((height_diff > 8 or dist_to_ground > 2) and self.fly_allowed) then
-					modding.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
+					mobforge.action_move(_self, tgt_pos, 2, "waterdragon:fly_simple", 1, "fly")
 				else
-					modding.action_move(_self, tgt_pos, 3, "modding:context_based_steering", 1, "walk")
+					mobforge.action_move(_self, tgt_pos, 3, "mobforge:context_based_steering", 1, "walk")
 				end
 			end
 		end
@@ -1987,7 +1987,7 @@ waterdragon.dragon_behavior = {
 				end
 			end
 			local scale = self.growth_scale
-			local dist2floor = modding.sensor_floor(self, 3, true)
+			local dist2floor = mobforge.sensor_floor(self, 3, true)
 			if not self.owner
 				and dist2floor < 3
 				and target:get_pos()
@@ -2310,9 +2310,9 @@ waterdragon.scottish_dragon_behavior = {
 		utility = "waterdragon:fly_to_land",
 		get_score = function(self)
 			local util = self:get_utility() or ""
-			local attacking_tgt = self._target and modding.is_alive(self._target)
+			local attacking_tgt = self._target and mobforge.is_alive(self._target)
 			if attacking_tgt or util == "waterdragon:scottish_dragon_breaking" then return 0 end
-			local dist2floor = modding.sensor_floor(self, 5, true)
+			local dist2floor = mobforge.sensor_floor(self, 5, true)
 			if dist2floor > 4 then
 				local is_landed = self.is_landed
 				local is_grounded = (self.owner and not self.fly_allowed) or self.order == "stay"
@@ -2330,7 +2330,7 @@ waterdragon.scottish_dragon_behavior = {
 	}
 }
 
-modding.register_utility("waterdragon:water_dive", function(self, player)
+mobforge.register_utility("waterdragon:water_dive", function(self, player)
 	local function func(_self)
 		if not player or not player:get_pos() then return true end
 
@@ -2376,7 +2376,7 @@ modding.register_utility("waterdragon:water_dive", function(self, player)
 	self:set_utility(func)
 end)
 
-modding.register_utility("waterdragon:guardian_dive", function(self)
+mobforge.register_utility("waterdragon:guardian_dive", function(self)
 	local function func(_self)
 		if _self.rider then return true end
 

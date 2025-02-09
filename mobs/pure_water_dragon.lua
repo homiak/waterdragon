@@ -111,7 +111,7 @@ function waterdragon.eat_dropped_item(self, item)
 					waterdragon.action_fly(self, food_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
 				else
 					-- Use walking movement if Dragon is on ground
-					modding.action_move(self, food_pos, 3, "modding:obstacle_avoidance", 1, "walk")
+					mobforge.action_move(self, food_pos, 3, "mobforge:obstacle_avoidance", 1, "walk")
 				end
 				return false
 			end
@@ -247,7 +247,7 @@ end
 
 local colors = { "pure_water" }
 
-modding.register_mob("waterdragon:pure_water_dragon", {
+mobforge.register_mob("waterdragon:pure_water_dragon", {
 	-- Stats
 	max_health = 1500,
 	max_hunger = 500,
@@ -578,7 +578,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 			or (self.rider and puncher == self.rider) then
 			return
 		end
-		modding.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+		mobforge.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
 		end
@@ -677,7 +677,7 @@ modding.register_mob("waterdragon:pure_water_dragon", {
 	end
 })
 
-modding.register_spawn_item("waterdragon:pure_water_dragon", {
+mobforge.register_spawn_item("waterdragon:pure_water_dragon", {
 	description = S("Creative Pure Water Dragon Egg"),
 	inventory_image = "waterdragon_creative_egg_pure_water.png"
 })

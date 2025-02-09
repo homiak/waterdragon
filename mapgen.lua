@@ -224,7 +224,7 @@ local function generate_pure_water_dragon_nest(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "mobforge:spawn_node" })
 		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:pure_water_dragon")
 		meta:set_string("gender", gender)
@@ -365,7 +365,7 @@ local function generate_rare_water_dragon_nest(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "mobforge:spawn_node" })
 		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:rare_water_dragon")
 		meta:set_string("gender", gender)
@@ -460,7 +460,7 @@ local function generate_pure_water_dragon_cavern(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "mobforge:spawn_node" })
 		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:pure_water_dragon")
 		meta:set_string("gender", gender)
@@ -555,7 +555,7 @@ local function generate_rare_water_dragon_cavern(minp, maxp, area, data)
 	end
 
 	minetest.after(0.2, function()
-		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "modding:spawn_node" })
+		minetest.add_node({ x = center_x, y = center_y, z = center_z }, { name = "mobforge:spawn_node" })
 		local meta = minetest.get_meta({ x = center_x, y = center_y, z = center_z })
 		meta:set_string("mob", "waterdragon:rare_water_dragon")
 		meta:set_string("gender", gender)
@@ -574,12 +574,12 @@ end
 -- Spawning --
 --------------
 
-modding.register_on_spawn("waterdragon:pure_water_dragon", function(self, pos)
+mobforge.register_on_spawn("waterdragon:pure_water_dragon", function(self, pos)
 	self.nest_pos = pos
 	self:memorize("nest_pos", self.nest_pos)
 end)
 
-modding.register_on_spawn("waterdragon:rare_water_dragon", function(self, pos)
+mobforge.register_on_spawn("waterdragon:rare_water_dragon", function(self, pos)
 	self.nest_pos = pos
 	self:memorize("nest_pos", self.nest_pos)
 end)
@@ -620,7 +620,7 @@ minetest.register_on_generated(function(minp, maxp)
 				for y = min_y, max_y do
 					local vi = area:index(x, y, z)
 					local vi_name = minetest.get_name_from_content_id(data[vi])
-					if not modding.get_node_def(vi_name).walkable then
+					if not mobforge.get_node_def(vi_name).walkable then
 						table.insert(heights, y)
 						break
 					end
@@ -636,7 +636,7 @@ minetest.register_on_generated(function(minp, maxp)
 					for y = min_y, max_y do
 						local vi = area:index(x, y, z)
 						local vi_name = minetest.get_name_from_content_id(data[vi])
-						if not modding.get_node_def(vi_name).walkable then
+						if not mobforge.get_node_def(vi_name).walkable then
 							table.insert(heights, y)
 							break
 						end
