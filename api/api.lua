@@ -891,7 +891,7 @@ function waterdragon.pure_water_breath(self, pos2)
 		self.attack_disabled = false
 		self:memorize("attack_disabled", self.attack_disabled)
 	end
-	breath_sound(self, "waterdragon_water_breath")
+	breath_sound(self, "waterdragon_water_breath")	
 	local pos, dir = get_head_pos(self, pos2)
 	dir.y = vec_dir(pos, pos2).y
 	pos.y = pos.y + self.object:get_rotation().x
