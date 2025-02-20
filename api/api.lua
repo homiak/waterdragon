@@ -2013,7 +2013,6 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
-	self.is_patrolling = self.is_patrolling or false
 	self.armour = self:recall("armour") or false
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
@@ -3051,11 +3050,6 @@ local dragon_dialogue = {
 					action_stopped = true
 				end
 
-				if dragon.is_patrolling then
-					stop_dragon_patrol(dragon)
-					dragon.is_patrolling = false
-					action_stopped = true
-				end
 				if dragon._target then
 					dragon._target = nil
 					action_stopped = true
