@@ -749,8 +749,8 @@ minetest.register_chatcommand("autopilot", {
     end
 })
 
-mobforge.register_utility("waterdragon:mount", function(self)
-    local is_landed = mobforge.sensor_floor(self, 5, true) < 4
+waterdragon.register_utility("waterdragon:mount", function(self)
+    local is_landed = waterdragon.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 3
     local first_person_height = 45
@@ -830,8 +830,8 @@ mobforge.register_utility("waterdragon:mount", function(self)
             else
                 if _self.touching_ground then
                     waterdragon.action_land(_self)
-                    mobforge.action_move(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
-                        "mobforge:obstacle_avoidance", 1)
+                    waterdragon.action_move(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
+                        "waterdragon:obstacle_avoidance", 1)
                 else
                     waterdragon.action_fly(_self, vector.add(_self.object:get_pos(), vector.multiply(look_dir, 50)), 5,
                         "waterdragon:fly_simple", 0.5)
@@ -1178,7 +1178,7 @@ mobforge.register_utility("waterdragon:mount", function(self)
     self:set_utility(func)
 end)
 
-mobforge.register_utility("waterdragon:scottish_dragon_mount", function(self)
+waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
     if self.owner then
         local player = minetest.get_player_by_name(self.owner)
         if player then
@@ -1189,7 +1189,7 @@ mobforge.register_utility("waterdragon:scottish_dragon_mount", function(self)
             end
         end
     end
-    local is_landed = mobforge.sensor_floor(self, 5, true) < 4
+    local is_landed = waterdragon.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 2
     local momentum = 0

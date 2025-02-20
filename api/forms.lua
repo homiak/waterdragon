@@ -273,12 +273,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if not ent.is_landed then
 				waterdragon.action_takeoff(ent, 10)
 				ent:set_gravity(0)
-				mobforge.action_idle(ent, 300, "hover")
+				waterdragon.action_idle(ent, 300, "hover")
 			end
 		end
 
 		if fields.btn_lay then
-			mobforge.action_idle(ent, 300, "sleep")
+			waterdragon.action_idle(ent, 300, "sleep")
 		end
 		if fields.btn_find_blocks then
 			local target_blocks = {
@@ -392,7 +392,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if not ent.is_landed then
 				waterdragon.action_takeoff(ent, 10)
 				ent:set_gravity(0)
-				mobforge.action_idle(ent, 300, "hover")
+				waterdragon.action_idle(ent, 300, "hover")
 			end
 		end
 		if fields.btn_wtd_order then

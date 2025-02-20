@@ -8,7 +8,7 @@ local scottish_spawn_rate = tonumber(minetest.settings:get("scottish_dragon_spaw
 
 local colors = { "blue" }
 
-mobforge.register_mob("waterdragon:scottish_dragon", {
+waterdragon.register_mob("waterdragon:scottish_dragon", {
 	-- Stats
 	max_health = 700,
 	max_hunger = 500,
@@ -386,7 +386,7 @@ mobforge.register_mob("waterdragon:scottish_dragon", {
 			-- Reset the counter
 			self.punch_data.count = 0
 		end
-		mobforge.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
+		waterdragon.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
 		if not self.is_landed then
 			self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
 		end
@@ -399,7 +399,7 @@ mobforge.register_mob("waterdragon:scottish_dragon", {
 	end
 })
 
-mobforge.register_spawn_item("waterdragon:scottish_dragon", {
+waterdragon.register_spawn_item("waterdragon:scottish_dragon", {
 	description = S("Creative Scottish Dragon Egg"),
 	inventory_image = "waterdragon_creative_egg_scottish.png"
 })
@@ -416,7 +416,7 @@ minetest.register_on_mods_loaded(function()
 	end
 end)
 
-mobforge.register_mob_spawn("waterdragon:scottish_dragon", {
+waterdragon.register_mob_spawn("waterdragon:scottish_dragon", {
 	chance = scottish_spawn_rate,
 	min_group = 1,
 	max_group = 2,

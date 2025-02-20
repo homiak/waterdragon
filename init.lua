@@ -103,13 +103,24 @@ function minetest.clear_objects(options)
 end
 
 -- Load Files --
+
+dofile(path.."/library/mob_meta.lua")
+dofile(path.."/library/api.lua") 
+dofile(path.."/library/methods.lua")
+
+dofile(path.."/library/pathfinding.lua")
+dofile(path.."/library/boids.lua")
+dofile(path.."/library/spawning.lua")
+
 dofile(path .. "/api/api.lua")
 dofile(path .. "/api/mount.lua")
 dofile(path .. "/api/behaviors.lua")
+
 dofile(path .. "/mobs/rare_water_dragon.lua")
 dofile(path .. "/mobs/pure_water_dragon.lua")
 dofile(path .. "/mobs/scottish_dragon.lua")
 dofile(path .. "/nodes.lua")
+
 dofile(path .. "/craftitems.lua")
 dofile(path .. "/wtd_armour.lua")
 dofile(path .. "/api/book.lua")
@@ -165,7 +176,7 @@ minetest.register_abm({
     action = function(pos)
         local meta = minetest.get_meta(pos)
         local mob = meta:get_string("name")
-        minetest.set_node(pos, { name = "mobforge:spawn_node" })
+        minetest.set_node(pos, { name = "waterdragon:spawn_node" })
         if mob ~= "" then
             meta:set_string("mob", mob)
         end
