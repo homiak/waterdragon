@@ -1,0 +1,12 @@
+You can also talk with Water 
+Dragons. To start a conversation, 
+type /talk_dragon when near 
+a Dragon. They can answer about 
+their health, origins,
+power and give wise advice. 
+You can command them to "fly", 
+"land", "follow", "stay", 
+"attack" or "fire" and more. To end 
+conversation just say "bye".
+Dragons will only fully respond
+to their bonded rider.

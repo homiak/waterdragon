@@ -190,11 +190,41 @@ local book_pages = {
 			offset = { x = 15, y = 9 },
 			size = { x = 1, y = 1 },
 			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
-			unlock_key = "draconic_steel",
+			unlock_key = "mounting",
 		},
 
 	},
-	-- Chapter 3
+	{ -- Chapter 3
+		{ -- Mounting text 1
+			element_type = "label",
+			font_size = 24,
+			offset = { x = 0, y = 1.2 },
+			file = "waterdragon_book_talk1.txt",
+			unlock_key = "mounting",
+		},
+		{ -- Mounting text 2
+			element_type = "label",
+			font_size = 24,
+			offset = { x = 8, y = 1.2 },
+			file = "waterdragon_book_talk2.txt",
+			unlock_key = "mounting",
+		},
+		{ -- Last Page
+			element_type = "image_button",
+			font_size = 24,
+			offset = { x = 1, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_last.png;btn_last;;true;false",
+		},
+		{ -- Next Page
+			element_type = "image_button",
+			offset = { x = 15, y = 9 },
+			size = { x = 1, y = 1 },
+			text = "waterdragon_book_icon_next.png;btn_next;;true;false",
+			unlock_key = "mounting",
+		},
+	},
+	-- Chapter 4
 	{ -- Steel Page 1
 		{ -- Main Page
 			unlock_key = "draconic_steel",
