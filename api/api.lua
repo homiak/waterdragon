@@ -891,7 +891,7 @@ function waterdragon.pure_water_breath(self, pos2)
 		self.attack_disabled = false
 		self:memorize("attack_disabled", self.attack_disabled)
 	end
-	breath_sound(self, "waterdragon_water_breath")	
+	breath_sound(self, "waterdragon_water_breath")
 	local pos, dir = get_head_pos(self, pos2)
 	dir.y = vec_dir(pos, pos2).y
 	pos.y = pos.y + self.object:get_rotation().x
@@ -2801,118 +2801,118 @@ local wand_users = {}
 local patrolling_dragons = {}
 
 minetest.register_craftitem("waterdragon:patrol_wand", {
-    description = S("Dragon Patrol Wand"),
-    inventory_image = "waterdragon_patrol_wand.png",
-    on_use = function(itemstack, user, pointed_thing)
-        local name = user:get_player_name()
-        if pointed_thing.type ~= "node" then return end
+	description = S("Dragon Patrol Wand"),
+	inventory_image = "waterdragon_patrol_wand.png",
+	on_use = function(itemstack, user, pointed_thing)
+		local name = user:get_player_name()
+		if pointed_thing.type ~= "node" then return end
 
-        local pos = pointed_thing.under
-        if not wand_users[name] then
-            wand_users[name] = {pos1 = pos}
-            minetest.chat_send_player(name, "Position 1 set to: " .. minetest.pos_to_string(pos))
-        else
-            wand_users[name].pos2 = pos
-            minetest.chat_send_player(name, "Position 2 set to: " .. minetest.pos_to_string(pos))
-            minetest.chat_send_player(name, "Region set. Talk to your Dragon to start patrol")
-        end
-    end
+		local pos = pointed_thing.under
+		if not wand_users[name] then
+			wand_users[name] = { pos1 = pos }
+			minetest.chat_send_player(name, "Position 1 set to: " .. minetest.pos_to_string(pos))
+		else
+			wand_users[name].pos2 = pos
+			minetest.chat_send_player(name, "Position 2 set to: " .. minetest.pos_to_string(pos))
+			minetest.chat_send_player(name, "Region set. Talk to your Dragon to start patrol")
+		end
+	end
 })
 
 local function start_dragon_patrol(dragon, pos1, pos2, method)
 	if not dragon or dragon.object:get_pos() then
 		return false
 	end
-    local patrol_points = {
-        pos1,
-        {x=pos1.x, y=pos1.y, z=pos2.z},
-        pos2,
-        {x=pos2.x, y=pos2.y, z=pos1.z},
-        pos1
-    }
-    dragon.is_patrolling = true
-    -- Set patrol height for flying
-    if method == "fly" then
-        for i, point in ipairs(patrol_points) do
-            point.y = point.y + 10
-        end
-    end
+	local patrol_points = {
+		pos1,
+		{ x = pos1.x, y = pos1.y, z = pos2.z },
+		pos2,
+		{ x = pos2.x, y = pos2.y, z = pos1.z },
+		pos1
+	}
+	dragon.is_patrolling = true
+	-- Set patrol height for flying
+	if method == "fly" then
+		for i, point in ipairs(patrol_points) do
+			point.y = point.y + 10
+		end
+	end
 
-    patrolling_dragons[dragon] = {
-        points = patrol_points,
-        current_point = 1,
-        method = method,
-        original_pos = dragon.object:get_pos()
-    }
+	patrolling_dragons[dragon] = {
+		points = patrol_points,
+		current_point = 1,
+		method = method,
+		original_pos = dragon.object:get_pos()
+	}
 end
 
 local function stop_dragon_patrol(dragon)
 	if not dragon or dragon.object:get_pos() then
 		return false
 	end
-    if patrolling_dragons[dragon] then
-        if dragon.rider then
-            waterdragon.detach_player(dragon, dragon.rider)
-        end
-        patrolling_dragons[dragon] = nil
-        return true
-    end
-    return false
+	if patrolling_dragons[dragon] then
+		if dragon.rider then
+			waterdragon.detach_player(dragon, dragon.rider)
+		end
+		patrolling_dragons[dragon] = nil
+		return true
+	end
+	return false
 end
 
 local function move_dragon(dragon, patrol_info, dtime)
 	if not dragon or dragon.object:get_pos() then
 		return false
 	end
-    local target = patrol_info.points[patrol_info.current_point]
-    local pos = dragon.object:get_pos()
-    local distance = vector.distance(pos, target)
+	local target = patrol_info.points[patrol_info.current_point]
+	local pos = dragon.object:get_pos()
+	local distance = vector.distance(pos, target)
 
-    if distance < 0.5 then
-        patrol_info.current_point = patrol_info.current_point % (#patrol_info.points - 1) + 1
-        target = patrol_info.points[patrol_info.current_point]
-    end
+	if distance < 0.5 then
+		patrol_info.current_point = patrol_info.current_point % (#patrol_info.points - 1) + 1
+		target = patrol_info.points[patrol_info.current_point]
+	end
 
-    local direction = vector.direction(pos, target)
-    
-    dragon.object:set_yaw(minetest.dir_to_yaw(direction))
-    
-    if patrol_info.method == "fly" then
-        dragon:animate("fly")
-        dragon:set_gravity(0)
-        waterdragon.action_fly(dragon, target, 3, "waterdragon:obstacle_avoidance", 0.8, "fly")
-    else
-        dragon:animate("walk")
-        dragon:set_gravity(-9.8)
-        waterdragon.action_move(dragon, target, 3, "waterdragon:obstacle_avoidance", 1, "walk")
-    end
+	local direction = vector.direction(pos, target)
+
+	dragon.object:set_yaw(minetest.dir_to_yaw(direction))
+
+	if patrol_info.method == "fly" then
+		dragon:animate("fly")
+		dragon:set_gravity(0)
+		waterdragon.action_fly(dragon, target, 3, "waterdragon:obstacle_avoidance", 0.8, "fly")
+	else
+		dragon:animate("walk")
+		dragon:set_gravity(-9.8)
+		waterdragon.action_move(dragon, target, 3, "waterdragon:obstacle_avoidance", 1, "walk")
+	end
 end
 
 minetest.register_globalstep(function(dtime)
-    for dragon, patrol_info in pairs(patrolling_dragons) do
-        if not dragon.object:get_pos() then
-            patrolling_dragons[dragon] = nil
-        else
-            move_dragon(dragon, patrol_info, dtime)
-        end
-    end
+	for dragon, patrol_info in pairs(patrolling_dragons) do
+		if not dragon.object:get_pos() then
+			patrolling_dragons[dragon] = nil
+		else
+			move_dragon(dragon, patrol_info, dtime)
+		end
+	end
 end)
 
 minetest.register_chatcommand("stop_patrol", {
-    description = "Stops the patrol of the nearest Dragon",
-    func = function(name)
-        local player = minetest.get_player_by_name(name)
-        if not player then return false, "Player not found" end
+	description = "Stops the patrol of the nearest Dragon",
+	func = function(name)
+		local player = minetest.get_player_by_name(name)
+		if not player then return false, "Player not found" end
 
-        local player_pos = player:get_pos()
-        for dragon, _ in pairs(patrolling_dragons) do
-            if vector.distance(player_pos, dragon.object:get_pos()) < 15 then
-                stop_dragon_patrol(dragon)
-                return true, "Dragon patrol stopped"
-            end
-        end
-        return false, "No patrolling Dragons found nearby"
-    end
+		local player_pos = player:get_pos()
+		for dragon, _ in pairs(patrolling_dragons) do
+			if vector.distance(player_pos, dragon.object:get_pos()) < 15 then
+				stop_dragon_patrol(dragon)
+				return true, "Dragon patrol stopped"
+			end
+		end
+		return false, "No patrolling Dragons found nearby"
+	end
 })
 
 -- Dragon dialogue options
@@ -2981,42 +2981,42 @@ local dragon_dialogue = {
 			"I stand against the chaos-bringers, the despoilers of nature, and those who would harm the innocent.",
 			"Enemies? I have faced shadowy creatures from other realms and mortals who dared to challenge the sanctity of my domain."
 		},
-		
+
 		["why do you help me"] = {
 			"I sense potential within you. The bond between Dragon and human is rare but powerful.",
 			"Not all humans earn my aid, but your actions speak louder than words. I see a kindred spirit.",
 			"I help those who respect the balance of the world. You have proven yourself worthy of my trust... so far."
 		},
-		
+
 		["how old are you"] = {
 			"I was born when the first waters flowed upon this land. Time holds little meaning to me.",
 			"I am as old as the winds that carry whispers across the seas. Ancient, but ever present."
 		},
-		
+
 		["what do you eat"] = {
 			"My sustenance comes from the energies of water and the skies, though I enjoy the occasional offering of fresh meat.",
 			"I feed on the vitality of my domain. A meal of fish or wild game is a welcome gift, but not a necessity.",
 			"My kind does not require sustenance as you do, though I appreciate tributes from those I bond with."
 		},
-		
+
 		["can you teach me magic"] = {
 			"Magic is not something I can teach—it is something you must discover within yourself.",
 			"I can guide you, but the true essence of magic lies in your connection to the world.",
 			"Magic flows through all things. If you are attuned, you may learn by observing my actions."
 		},
-		
+
 		["do you have a family"] = {
 			"My kin are scattered across realms, guardians of their own domains.",
 			"Family? We Dragons are solitary by nature, but I have crossed paths with others of my lineage.",
 			"The bonds of Dragonkind are different from those of humans. My family is the sky, the water, and the earth."
 		},
-		
+
 		["what is your purpose"] = {
 			"To guard the waters, to preserve the balance, and to guide those worthy of my wisdom.",
 			"My purpose is to maintain the harmony of the realms I traverse.",
 			"I exist to protect and to remind others of the ancient forces that shaped this world."
 		},
-		
+
 		["where do you come from"] = {
 			"I emerged from the first waters, born of magic and the elements.",
 			"My origins lie in a realm where water and sky merge into endless horizons.",
@@ -3194,7 +3194,7 @@ local dragon_dialogue = {
 			action = function(dragon, player)
 				-- Проверяем тип дракона
 				local dragon_name = dragon.object and dragon.object:get_luaentity() and
-				dragon.object:get_luaentity().name
+					dragon.object:get_luaentity().name
 				if dragon_name == "waterdragon:rare_water_dragon" or dragon_name == "waterdragon:pure_water_dragon" then
 					local continuous_actions = {}
 
@@ -3257,7 +3257,7 @@ local dragon_dialogue = {
 					continuous_actions[dragon.wtd_id]()
 					return true
 				elseif dragon_name == "waterdragon:scottish_dragon" then
-					breathe_pegasus_fire(dragon)
+					dragon.is_breathing_fire = true
 					return true
 				end
 			end
@@ -3337,8 +3337,13 @@ local dragon_dialogue = {
 					local pos = self.object:get_pos()
 					local dist = vector.distance(pos, owner_pos)
 
-					if dist > 5 then
+					if dist and pos and dist > 22 then
 						waterdragon.action_fly(self, owner_pos, 3, "waterdragon:fly_simple", 0.8, "fly")
+					elseif dist and pos and dist <= 22 then
+						if not self.is_landed then
+							waterdragon.action_land(self)
+						end
+						waterdragon.action_move(self, owner_pos, 3, "waterdragon:obstacle_avoidance", 1, "walk")
 						return true
 					end
 					return false
@@ -3352,56 +3357,22 @@ local dragon_dialogue = {
 			end
 		},
 
-		["you can do it"] = {
-			name = "cheer",
-			response = "*The Dragon roars proudly*",
-			action = function(dragon, player)
-				if not dragon._target then
-					return false, "I am not in battle right now."
-				end
-
-				-- Boost Dragon's damage temporarily
-				local old_damage = dragon.damage
-				dragon.damage = dragon.damage * 1.5
-				dragon.hp = dragon.hp * 1.5
-				dragon.flight_stamina = dragon.flight_stamina * 1.5
-
-				
-
-				-- Reset damage after 5 seconds
-				minetest.after(5, function()
-					if dragon and dragon.object then
-						dragon.damage = old_damage
-					end
-				end)
-
-				-- Play roar sound
-				minetest.sound_play("waterdragon_water_dragon_random_3", {
-					object = dragon.object,
-					gain = 1.0,
-					max_hear_distance = 32,
-					pitch = 1.2
-				})
-
-				return true
-			end
-		},
 		["patrol"] = {
 			name = "patrol",
 			response = "*The Dragon prepares to patrol*",
 			action = function(dragon, player)
 				local name = player:get_player_name()
-				
+
 				if not wand_users[name] or not wand_users[name].pos1 or not wand_users[name].pos2 then
 					return false, "Set patrol area with the Patrol Wand first"
 				end
-				
+
 				-- Ask for patrol method
 				minetest.show_formspec(name, "waterdragon:patrol_method",
 					"size[4,3]" ..
 					"button_exit[0.5,0.5;3,1;fly;Fly Patrol]" ..
 					"button_exit[0.5,1.5;3,1;walk;Ground Patrol]")
-					
+
 				minetest.register_on_player_receive_fields(function(player, formname, fields)
 					if formname == "waterdragon:patrol_method" then
 						if fields.fly or fields.walk then
@@ -3454,7 +3425,7 @@ local dragon_dialogue = {
 	}
 }
 
-waterdragon.register_movement_method("waterdragon:obstacle_avoidance", function(self)
+waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", function(self)
 	local box = clamp(self.width, 0.5, 1.5)
 	local steer_to
 	local steer_timer = 0.25
@@ -3507,7 +3478,8 @@ waterdragon.register_movement_method("waterdragon:obstacle_avoidance", function(
 				if self.transport_rider then
 					local rider_name = self.transport_rider:get_player_name()
 					if rider_name then
-						minetest.chat_send_player(rider_name, (dragon.nametag or "Dragon") .. ": I need to rest my wings. I'll walk for a while.")
+						minetest.chat_send_player(rider_name,
+							(dragon.nametag or "Dragon") .. ": I need to rest my wings. I'll walk for a while.")
 					end
 				end
 			end
@@ -3712,7 +3684,8 @@ local function handle_transport(dragon, player, message)
 		minetest.after(1, function()
 			if dragon and dragon.object and dragon.object:get_pos() then
 				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 0.5, "fly")
-				minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
+				minetest.chat_send_player(player:get_player_name(),
+					(dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
 			end
 		end)
 	else
@@ -3731,7 +3704,8 @@ local function handle_transport(dragon, player, message)
 					waterdragon.detach_player(dragon, player)
 				end
 				dragon.transport_rider = false
-				minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": Journey interrupted")
+				minetest.chat_send_player(player:get_player_name(),
+					(dragon.nametag or "Dragon") .. ": Journey interrupted")
 				return
 			end
 
@@ -3780,7 +3754,8 @@ local function handle_transport(dragon, player, message)
 			minetest.after(10, function()
 				if dragon and dragon.object and dragon.object:get_pos() then
 					if dragon.flight_stamina <= 100 then
-						waterdragon.action_move(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 1, "walk")
+						waterdragon.action_move(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 1,
+							"walk")
 						dragon:set_gravity(-9.8)
 					end
 					if dragon.flight_stamina >= 300 then
@@ -3810,7 +3785,8 @@ local function process_dragon_chat(name, message)
 
 	-- Handle exit command
 	if message == "bye" or message == "goodbye" or message == "farewell" then
-		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.farewell[math.random(#dragon_dialogue.farewell)])
+		minetest.chat_send_player(name,
+			(dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.farewell[math.random(#dragon_dialogue.farewell)])
 		active_chats[name] = nil
 		return true
 	end
@@ -3847,10 +3823,12 @@ local function process_dragon_chat(name, message)
 	if message:find("take me to") then
 		local success, error_msg = handle_transport(dragon, player, message)
 		if success then
-			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": *The Dragon's eyes glow as it studies the destination*")
+			minetest.chat_send_player(name,
+				(dragon.nametag or "Dragon") .. ": *The Dragon's eyes glow as it studies the destination*")
 		else
 			-- Проверяем error_msg перед использованием
-			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot make this journey right now."))
+			minetest.chat_send_player(name,
+				(dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot make this journey right now."))
 		end
 		return true
 	end
@@ -3862,7 +3840,8 @@ local function process_dragon_chat(name, message)
 			if success then
 				minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. cmd.response)
 			else
-				minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot do that now."))
+				minetest.chat_send_player(name,
+					(dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot do that now."))
 			end
 			return true
 		end
@@ -3877,7 +3856,8 @@ local function process_dragon_chat(name, message)
 	end
 
 	-- Handle unknown input
-	minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.unknown[math.random(#dragon_dialogue.unknown)])
+	minetest.chat_send_player(name,
+		(dragon.nametag or "Dragon") .. ": " .. dragon_dialogue.unknown[math.random(#dragon_dialogue.unknown)])
 	return true
 end
 
