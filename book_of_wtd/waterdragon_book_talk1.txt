@@ -1,6 +1,6 @@
 You can also talk with Water 
 Dragons. To start a conversation, 
-type /talk_dragon when near 
+type /talk_wtd when near 
 a Dragon. They can answer about 
 their health, origins, magic
 and world's mysteries. Dragons

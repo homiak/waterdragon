@@ -3707,7 +3707,7 @@ local function process_dragon_chat(name, message)
 end
 
 -- Register chat command
-minetest.register_chatcommand("talk_dragon", {
+minetest.register_chatcommand("talk_wtd", {
 	description = S("Start a conversation with a nearby Dragon"),
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
