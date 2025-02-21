@@ -2907,19 +2907,19 @@ local dragon_dialogue = {
 			"It is the essence that binds all realms together, as ancient as time itself.",
 			"Magic is not merely power, but the very breath of creation that sustains all things."
 		},
-
+		
 		["what other dragons exist"] = {
 			"Many of my kin soar through different realms. Some command fire, others dance with lightning.",
 			"The Scottish Dragons are our distant cousins, proud and fierce in their own way.",
 			"Each Dragon race carries its own ancient wisdom and power."
 		},
-
+		
 		["do you dream"] = {
 			"Our dreams flow like deep currents, carrying visions of ages past and yet to come.",
 			"When I sleep, I see the world as it was in the time of the First Dragons.",
 			"My dreams are filled with the songs of ancient waters and forgotten magics."
 		},
-
+		
 		["what makes you happy"] = {
 			"The freedom of flight, the song of rushing waters, and the trust of a true companion.",
 			"When harmony exists between the realms of water, earth, and sky.",
@@ -3009,9 +3009,9 @@ local dragon_dialogue = {
 				if dragon.last_conversation ~= "can you teach me magic" then
 					return false, "What do you mean?"
 				end
-
+				
 				local name = player:get_player_name()
-
+				
 				if not waterdragon.players_with_wind_magic then
 					waterdragon.players_with_wind_magic = {}
 				end
@@ -3756,98 +3756,98 @@ end
 waterdragon.wind_vortexes = {}
 
 minetest.register_globalstep(function(dtime)
-	if not waterdragon.players_with_wind_magic then return end
-
-	for _, player in ipairs(minetest.get_connected_players()) do
-		local name = player:get_player_name()
-		if waterdragon.players_with_wind_magic[name] then
-			local control = player:get_player_control()
-			local pos = player:get_pos()
-
-			-- Check if player is on ground
-			local check_ground = vector.new(pos.x, pos.y - 0.1, pos.z)
-			local node = minetest.get_node(check_ground)
-			local is_on_ground = minetest.registered_nodes[node.name].walkable
-
-			if control.aux1 and control.sneak and is_on_ground then
-				if not waterdragon.wind_vortexes[name] then
-					waterdragon.wind_vortexes[name] = {
-						start_pos = vector.round(vector.subtract(pos, { x = 0, y = 1, z = 0 })),
-						start_time = os.time(),
-						start_y = pos.y,
-						reached_max = false
-					}
-				end
-
-				local vortex = waterdragon.wind_vortexes[name]
-
-				local horizontal_dist = vector.distance(
-					{ x = pos.x, y = 0, z = pos.z },
-					{ x = vortex.start_pos.x, y = 0, z = vortex.start_pos.z }
-				)
-
-				local time_passed = os.time() - vortex.start_time
-				if time_passed > 15 then
-					waterdragon.wind_vortexes[name] = nil
-					-- Remove hover effect
-					player:set_physics_override({ gravity = 1 })
-					return
-				end
-
-				if horizontal_dist > 3 then
-					waterdragon.wind_vortexes[name] = nil
-					player:set_physics_override({ gravity = 1 })
-					return
-				end
-
-				-- Check height and apply effects
-				local height_diff = pos.y - vortex.start_y
-				if height_diff < 20 and not vortex.reached_max then
-					player:add_velocity({ x = 0, y = 4, z = 0 })
-					local block_pos = vector.round({ x = pos.x, y = pos.y - 1, z = pos.z })
-					if minetest.get_node(block_pos).name == "air" then
-						minetest.set_node(block_pos, { name = "default:sand" })
-					end
-					-- Spiral particles...
-					for i = 0, 10 do
-						local angle = i * math.pi / 5
-						local y_offset = i * 0.5
-						local radius = 3 - (y_offset / 10)
-						local particle_pos = {
-							x = pos.x + radius * math.cos(angle),
-							y = pos.y + y_offset,
-							z = pos.z + radius * math.sin(angle)
-						}
-
-						minetest.add_particlespawner({
-							amount = 3,
-							time = 0.1,
-							minpos = particle_pos,
-							maxpos = particle_pos,
-							minvel = { x = 0, y = 2, z = 0 },
-							maxvel = { x = 0, y = 4, z = 0 },
-							minacc = { x = 0, y = 0.5, z = 0 },
-							maxacc = { x = 0, y = 1, z = 0 },
-							minexptime = 1,
-							maxexptime = 2,
-							minsize = 2,
-							maxsize = 4,
-							texture = "waterdragon_particle_blue.png",
-						})
-					end
-				end
-			else
-				-- Check if we need to clear vortex
-				if waterdragon.wind_vortexes[name] then
-					local time_passed = os.time() - waterdragon.wind_vortexes[name].start_time
-					if time_passed > 15 then
-						waterdragon.wind_vortexes[name] = nil
-						player:set_physics_override({ gravity = 1 })
-					end
-				end
-			end
-		end
-	end
+    if not waterdragon.players_with_wind_magic then return end
+    
+    for _, player in ipairs(minetest.get_connected_players()) do
+        local name = player:get_player_name()
+        if waterdragon.players_with_wind_magic[name] then
+            local control = player:get_player_control()
+            local pos = player:get_pos()
+            
+            -- Check if player is on ground
+            local check_ground = vector.new(pos.x, pos.y - 0.1, pos.z)
+            local node = minetest.get_node(check_ground)
+            local is_on_ground = minetest.registered_nodes[node.name].walkable
+            
+            if control.aux1 and control.sneak and is_on_ground then
+                if not waterdragon.wind_vortexes[name] then
+                    waterdragon.wind_vortexes[name] = {
+                        start_pos = vector.round(vector.subtract(pos, {x=0,y=1,z=0})),
+                        start_time = os.time(),
+                        start_y = pos.y,
+                        reached_max = false
+                    }
+                end
+                
+                local vortex = waterdragon.wind_vortexes[name]
+                
+                local horizontal_dist = vector.distance(
+                    {x=pos.x, y=0, z=pos.z},
+                    {x=vortex.start_pos.x, y=0, z=vortex.start_pos.z}
+                )
+                
+                local time_passed = os.time() - vortex.start_time
+                if time_passed > 15 then
+                    waterdragon.wind_vortexes[name] = nil
+                    -- Remove hover effect
+                    player:set_physics_override({gravity = 1})
+                    return
+                end
+                
+                if horizontal_dist > 3 then
+                    waterdragon.wind_vortexes[name] = nil
+                    player:set_physics_override({gravity = 1})
+                    return
+                end
+                
+                -- Check height and apply effects
+                local height_diff = pos.y - vortex.start_y
+                if height_diff < 20 and not vortex.reached_max then
+                    player:add_velocity({x=0, y=4, z=0})
+                    local block_pos = vector.round({ x = pos.x, y = pos.y - 1, z = pos.z })
+                    if minetest.get_node(block_pos).name == "air" then
+                        minetest.set_node(block_pos, { name = "default:sand" })
+                    end
+                    -- Spiral particles...
+                    for i = 0, 10 do
+                        local angle = i * math.pi/5
+                        local y_offset = i * 0.5
+                        local radius = 3 - (y_offset/10)
+                        local particle_pos = {
+                            x = pos.x + radius * math.cos(angle),
+                            y = pos.y + y_offset,
+                            z = pos.z + radius * math.sin(angle)
+                        }
+                        
+                        minetest.add_particlespawner({
+                            amount = 3,
+                            time = 0.1,
+                            minpos = particle_pos,
+                            maxpos = particle_pos,
+                            minvel = {x=0, y=2, z=0},
+                            maxvel = {x=0, y=4, z=0},
+                            minacc = {x=0, y=0.5, z=0},
+                            maxacc = {x=0, y=1, z=0},
+                            minexptime = 1,
+                            maxexptime = 2,
+                            minsize = 2,
+                            maxsize = 4,
+                            texture = "waterdragon_particle_blue.png",
+                        })
+                    end
+                end
+            else
+                -- Check if we need to clear vortex
+                if waterdragon.wind_vortexes[name] then
+                    local time_passed = os.time() - waterdragon.wind_vortexes[name].start_time
+                    if time_passed > 15 then
+                        waterdragon.wind_vortexes[name] = nil
+                        player:set_physics_override({gravity = 1})
+                    end
+                end
+            end
+        end
+    end
 end)
 
 -- Register chat command
