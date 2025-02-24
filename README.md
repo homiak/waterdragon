@@ -11,10 +11,12 @@ Standard installation via Minetest Mod Menu, or just from ContentDB.
 ## Usage
 After installing the mod, you will be able to encounter Water Dragons in their Nests. Interact with them to discover their unique abilities and obtain Draconic materials for crafting blocks and armor.
 
+## optional dependency "pegasus"
+The mod has an optional dependency on Pegasus mod. When both mods are installed, Dragons and Pegasi will recognize each other in the world. Pegasi can use Dragon-like flight mechanics, and Dragons may respond differently to Pegasi. The interaction between these magnificent creatures adds depth to your mythical creature experience.
+
 More information you will find in the Book about Water Dragons - search inventory for it.
 
-This mod is based on Draconis and created by Scottii.
-
+This mod is based on Draconis and Creatura and is created by Scottii.
 
 ## Release log
 

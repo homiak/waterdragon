@@ -3570,13 +3570,13 @@ local function handle_transport(dragon, player, message)
 		waterdragon.action_takeoff(dragon, 5)
 		minetest.after(1, function()
 			if dragon and dragon.object and dragon.object:get_pos() then
-				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 0.5, "fly")
+				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance", 0.5, "fly")
 				minetest.chat_send_player(player:get_player_name(),
 					(dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
 			end
 		end)
 	else
-		waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 0.5, "fly")
+		waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance", 0.5, "fly")
 	end
 	-- Add after flight starts and before arrival handler
 	minetest.after(0.1, function()
