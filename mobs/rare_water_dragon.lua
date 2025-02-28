@@ -18,18 +18,16 @@ end
 function dragon_stay_behavior(self)
     if self.order ~= "stay" then return end
     if self.rider then return end
-    local vel = self.object:get_velocity()
-    local pos = self.object:get_pos()
-    local node_below = minetest.get_node({ x = pos.x, y = pos.y - 1, z = pos.z })
+    if self.passenger then return end
+    if self._target then return end
+    if self:get_action() then return end
 
-    if vel.y < -0.5 and minetest.get_item_group(node_below.name, "liquid") == 0 then
-        self.object:set_velocity({ x = 0, y = 0, z = 0 })
-        self:set_forward_velocity(0)
-        self:set_vertical_velocity(0)
-        self.object:set_acceleration({ x = 0, y = 0, z = 0 })
+    if not self.touching_ground then
+        self:set_gravity(0)
         self:animate("hover")
-    else
-        self.object:set_acceleration({ x = 0, y = -9.81, z = 0 })
+    elseif self.touching_ground then
+        self:set_gravity(-9.81)
+        self:animate("stand")
     end
 end
 
