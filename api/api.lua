@@ -2132,6 +2132,10 @@ function waterdragon.scottish_dragon_activate(self)
 	end
 	self.scottish_eye_colour = self:recall("scottish_eye_colour")
 	self.attack_cooldown = {}
+	if self.scottish_id == 1 then
+		self.scottish_id = waterdragon.generate_scottish_id()
+		self:memorize("scottish_id", self.scottish_id)
+	end
 	-- Tamed Data
 	self.rider = nil
 	self.owner = self:recall("owner") or false
@@ -2388,7 +2392,14 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if obj then self._ignore_obj[obj] = nil end
 	end
 	if not waterdragon.scottish_dragons[self.object] then
-		waterdragon.scottish_dragons[self.object] = { owner = self.owner }
+		waterdragon.scottish_dragons[self.scottish_id] = {
+			last_pos = self.object:get_pos(),
+			owner = self.owner,
+			name = self.nametag or nil,
+			staticdata = self:get_staticdata(),
+			removal_queue = {},
+			stored_in_item = false
+		}
 	end
 end
 
