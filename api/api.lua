@@ -484,7 +484,7 @@ function waterdragon.drop_items(self)
 			maxexptime = 1,
 			minsize = 4,
 			maxsize = 4,
-			texture = "waterdragon_smoke_particle.png",
+			texture = "waterdragon_water_particle.png",
 			animation = {
 				type = 'vertical_frames',
 				aspect_w = 4,

@@ -956,7 +956,7 @@ waterdragon.register_utility("waterdragon:die", function(self)
 			init = true
 		end
 		timer = timer - _self.dtime
-		if timer <= 0 then
+		if timer <= -3 then
 			local pos = _self.object:get_pos()
 			if not pos then return end
 			minetest.add_particlespawner({
@@ -972,7 +972,7 @@ waterdragon.register_utility("waterdragon:die", function(self)
 				maxexptime = 1,
 				minsize = 4,
 				maxsize = 4,
-				texture = "waterdragon_smoke_particle.png",
+				texture = "waterdragon_water_particle.png",
 				animation = {
 					type = 'vertical_frames',
 					aspect_w = 4,
@@ -981,6 +981,7 @@ waterdragon.register_utility("waterdragon:die", function(self)
 				},
 				glow = 1
 			})
+			minetest.chat_send_player(_self.owner, "Your Scottish Dragon has died! You can revive it with a Dragon Water Drop")
 			waterdragon.drop_items(_self)
 			_self.object:remove()
 		end

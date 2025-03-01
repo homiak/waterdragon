@@ -71,7 +71,7 @@ function waterdragon.get_collision(self, dir, range)
 	local pos_x, pos_y, pos_z = pos.x, pos.y, pos.z
 	local dir_x, dir_y, dir_z = dir.x, dir.y, dir.z
 
-	local pos2 = {x = pos_x, y = pos_y, z = pos_z}
+	local pos2 = { x = pos_x, y = pos_y, z = pos_z }
 	local collision
 
 
@@ -96,7 +96,7 @@ function waterdragon.get_collision(self, dir, range)
 				if get_node_def(pos2).walkable then
 					local score = abs(pos.y - pos2.y) * vec_dot(dir, vec_dir(pos, pos2))
 					if not low_score
-					or score < low_score then
+						or score < low_score then
 						low_score = score
 						collision = pos2
 					end
@@ -127,10 +127,10 @@ local function get_avoidance_dir(self)
 end
 
 local function get_collision_single(pos, water)
-	local pos2 = {x = pos.x, y = pos.y, z = pos.z}
+	local pos2 = { x = pos.x, y = pos.y, z = pos.z }
 	local n_def = get_node_def(pos2)
 	if n_def.walkable
-	or (water and (n_def.groups.liquid or 0) > 0) then
+		or (water and (n_def.groups.liquid or 0) > 0) then
 		pos2.y = pos.y + 1
 		n_def = get_node_def(pos2)
 		local col_max = n_def.walkable or (water and (n_def.groups.liquid or 0) > 0)
@@ -149,7 +149,7 @@ function waterdragon.get_avoidance_lift(self, pos2, range)
 	range = ceil(max(range or 1, 0.5))
 	local height_half = (self.height or 1) * 0.5
 	local center_y = pos2.y + height_half
-	local check_pos = {x = pos2.x, y = center_y, z = pos2.z}
+	local check_pos = { x = pos2.x, y = center_y, z = pos2.z }
 
 	-- Find ceiling and floor collisions
 	local def
@@ -160,22 +160,22 @@ function waterdragon.get_avoidance_lift(self, pos2, range)
 		check_pos.y = center_y + i
 		def = waterdragon.get_node_def(check_pos)
 		if not ceil_pos
-		and (def.walkable
-		or minetest.get_item_group(def.name, "liquid") > 0) then
+			and (def.walkable
+				or minetest.get_item_group(def.name, "liquid") > 0) then
 			ceil_pos = check_pos
 		end
 		check_pos.y = center_y - i
 		def = waterdragon.get_node_def(check_pos)
 		if not floor_pos
-		and (def.walkable
-		or minetest.get_item_group(def.name, "liquid") > 0) then
+			and (def.walkable
+				or minetest.get_item_group(def.name, "liquid") > 0) then
 			floor_pos = check_pos
 		end
 	end
 
 	-- Calculate direction to average point of collisions
 	check_pos.y = center_y
-	local offset = {x = 0, y = height_half + range, z = 0}
+	local offset = { x = 0, y = height_half + range, z = 0 }
 	if not ceil_pos then ceil_pos = vec_add(check_pos, offset) end
 	if not floor_pos then floor_pos = vec_sub(check_pos, offset) end
 
@@ -191,7 +191,7 @@ function waterdragon.get_avoidance_lift_aquatic(self, pos2, range)
 	range = ceil(max(range or 1, 0.5))
 	local height_half = (self.height or 1) * 0.5
 	local center_y = pos2.y + height_half
-	local check_pos = {x = pos2.x, y = center_y, z = pos2.z}
+	local check_pos = { x = pos2.x, y = center_y, z = pos2.z }
 
 	-- Find ceiling and floor collisions
 	local ceil_pos
@@ -200,19 +200,19 @@ function waterdragon.get_avoidance_lift_aquatic(self, pos2, range)
 		if ceil_pos and floor_pos then break end
 		check_pos.y = center_y + i
 		if not ceil_pos
-		and minetest.get_item_group(waterdragon.get_node_def(check_pos).name, "liquid") < 1 then
+			and minetest.get_item_group(waterdragon.get_node_def(check_pos).name, "liquid") < 1 then
 			ceil_pos = check_pos
 		end
 		check_pos.y = center_y - i
 		if not floor_pos
-		and minetest.get_item_group(waterdragon.get_node_def(check_pos).name, "liquid") < 1 then
+			and minetest.get_item_group(waterdragon.get_node_def(check_pos).name, "liquid") < 1 then
 			floor_pos = check_pos
 		end
 	end
 
 	-- Calculate direction to average point of collisions
 	check_pos.y = center_y
-	local offset = {x = 0, y = height_half + range, z = 0}
+	local offset = { x = 0, y = height_half + range, z = 0 }
 	if not ceil_pos then ceil_pos = vec_add(check_pos, offset) end
 	if not floor_pos then floor_pos = vec_sub(check_pos, offset) end
 
@@ -229,14 +229,14 @@ end
 ----------------------------
 
 local steer_directions = {
-	vec_normal({x = 1, y = 0, z = 0}),
-	vec_normal({x = 1, y = 0, z = 1}),
-	vec_normal({x = 0, y = 0, z = 1}),
-	vec_normal({x = -1, y = 0, z = 0}),
-	vec_normal({x = -1, y = 0, z = -1}),
-	vec_normal({x = 0, y = 0, z = -1}),
-	vec_normal({x = 1, y = 0, z = -1}),
-	vec_normal({x = -1, y = 0, z = 1})
+	vec_normal({ x = 1, y = 0, z = 0 }),
+	vec_normal({ x = 1, y = 0, z = 1 }),
+	vec_normal({ x = 0, y = 0, z = 1 }),
+	vec_normal({ x = -1, y = 0, z = 0 }),
+	vec_normal({ x = -1, y = 0, z = -1 }),
+	vec_normal({ x = 0, y = 0, z = -1 }),
+	vec_normal({ x = 1, y = 0, z = -1 }),
+	vec_normal({ x = -1, y = 0, z = 1 })
 }
 
 -- Context Methods
@@ -252,8 +252,8 @@ function waterdragon.get_context_default(self, goal, steer_dir, interest, danger
 	local ray = minetest.raycast(pos, vec_add(pos, vec_multi(steer_dir, width + range)), false, false)
 	local pointed = ray:next()
 	if pointed
-	and pointed.type == "node"
-	and waterdragon.get_node_def(pointed.under).walkable then
+		and pointed.type == "node"
+		and waterdragon.get_node_def(pointed.under).walkable then
 		collision = pointed.under
 	end
 
@@ -337,12 +337,12 @@ function waterdragon.calc_steering(self, goal, get_context, range)
 	if not pos or not yaw then return end
 	range = math.max(range or 2, 2)
 	local dir2goal = vec_normal(vec_dir(pos, goal))
-	local output_dir = {x = 0, y = dir2goal.y, z = 0}
+	local output_dir = { x = 0, y = dir2goal.y, z = 0 }
 
 	-- Cached variables
 	local dir
 	for _, _dir in ipairs(steer_directions) do
-		dir = {x = _dir.x, y = dir2goal.y, z = _dir.z}
+		dir = { x = _dir.x, y = dir2goal.y, z = _dir.z }
 		local score = vec_dot(dir2goal, dir)
 		local interest = clamp(score, 0, 1)
 		local danger = 0
@@ -361,7 +361,7 @@ function waterdragon.get_context_steering(self, goal, range, water)
 	local context = waterdragon.get_context_default
 	local width, height = self.width, self.height
 	if width > 0.5
-	or height > 1 then
+		or height > 1 then
 		context = waterdragon.get_context_large
 	elseif water then
 		context = waterdragon.get_context_small_aquatic
@@ -385,14 +385,14 @@ function waterdragon.action_move(self, pos2, timeout, method, speed_factor, anim
 		self:animate(anim or "walk")
 		local safe = true
 		if _self.max_fall
-		and _self.max_fall > 0 then
+			and _self.max_fall > 0 then
 			local pos = self.object:get_pos()
 			if not pos then return end
 			safe = _self:is_pos_safe(pos2)
 		end
 		if timer <= 0
-		or not safe
-		or _self:move_to(pos2, method or "waterdragon:obstacle_avoidance", speed_factor or 0.5) then
+			or not safe
+			or _self:move_to(pos2, method or "waterdragon:obstacle_avoidance", speed_factor or 0.5) then
 			return true
 		end
 	end
@@ -432,14 +432,16 @@ function waterdragon.action_fallover(self)
 			end
 			init = true
 		end
-		rot = _self.object:get_rotation()
-		local goal = (pi * 0.5) * dir
-		local step = _self.dtime
-		if step > 0.5 then step = 0.5 end
-		zrot = zrot + (pi * dir) * step
-		_self.object:set_rotation({x = rot.x, y = rot.y, z = zrot})
-		if (dir > 0 and zrot >= goal)
-		or (dir < 0 and zrot <= goal) then return true end
+			rot = _self.object:get_rotation()
+			local goal = (pi * 0.5) * dir
+			local step = _self.dtime
+			if step > 0.5 then step = 0.5 end
+			zrot = zrot + (pi * dir) * step
+			_self.object:set_rotation({ x = rot.x, y = rot.y, z = zrot })
+			if (dir > 0 and zrot >= goal)
+				or (dir < 0 and zrot <= goal) then
+				return true
+			end
 	end
 	self:set_action(func)
 end
@@ -495,8 +497,8 @@ waterdragon.register_movement_method("waterdragon:pathfind_theta", function(self
 		path = (#path > 0 and path) or (waterdragon.pathfinder.find_path_theta(_self, pos, goal) or {})
 
 		if path_dir
-		and ((path[2] and vec_dist(pos, path[2]) < arrival_threshold)
-		or vec_dist(pos, path[1]) < arrival_threshold) then
+			and ((path[2] and vec_dist(pos, path[2]) < arrival_threshold)
+				or vec_dist(pos, path[1]) < arrival_threshold) then
 			table.remove(path, 1)
 		end
 
@@ -534,8 +536,8 @@ waterdragon.register_movement_method("waterdragon:pathfind", function(self)
 		path = (#path > 0 and path) or (waterdragon.pathfinder.find_path(_self, pos, goal) or {})
 
 		if path_dir
-		and ((path[2] and vec_dist(pos, path[2]) < arrival_threshold + 0.5)
-		or vec_dist(pos, path[1]) < arrival_threshold) then
+			and ((path[2] and vec_dist(pos, path[2]) < arrival_threshold + 0.5)
+				or vec_dist(pos, path[1]) < arrival_threshold) then
 			table.remove(path, 1)
 		end
 
@@ -664,7 +666,7 @@ waterdragon.register_movement_method("waterdragon:obstacle_avoidance", function(
 		-- Movement
 		local yaw_diff = abs(diff(yaw, goal_yaw))
 		if yaw_diff < pi * 0.25
-		or steer_to then
+			or steer_to then
 			_self:set_forward_velocity(speed)
 		else
 			_self:set_forward_velocity(speed * 0.33)
@@ -673,5 +675,3 @@ waterdragon.register_movement_method("waterdragon:obstacle_avoidance", function(
 	end
 	return func
 end)
-
-
