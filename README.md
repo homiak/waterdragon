@@ -1,10 +1,10 @@
 # Draigh-uisge means in Scottish Gaelic a Water Dragon.
 
-**Water Dragons:** The mod introduces two types of Water Dragons - the Pure Water Dragon and the Rare Water Dragon. These Dragons inhabit their Water Nests, each with unique abilities and characteristics.
+**Water Dragons:** The mod introduces tree types of Dragons - the Pure Water Dragon, the Rare Water Dragon and the Scottish Dragon. These Dragons inhabit their Water Nests, each with unique abilities and characteristics.
 
-**Draconic Blocks:** The mod features various decorative and functional blocks, including Draconic Bricks, slabs, stairs, and more.
+**Draconic Blocks:** The mod features various decorative and functional blocks, including Draconic Bricks, Draconic Stone, and more.
 
-**Water-Forged Draconic Armour:** Gather the Water-Forged Draconic Steel material and craft powerful armor to protect you during battles.
+**Water-Forged Draconic Armour:** Forge the Water-Forged Draconic Steel material and craft powerful armor to protect you during battles.
 
 ## Installation
 Standard installation via Minetest Mod Menu, or just from ContentDB.
@@ -14,9 +14,17 @@ After installing the mod, you will be able to encounter Water Dragons in their N
 
 More information you will find in the Book about Water Dragons - search inventory for it.
 
-This mod is based on Draconis and created by Scottii.
+This mod is based on Draconis and Creatura and created by Scottii.
 
 ## Release log
+
+### Release v 4.2.0
+- Fix bugs
+- Remove Scottish Dragon Crate
+-  Ability to store Scottish Dragons in Dragon Horns
+
+### Release v 4.1.0
+- Fix bugs
 
 ### Release v 4.0.1
 - Fix bugs
@@ -39,7 +47,7 @@ This mod is based on Draconis and created by Scottii.
 - Minor tweaks
 
 ### Release v 2.3.1
-- Fix many bugs
+- Fix bugs
 
 ### Release v 2.2.0
 - Fix bugs
