@@ -912,7 +912,7 @@ waterdragon.register_utility("waterdragon:mount", function(self)
             if is_landed then
                 _self:set_gravity(-9.8)
                 anim = "stand"
-                if _self.flight_stamina <= 50 then
+                if _self.flight_stamina <= 50 and not is_landed then
                     local rider_name = _self.rider:get_player_name()
                     if rider_name then
                         minetest.chat_send_player(rider_name, S("The Water Dragon is tired and needs to rest"))
@@ -922,9 +922,7 @@ waterdragon.register_utility("waterdragon:mount", function(self)
                         anim = "fly"
                         if _self.touching_ground then
                             waterdragon.action_land(_self)
-                            anim = "sleep"
-                            _self:set_vertical_velocity(0)
-                            _self:set_forward_velocity(0)
+                            is_landed = true
                             return
                         end
                     end
