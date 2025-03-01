@@ -2392,14 +2392,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if obj then self._ignore_obj[obj] = nil end
 	end
 	if not waterdragon.scottish_dragons[self.object] then
-		waterdragon.scottish_dragons[self.scottish_id] = {
-			last_pos = self.object:get_pos(),
-			owner = self.owner,
-			name = self.nametag or nil,
-			staticdata = self:get_staticdata(),
-			removal_queue = {},
-			stored_in_item = false
-		}
+		waterdragon.scottish_dragons[self.object] = { owner = self.owner }
 	end
 end
 
