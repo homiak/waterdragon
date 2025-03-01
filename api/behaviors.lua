@@ -981,9 +981,14 @@ waterdragon.register_utility("waterdragon:die", function(self)
 				},
 				glow = 1
 			})
-			minetest.chat_send_player(_self.owner, "Your Scottish Dragon has died! You can revive it with a Dragon Water Drop")
+
 			waterdragon.drop_items(_self)
 			_self.object:remove()
+			minetest.add_item(pos, "waterdragon:draconic_tooth 5")
+			minetest.add_item(pos, "waterdragon:wing_horn 2")
+			minetest.add_item(pos, "waterdragon:scales_scottish_dragon 12")
+			minetest.add_item(pos, "waterdragon:dragon_horn 2")
+			return true
 		end
 	end
 	self:set_utility(func)
