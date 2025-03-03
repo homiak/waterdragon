@@ -18,6 +18,9 @@ This mod is based on Draconis and Creatura and created by Scottii.
 
 ## Release log
 
+### Release v 4.3.0
+- Fix bugs
+
 ### Release v 4.2.0
 - Fix bugs
 - Remove Scottish Dragon Crate
