@@ -941,7 +941,7 @@ waterdragon.register_utility("waterdragon:wander", function(self)
 end)
 
 waterdragon.register_utility("waterdragon:die", function(self)
-	local timer = 1.5
+	local timer = 4
 	local init = false
 	local die = "waterdragon_death"
 	local function func(_self)
@@ -956,7 +956,7 @@ waterdragon.register_utility("waterdragon:die", function(self)
 			init = true
 		end
 		timer = timer - _self.dtime
-		if timer <= -3 then
+		if timer <= 0 then
 			local pos = _self.object:get_pos()
 			if not pos then return end
 			minetest.add_particlespawner({

@@ -28,7 +28,6 @@ local function create_fire_sphere(pos, radius)
                     if node.name ~= "air" and node.name ~= "ignore" and
                         not minetest.is_protected(check_pos, "") then
                         minetest.set_node(check_pos, { name = "air" })
-                        
                     end
                 end
             end
@@ -369,11 +368,15 @@ local function set_hud(player, def)
 end
 
 function waterdragon.attach_player(self, player)
+    if not self.object or not self.object:get_pos() then
+        return
+    end
     if not player
         or not player:get_look_horizontal()
         or not player:is_player() then
         return
     end
+    
     local scale = self.growth_scale or 1
     -- Attach Player
     player:set_attach(self.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
@@ -422,6 +425,9 @@ function waterdragon.attach_player(self, player)
 end
 
 function waterdragon.attach_passenger(self, player)
+    if not self.object or not self.object:get_pos() then
+        return
+    end
     if not player
         or not player:get_look_horizontal()
         or not player:is_player() then
@@ -747,16 +753,7 @@ minetest.register_chatcommand("autopilot", {
     end
 })
 
-function waterdragon.set_utility(self, utility_name, ...)
-    if type(waterdragon.registered_utilities[utility_name]) == "function" then
-        waterdragon.registered_utilities[utility_name](self, ...)
-    else
-        minetest.log("error", "Attempt to set non-existent utility: " .. utility_name)
-    end
-end
-
 waterdragon.register_utility("waterdragon:mount", function(self)
-
     local is_landed = waterdragon.sensor_floor(self, 5, true) < 4
     local view_held = false
     local view_point = 3
@@ -922,7 +919,14 @@ waterdragon.register_utility("waterdragon:mount", function(self)
                         anim = "fly"
                         if _self.touching_ground then
                             waterdragon.action_land(_self)
+                            anim = "stand"
+                            _self:set_vertical_velocity(0)
+                            _self:set_forward_velocity(0)
                             is_landed = true
+                        end
+                        if _self.flight_stamina >= 100 then
+                            waterdragon.action_takeoff(_self, 1)
+                            is_landed = false
                             return
                         end
                     end
@@ -1004,6 +1008,8 @@ waterdragon.register_utility("waterdragon:mount", function(self)
                 anim = "fly_to_land"
             else
                 _self:set_gravity(0)
+                anim = "hover"
+                
 
                 if control.up and _self.moveresult and _self.moveresult.collisions and not control.down and not control.LMB then
                     for _, collision in ipairs(_self.moveresult.collisions) do
