@@ -519,14 +519,6 @@ function waterdragon.generate_scottish_id()
 	return "SC-" .. minetest.sha1(tostring(math.random()) .. tostring(os.time())):sub(1, 16)
 end
 
-local function get_scottish_dragon_by_id(scottish_id)
-	for _, ent in pairs(minetest.luaentities) do
-		if ent.scottish_id and ent.scottish_id == scottish_id then
-			return ent
-		end
-	end
-end
-
 -- Items --
 
 local function capture(player, ent)
