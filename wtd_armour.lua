@@ -88,6 +88,7 @@ waterdragon.register_mob_armour = function(name, def)
                     props.textures[1] = def.dragon_armour_texture
                     obj:set_properties(props)
                     itemstack:take_item()
+                    ent.armour = true
                     ent:memorize("armour", ent.armour)
                     return itemstack
                 end

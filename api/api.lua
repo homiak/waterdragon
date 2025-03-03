@@ -2002,7 +2002,7 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
-	self.armour = self:recall("armour") or false
+	self.armour = self:recall("armour") or nil
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
 	if not self.gender then
@@ -2143,6 +2143,7 @@ function waterdragon.scottish_dragon_activate(self)
 	self.order = self:recall("order") or "wander"
 	self.fly_allowed = self:recall("fly_allowed") or false
 	self.hunger = self:recall("hunger") or self.max_hunger
+	self.is_stored_in_item = self.is_stored_in_item or false
 	activate_nametag(self)
 	-- Movement Data
 	self.is_landed = self:recall("is_landed") or false
