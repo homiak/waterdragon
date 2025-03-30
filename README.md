@@ -24,7 +24,7 @@ This mod is based on Draconis and Creatura and created by Scottii.
 ### Release v 4.2.0
 - Fix bugs
 - Remove Scottish Dragon Crate
--  Ability to store Scottish Dragons in Dragon Horns
+- Ability to store Scottish Dragons in Dragon Horns
 
 ### Release v 4.1.0
 - Fix bugs

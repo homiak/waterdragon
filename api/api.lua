@@ -903,7 +903,7 @@ function waterdragon.pure_water_breath(self, pos2)
 			y = pos.y + dir.y * (self.growth_scale * 5) + vel.y + 2,
 			z = pos.z + dir.z * (self.growth_scale * 4) + vel.z
 		}
-		
+
 		local scale = self.growth_scale
 		if minetest.has_feature("particlespawner_tweenable") then
 			minetest.add_particlespawner({
@@ -2901,19 +2901,19 @@ local dragon_dialogue = {
 			"It is the essence that binds all realms together, as ancient as time itself.",
 			"Magic is not merely power, but the very breath of creation that sustains all things."
 		},
-		
+
 		["what other dragons exist"] = {
 			"Many of my kin soar through different realms. Some command fire, others dance with lightning.",
 			"The Scottish Dragons are our distant cousins, proud and fierce in their own way.",
 			"Each Dragon race carries its own ancient wisdom and power."
 		},
-		
+
 		["do you dream"] = {
 			"Our dreams flow like deep currents, carrying visions of ages past and yet to come.",
 			"When I sleep, I see the world as it was in the time of the First Dragons.",
 			"My dreams are filled with the songs of ancient waters and forgotten magics."
 		},
-		
+
 		["what makes you happy"] = {
 			"The freedom of flight, the song of rushing waters, and the trust of a true companion.",
 			"When harmony exists between the realms of water, earth, and sky.",
@@ -2969,6 +2969,13 @@ local dragon_dialogue = {
 					waterdragon.action_fly(dragon, circle_pos, 2, "waterdragon:fly_simple", 1, "fly")
 				end)
 				return true
+			end
+		},
+		["bring me to"] = {
+			name = "bring me to",
+			response = "*The Dragon raises its head and calls to its kin*",
+			action = function(dragon, player, message)
+				return false, "Please tell me the name of the Dragon you wish to visit (e.g., 'bring me to Kilgara')"
 			end
 		},
 
@@ -3130,7 +3137,7 @@ local dragon_dialogue = {
 						local eye_correction = vector.multiply(current_dir, eye_offset.z * 0.125)
 						current_pos = vector.add(current_pos, eye_correction)
 						current_pos.y = current_pos.y + eye_offset.y
-						
+
 						local tpos = vector.add(current_pos, vector.multiply(current_dir, 64))
 						if anim then dragon:animate(anim) end
 						dragon:breath_attack(tpos)
@@ -3547,7 +3554,8 @@ local function handle_transport(dragon, player, message)
 		waterdragon.action_takeoff(dragon, 5)
 		minetest.after(1, function()
 			if dragon and dragon.object and dragon.object:get_pos() then
-				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance", 0.5, "fly")
+				waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance", 0.5,
+					"fly")
 				minetest.chat_send_player(player:get_player_name(),
 					(dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
 			end
@@ -3696,7 +3704,100 @@ local function process_dragon_chat(name, message)
 		end
 		return true
 	end
+	-- Handle special commands with parameters
+	if message:match("^bring%s+me%s+to%s+%S") then
+		-- Extract the Dragon name with proper capitalization, allowing for spaces in the name
+		local dragon_name = message:match("^bring%s+me%s+to%s+(.+)$")
 
+		if not dragon_name then
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": Tell me which Dragon you wish to visit")
+			return true
+		end
+
+		if dragon.owner and dragon.owner ~= player:get_player_name() then
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": I only respond to my chosen companion.")
+			return true
+		end
+
+		if dragon_name:lower() == (dragon.nametag or ""):lower() then
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": I am already here.")
+			return true
+		end
+
+		local target_dragon = nil
+
+		for _, obj in pairs(minetest.luaentities) do
+			if obj.name and obj.name:match("^waterdragon:") and
+				obj.nametag and obj.nametag:lower() == dragon_name:lower() then
+				target_dragon = obj
+				dragon_name = obj.nametag -- Get the exact capitalization from the actual Dragon
+				break
+			end
+		end
+
+		if target_dragon then
+			-- Mount the player before flying
+			if not dragon.rider and not dragon.transport_rider then
+				-- Set up the player as a rider for transport
+				local scale = dragon.growth_scale or 1
+				player:set_attach(dragon.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+				player:set_eye_offset({
+					x = 0,
+					y = 115 * scale,
+					z = -280 * scale
+				}, { x = 0, y = 0, z = 0 })
+
+				-- Set the transport rider flag
+				dragon.transport_rider = true
+
+				-- Start takeoff if on ground
+				if dragon.touching_ground then
+					waterdragon.action_takeoff(dragon, 5)
+					minetest.after(1, function()
+						if dragon and dragon.object and dragon.object:get_pos() then
+							waterdragon.action_fly(dragon, target_dragon.object:get_pos(), 3, "waterdragon:fly_simple", 1,
+								"fly")
+						end
+					end)
+				else
+					waterdragon.action_fly(dragon, target_dragon.object:get_pos(), 3, "waterdragon:fly_simple", 1, "fly")
+				end
+			else
+				waterdragon.action_fly(dragon, target_dragon.object:get_pos(), 3, "waterdragon:fly_simple", 1, "fly")
+			end
+			minetest.after(0.1, function()
+				local function check_sneak()
+					if not dragon or not dragon.object or not dragon.object:get_pos() then return end
+
+					if player:get_player_control().sneak and dragon.transport_rider then
+						player:set_detach()
+						player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
+						waterdragon.action_land(dragon)
+						if dragon.rider then
+							waterdragon.detach_player(dragon, player)
+						end
+						dragon.transport_rider = false
+						minetest.chat_send_player(player:get_player_name(),
+							(dragon.nametag or "Dragon") .. ": Journey stopped")
+						return
+					end
+
+					if dragon.transport_rider then
+						minetest.after(0.1, check_sneak)
+					end
+				end
+				check_sneak()
+			end)
+			minetest.chat_send_player(name,
+				(dragon.nametag or "Dragon") .. ": *The Dragon spreads its wings and flies toward " .. dragon_name .. "*")
+		else
+			-- Capitalize first letter for the response
+			dragon_name = dragon_name:sub(1, 1):upper() .. dragon_name:sub(2)
+			minetest.chat_send_player(name,
+				(dragon.nametag or "Dragon") .. ": I don't know a Dragon named " .. dragon_name)
+		end
+		return true
+	end
 	-- Handle standard commands
 	for cmd_name, cmd in pairs(dragon_dialogue.commands) do
 		if message == cmd_name then
@@ -3734,98 +3835,98 @@ end
 waterdragon.wind_vortexes = {}
 
 minetest.register_globalstep(function(dtime)
-    if not waterdragon.players_with_wind_magic then return end
-    
-    for _, player in ipairs(minetest.get_connected_players()) do
-        local name = player:get_player_name()
-        if waterdragon.players_with_wind_magic[name] then
-            local control = player:get_player_control()
-            local pos = player:get_pos()
-            
-            -- Check if player is on ground
-            local check_ground = vector.new(pos.x, pos.y - 0.1, pos.z)
-            local node = minetest.get_node(check_ground)
-            local is_on_ground = minetest.registered_nodes[node.name].walkable
-            
-            if control.aux1 and control.sneak and is_on_ground then
-                if not waterdragon.wind_vortexes[name] then
-                    waterdragon.wind_vortexes[name] = {
-                        start_pos = vector.round(vector.subtract(pos, {x=0,y=1,z=0})),
-                        start_time = os.time(),
-                        start_y = pos.y,
-                        reached_max = false
-                    }
-                end
-                
-                local vortex = waterdragon.wind_vortexes[name]
-                
-                local horizontal_dist = vector.distance(
-                    {x=pos.x, y=0, z=pos.z},
-                    {x=vortex.start_pos.x, y=0, z=vortex.start_pos.z}
-                )
-                
-                local time_passed = os.time() - vortex.start_time
-                if time_passed > 15 then
-                    waterdragon.wind_vortexes[name] = nil
-                    -- Remove hover effect
-                    player:set_physics_override({gravity = 1})
-                    return
-                end
-                
-                if horizontal_dist > 3 then
-                    waterdragon.wind_vortexes[name] = nil
-                    player:set_physics_override({gravity = 1})
-                    return
-                end
-                
-                -- Check height and apply effects
-                local height_diff = pos.y - vortex.start_y
-                if height_diff < 20 and not vortex.reached_max then
-                    player:add_velocity({x=0, y=4, z=0})
-                    local block_pos = vector.round({ x = pos.x, y = pos.y - 1, z = pos.z })
-                    if minetest.get_node(block_pos).name == "air" then
-                        minetest.set_node(block_pos, { name = "default:sand" })
-                    end
-                    -- Spiral particles...
-                    for i = 0, 10 do
-                        local angle = i * math.pi/5
-                        local y_offset = i * 0.5
-                        local radius = 3 - (y_offset/10)
-                        local particle_pos = {
-                            x = pos.x + radius * math.cos(angle),
-                            y = pos.y + y_offset,
-                            z = pos.z + radius * math.sin(angle)
-                        }
-                        
-                        minetest.add_particlespawner({
-                            amount = 3,
-                            time = 0.1,
-                            minpos = particle_pos,
-                            maxpos = particle_pos,
-                            minvel = {x=0, y=2, z=0},
-                            maxvel = {x=0, y=4, z=0},
-                            minacc = {x=0, y=0.5, z=0},
-                            maxacc = {x=0, y=1, z=0},
-                            minexptime = 1,
-                            maxexptime = 2,
-                            minsize = 2,
-                            maxsize = 4,
-                            texture = "waterdragon_particle_blue.png",
-                        })
-                    end
-                end
-            else
-                -- Check if we need to clear vortex
-                if waterdragon.wind_vortexes[name] then
-                    local time_passed = os.time() - waterdragon.wind_vortexes[name].start_time
-                    if time_passed > 15 then
-                        waterdragon.wind_vortexes[name] = nil
-                        player:set_physics_override({gravity = 1})
-                    end
-                end
-            end
-        end
-    end
+	if not waterdragon.players_with_wind_magic then return end
+
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		if waterdragon.players_with_wind_magic[name] then
+			local control = player:get_player_control()
+			local pos = player:get_pos()
+
+			-- Check if player is on ground
+			local check_ground = vector.new(pos.x, pos.y - 0.1, pos.z)
+			local node = minetest.get_node(check_ground)
+			local is_on_ground = minetest.registered_nodes[node.name].walkable
+
+			if control.aux1 and control.sneak and is_on_ground then
+				if not waterdragon.wind_vortexes[name] then
+					waterdragon.wind_vortexes[name] = {
+						start_pos = vector.round(vector.subtract(pos, { x = 0, y = 1, z = 0 })),
+						start_time = os.time(),
+						start_y = pos.y,
+						reached_max = false
+					}
+				end
+
+				local vortex = waterdragon.wind_vortexes[name]
+
+				local horizontal_dist = vector.distance(
+					{ x = pos.x, y = 0, z = pos.z },
+					{ x = vortex.start_pos.x, y = 0, z = vortex.start_pos.z }
+				)
+
+				local time_passed = os.time() - vortex.start_time
+				if time_passed > 15 then
+					waterdragon.wind_vortexes[name] = nil
+					-- Remove hover effect
+					player:set_physics_override({ gravity = 1 })
+					return
+				end
+
+				if horizontal_dist > 3 then
+					waterdragon.wind_vortexes[name] = nil
+					player:set_physics_override({ gravity = 1 })
+					return
+				end
+
+				-- Check height and apply effects
+				local height_diff = pos.y - vortex.start_y
+				if height_diff < 20 and not vortex.reached_max then
+					player:add_velocity({ x = 0, y = 4, z = 0 })
+					local block_pos = vector.round({ x = pos.x, y = pos.y - 1, z = pos.z })
+					if minetest.get_node(block_pos).name == "air" then
+						minetest.set_node(block_pos, { name = "default:sand" })
+					end
+					-- Spiral particles...
+					for i = 0, 10 do
+						local angle = i * math.pi / 5
+						local y_offset = i * 0.5
+						local radius = 3 - (y_offset / 10)
+						local particle_pos = {
+							x = pos.x + radius * math.cos(angle),
+							y = pos.y + y_offset,
+							z = pos.z + radius * math.sin(angle)
+						}
+
+						minetest.add_particlespawner({
+							amount = 3,
+							time = 0.1,
+							minpos = particle_pos,
+							maxpos = particle_pos,
+							minvel = { x = 0, y = 2, z = 0 },
+							maxvel = { x = 0, y = 4, z = 0 },
+							minacc = { x = 0, y = 0.5, z = 0 },
+							maxacc = { x = 0, y = 1, z = 0 },
+							minexptime = 1,
+							maxexptime = 2,
+							minsize = 2,
+							maxsize = 4,
+							texture = "waterdragon_particle_blue.png",
+						})
+					end
+				end
+			else
+				-- Check if we need to clear vortex
+				if waterdragon.wind_vortexes[name] then
+					local time_passed = os.time() - waterdragon.wind_vortexes[name].start_time
+					if time_passed > 15 then
+						waterdragon.wind_vortexes[name] = nil
+						player:set_physics_override({ gravity = 1 })
+					end
+				end
+			end
+		end
+	end
 end)
 
 
