@@ -175,8 +175,6 @@ local function get_scottish_dragon_formspec(self)
 	local fire = get_perc(self.fire, 10)
 	-- Visuals
 	local frame_range = self.animations["stand"].range
-	local frame_loop = frame_range.x .. "," .. frame_range.y
-	local texture = self:get_props().textures[1]
 	local health_ind = "waterdragon_forms_health_bg.png^[lowpart:" .. health .. ":waterdragon_forms_health_fg.png"
 	local hunger_ind = "waterdragon_forms_hunger_bg.png^[lowpart:" .. hunger .. ":waterdragon_forms_hunger_fg.png"
 	local stamina_ind = "waterdragon_forms_stamina_bg.png^[lowpart:" .. stamina .. ":waterdragon_forms_stamina_fg.png"
@@ -248,7 +246,6 @@ local function get_dragon_actions_formspec(ent)
 		"button[1,2;6,0.8;btn_roar;Roar]",
 		"button[1,3;6,0.8;btn_takeoff;Takeoff]",
 		"button[1,4;6,0.8;btn_lay;Sleep]",
-		"button[1,5;6,0.8;btn_find_blocks;Find Blocks]",
 		"button_exit[7.1,0.1;1.0,0.6;btn_close;Close]"
 	}
 	return table.concat(form, "")
@@ -279,43 +276,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 		if fields.btn_lay then
 			waterdragon.action_idle(ent, 300, "sleep")
-		end
-		if fields.btn_find_blocks then
-			local target_blocks = {
-				["default:diamondblock"] = true,
-				["default:goldblock"] = true,
-				["default:water_source"] = true,
-				["default:steelblock"] = true,
-			}
-
-			local pos = ent.object:get_pos()
-			local nearest_block, nearest_dist = nil, math.huge
-			for x = -50, 50 do
-				for y = -50, 50 do
-					for z = -50, 50 do
-						local check_pos = vector.add(pos, { x = x, y = y, z = z })
-						local node = minetest.get_node(check_pos)
-						if node and target_blocks[node.name] then
-							local dist = vector.distance(pos, check_pos)
-							if dist < nearest_dist then
-								nearest_block = check_pos
-								nearest_dist = dist
-							end
-						end
-					end
-				end
-			end
-
-			if nearest_block then
-				waterdragon.action_fly(ent, nearest_block, 3, "waterdragon:fly_simple", 0.8, "fly")
-				minetest.chat_send_player(name,
-					"The Water Dragon has found a target block! The target blocks are: the default diamondblock, the goldblock, the water source and the steelblock")
-				if vector.distance(ent.object:get_pos(), nearest_block) <= 5 then
-					ent:animate("hover")
-				end
-			else
-				minetest.chat_send_player(name, "No target blocks found nearby!")
-			end
 		end
 	end
 end)
