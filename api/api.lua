@@ -3727,7 +3727,7 @@ local function process_dragon_chat(name, message)
 		local target_dragon = nil
 
 		for _, obj in pairs(minetest.luaentities) do
-			if obj.name and obj.name:match("^waterdragon:") and
+			if obj.name and (obj.name:match("^waterdragon:") or obj.name:match("^winddragon:")) and
 				obj.nametag and obj.nametag:lower() == dragon_name:lower() then
 				target_dragon = obj
 				dragon_name = obj.nametag -- Get the exact capitalization from the actual Dragon
