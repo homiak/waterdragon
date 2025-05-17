@@ -259,13 +259,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if not ent or not ent.object then return end
 
 		if fields.btn_roar then
-			minetest.sound_play("waterdragon_water_dragon_random_3", {
+			local roar_sounds = {
+				"waterdragon_water_dragon_random_1",
+				"waterdragon_water_dragon_random_2",
+				"waterdragon_water_dragon_random_3"
+			}
+			local sound = roar_sounds[math.random(1, #roar_sounds)]
+			minetest.sound_play(sound, {
 				object = ent.object,
 				gain = 1.0,
 				max_hear_distance = 32
 			})
 		end
-
 		if fields.btn_takeoff then
 			if not ent.is_landed then
 				waterdragon.action_takeoff(ent, 10)

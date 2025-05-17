@@ -95,6 +95,18 @@ local special_dragon_names = {
         speed_bonus = 8,
         effect = "powerful"
     },
+    ["Braenach"] = {
+        health_bonus = 180,
+        damage_bonus = 10,
+        speed_bonus = 8,
+        effect = "powerful"
+    },
+    ["Braenachan"] = {
+        health_bonus = 200,
+        damage_bonus = 10,
+        speed_bonus = 8,
+        effect = "powerful"
+    },
     ["Dealanach"] = {
         health_bonus = 220,
         damage_bonus = 10,
