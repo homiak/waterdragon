@@ -1,22 +1,35 @@
 # Draigh-uisge means in Scottish Gaelic a Water Dragon.
 
-**Water Dragons:** The mod introduces tree types of Dragons - the Pure Water Dragon, the Rare Water Dragon and the Scottish Dragon. These Dragons inhabit their Water Nests, each with unique abilities and characteristics.
+**Water Dragons:** This mod introduces three types of Dragons — the Pure Water Dragon, the Rare Water Dragon, and the Scottish Dragon. Each has some unique abilities, such as creating healing water and glowing at night.
+
+**Useful things:** Water Dragons can rescue players in danger. There are also many craftitems to discover — some of them are quite special, like the one that lets you talk to Water Dragons.
 
 **Draconic Blocks:** The mod features various decorative and functional blocks, including Draconic Bricks, Draconic Stone, and more.
 
-**Water-Forged Draconic Armour:** Forge the Water-Forged Draconic Steel material and craft powerful armor to protect you during battles.
+**Water-Forged Draconic Tools and Armour:** Forge powerful gear from Water-Forged Draconic Steel. The armour offers great protection in battles, and the tools — forged in Dragon Water — are incredibly powerful, capable of killing some enemies in a single hit.
+
+## Chatcommands
+- call_wtd <radius> - Calls the nearest Water Dragon within the specified radius (default is 100) and teleports it to you.
+- set_wtd_owner <player_name> - Sets the owner of the pointed Water Dragon.
+- wtd_blacklist_add <player_name> - Adds a player to the Water Dragon Attack Blacklist.
+- wtd_blacklist_remove <player_name> - Removes a player from the Water Dragon Attack Blacklist.
+- wtd_blacklist_show - Shows all players currently in the Blacklist.
+- talk_wtd - Start a conversation with the nearest Water Dragon.
+- wtd_mount_settings - Opens the Water Dragon mount settings form.
+- autopilot - Toggles the Water Dragon’s autopilot mode when mounted.
 
 ## Installation
-Standard installation via Minetest Mod Menu, or just from ContentDB.
+Install via the Minetest Mod Menu, or download from ContentDB.
 
-## Usage
-After installing the mod, you will be able to encounter Water Dragons in their Nests. Interact with them to discover their unique abilities and obtain Draconic materials for crafting blocks and armor.
-
-More information you will find in the Book about Water Dragons - search inventory for it.
+More details can be found in the Book about Water Dragons — it's included in this mod, just search for it in your inventory.
 
 This mod is based on Draconis and Creatura and created by Scottii.
 
-## Release log
+# Release log
+
+### Release v 4.4.0
+- Fix bugs
+- Fix shoulder mount bug
 
 ### Release v 4.3.0
 - Fix bugs
