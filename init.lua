@@ -127,7 +127,7 @@ dofile(path .. "/api/book.lua")
 dofile(path .. "/bonuses.lua")
 
 if minetest.get_modpath("3d_armor") then
-    dofile(path .. "/armor.lua")
+    dofile(path .. "/armour.lua")
 end
 
 -- Spawning --
