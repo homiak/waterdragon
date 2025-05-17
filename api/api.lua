@@ -2594,6 +2594,7 @@ function waterdragon.dragon_rightclick(self, clicker)
 			self.object:set_attach(clicker, "",
 				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
 		end
+		
 	end
 	if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
 		waterdragon.send_passenger_request(self, clicker)
