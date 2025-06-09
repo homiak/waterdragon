@@ -420,6 +420,23 @@ local wing_colors = {
 	},
 }
 
+function winddragon.safe_set_texture(self, texture_name)
+    -- Базовая текстура
+    local new_texture = texture_name
+    
+    -- Если есть броня, добавляем её текстуру
+    if self.armour and self.armour.texture then
+        new_texture = new_texture .. "^" .. self.armour.texture
+    end
+    
+    -- Применяем текстуру
+    local props = self.object:get_properties()
+    if props and props.textures then
+        props.textures[1] = new_texture
+        self.object:set_properties(props)
+    end
+end
+
 local function generate_texture(self, force)
 	waterdragon.set_color_string(self)
 	local def = minetest.registered_entities[self.name]
@@ -435,6 +452,11 @@ local function generate_texture(self, force)
 	if self:get_props().textures[1]:find("wing_fade") and not force then return end
 	textures[1] = textures[1] .. "^" .. self.wing_overlay
 	self:set_texture(1, textures)
+	local base_texture = texture
+    self.original_texture = base_texture
+    if self.armour and self.armour.texture then
+        texture = base_texture .. "^" .. self.armour.texture
+    end
 end
 
 waterdragon.generate_texture = generate_texture
@@ -1764,7 +1786,7 @@ minetest.register_chatcommand("call_wtd", {
 		-- Search for the nearest Water Dragon within the radius
 		for _, obj in pairs(minetest.get_objects_inside_radius(player_pos, radius)) do
 			local ent = obj:get_luaentity()
-			if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon") then
+			if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon" or ent.name == "waterdragon:scottish_dragon") then
 				if ent.owner == name then
 					local dist = vector.distance(player_pos, obj:get_pos())
 					if dist < nearest_dist then
@@ -2002,7 +2024,7 @@ function waterdragon.dragon_activate(self)
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
-	self.armour = self:recall("armour") or nil
+	self.armour = self:recall("armour") or false
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
 	if not self.gender then
@@ -2144,6 +2166,7 @@ function waterdragon.scottish_dragon_activate(self)
 	self.fly_allowed = self:recall("fly_allowed") or false
 	self.hunger = self:recall("hunger") or self.max_hunger
 	self.is_stored_in_item = self.is_stored_in_item or false
+	self.armour = self:recall("armour") or false
 	activate_nametag(self)
 	-- Movement Data
 	self.is_landed = self:recall("is_landed") or false
@@ -2866,9 +2889,15 @@ local dragon_dialogue = {
 			"I am as old as the winds that carry whispers across the seas. Ancient, but ever present."
 		},
 
+		["what is your name"] = {
+			"My name is a fire that burns in the depths of the ocean, a whisper in the winds of the skies. I am ",
+			"I am known as the Water Dragon, a guardian of the waters and skies. My name is ",
+			"I am the embodiment of the ancient waters, a spirit of the skies, and my name is the echo of the elements: "
+		},
+
 		["what do you eat"] = {
 			"My sustenance comes from the energies of water and the skies, though I enjoy the occasional offering of fresh meat.",
-			"I feed on the vitality of my domain. A meal of fish or wild game is a welcome gift, but not a necessity.",
+			"I feed on the vitality of my domain. A meal of wild meat is a welcome gift, but not a necessity.",
 			"My kind does not require sustenance as you do, though I appreciate tributes from those I bond with."
 		},
 
@@ -3750,6 +3779,14 @@ local function process_dragon_chat(name, message)
 		local response = dragon_dialogue.conversations["how much breath do you have"][math.random(3)]
 		response = response .. " " .. (dragon.attack_stamina or 0) .. "/" .. dragon.attack_stamina
 		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response)
+		return true
+	end
+	if message:find("what is your name") then
+		local response = dragon_dialogue.conversations["what is your name"][math.random(3)]
+		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response .. (dragon.nametag or "Dragon"))
+		if dragon.nametag == "" then
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": My name is a secret, but you can call me 'Water Dragon'")
+		end
 		return true
 	end
 	-- Handle transport command

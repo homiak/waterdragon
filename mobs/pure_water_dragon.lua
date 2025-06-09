@@ -441,6 +441,50 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
 	activate_func = function(self)
 		waterdragon.dragon_activate(self)
 		apply_name_bonuses(self)
+		local data = {}
+		if self.staticdata and type(self.staticdata) == "string" then
+			data = minetest.deserialize(self.staticdata) or {}
+		end
+
+		if data.armour then
+			self.armour = data.armour
+			self.original_texture = data.original_texture
+
+			local props = self.object:get_properties()
+			if props and props.textures and props.textures[1] and self.armour.texture then
+				local base_texture = props.textures[1]:gsub("%^.*", "")
+
+				props.textures[1] = base_texture .. "^" .. self.armour.texture
+				self.object:set_properties(props)
+
+			end
+			if data.armour then
+				self.armour = data.armour
+				self.original_texture = data.original_texture
+				
+				if not self.original_texture then
+					self.original_texture = "waterdragon_pure_water_dragon.png^waterdragon_baked_in_shading.png"
+					
+					local props = self.object:get_properties()
+					if props and props.textures and props.textures[1] then
+						local current_texture = props.textures[1]
+						if current_texture:match("^waterdragon_") then
+							self.original_texture = current_texture:gsub("%^.*", "")
+						end
+					end
+				end
+				
+				if self.armour.texture and self.original_texture then
+					local props = self.object:get_properties()
+					if props and props.textures then
+						props.textures[1] = self.original_texture .. "^" .. self.armour.texture
+						self.object:set_properties(props)
+						
+						
+					end
+				end
+			end
+		end
 	end,
 	step_func = function(self, dtime, moveresult)
 		waterdragon.dragon_step(self, dtime, moveresult)
@@ -453,10 +497,6 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
             if self.hunger and self.hunger < hunger_threshold then
                 local pos = self.object:get_pos()
                 if self.owner then
-                    -- Прирученный дракон
-                    minetest.chat_send_player(self.owner,
-                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Help him find food!")
-
                     -- Попытка найти мясо в ближайших объектах
                     local found_meat = false
                     if pos then

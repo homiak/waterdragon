@@ -191,21 +191,54 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
 		end
 	end,
 	on_activate = function(self, staticdata, dtime_s)
-		if staticdata ~= "" then
-			local data = minetest.deserialize(staticdata)
-			if data and data.armour then
+
+		local data = {}
+		if self.staticdata and type(self.staticdata) == "string" then
+			data = minetest.deserialize(self.staticdata) or {}
+		end
+
+		if data.armour then
+			self.armour = data.armour
+			self.original_texture = data.original_texture
+
+			local props = self.object:get_properties()
+			if props and props.textures and props.textures[1] and self.armour.texture then
+				local base_texture = props.textures[1]:gsub("%^.*", "")
+
+				props.textures[1] = base_texture .. "^" .. self.armour.texture
+				self.object:set_properties(props)
+
+			end
+			if data.armour then
 				self.armour = data.armour
+				self.original_texture = data.original_texture
+				
+				if not self.original_texture then
+					self.original_texture = "waterdragon_scottish_dragon.png^waterdragon_baked_in_shading.png"
+					
+					local props = self.object:get_properties()
+					if props and props.textures and props.textures[1] then
+						local current_texture = props.textures[1]
+						if current_texture:match("^waterdragon_") then
+							self.original_texture = current_texture:gsub("%^.*", "")
+						end
+					end
+				end
+				
+				if self.armour.texture and self.original_texture then
+					local props = self.object:get_properties()
+					if props and props.textures then
+						props.textures[1] = self.original_texture .. "^" .. self.armour.texture
+						self.object:set_properties(props)
+						
+						
+					end
+				end
 			end
 		end
 
-		if self.armour and self.armour.texture then
-			local props = self.object:get_properties()
-			props.textures[1] = self.armour.texture
-			self.object:set_properties(props)
-		end
-
-		if self.dragon_activate then
-			self.dragon_activate(self)
+		if self.scottish_dragon_activate then
+			self.scottish_dragon_activate(self)
 		end
 	end,
 	step_func = function(self, dtime)
@@ -227,10 +260,6 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
             if self.hunger and self.hunger < hunger_threshold then
                 local pos = self.object:get_pos()
                 if self.owner then
-                    -- Прирученный дракон
-                    minetest.chat_send_player(self.owner,
-                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Help him find food!")
-
                     -- Попытка найти мясо в ближайших объектах
                     local found_meat = false
                     if pos then

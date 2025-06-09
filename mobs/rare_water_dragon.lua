@@ -116,22 +116,59 @@ waterdragon.register_mob("waterdragon:rare_water_dragon", {
     activate_func = function(self)
         waterdragon.dragon_activate(self)
         apply_name_bonuses(self)
+        local data = {}
+        if self.staticdata and type(self.staticdata) == "string" then
+            data = minetest.deserialize(self.staticdata) or {}
+        end
+
+        if data.armour then
+            self.armour = data.armour
+            self.original_texture = data.original_texture
+
+            local props = self.object:get_properties()
+            if props and props.textures and props.textures[1] and self.armour.texture then
+                local base_texture = props.textures[1]:gsub("%^.*", "")
+
+                props.textures[1] = base_texture .. "^" .. self.armour.texture
+                self.object:set_properties(props)
+            end
+            if data.armour then
+                self.armour = data.armour
+                self.original_texture = data.original_texture
+
+                if not self.original_texture then
+                    self.original_texture = "waterdragon_rare_water_dragon.png^waterdragon_baked_in_shading.png"
+
+                    local props = self.object:get_properties()
+                    if props and props.textures and props.textures[1] then
+                        local current_texture = props.textures[1]
+                        if current_texture:match("^waterdragon_") then
+                            self.original_texture = current_texture:gsub("%^.*", "")
+                        end
+                    end
+                end
+
+                if self.armour.texture and self.original_texture then
+                    local props = self.object:get_properties()
+                    if props and props.textures then
+                        props.textures[1] = self.original_texture .. "^" .. self.armour.texture
+                        self.object:set_properties(props)
+                    end
+                end
+            end
+        end
     end,
     step_func = function(self, dtime, moveresult)
         waterdragon.dragon_step(self, dtime, moveresult)
         dragon_stay_behavior(self)
         waterdragon.eat_dropped_item(self, item)
-        if self:timer(1) then                            -- Check every second
+        if self:timer(1) then                                        -- Check every second
             local scale = self.growth_scale or 1
             local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
 
             if self.hunger and self.hunger < hunger_threshold then
                 local pos = self.object:get_pos()
                 if self.owner then
-                    -- Прирученный дракон
-                    minetest.chat_send_player(self.owner,
-                        "Your Dragon " .. (self.nametag or "") .. " is hungry! Help him find food!")
-
                     -- Попытка найти мясо в ближайших объектах
                     local found_meat = false
                     if pos then
@@ -234,7 +271,6 @@ waterdragon.register_mob("waterdragon:rare_water_dragon", {
                 return armour_def.on_use(item, clicker, { type = "object", ref = self.object })
             end
         end
-        
     end,
     on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if puncher == self.rider then return end
@@ -294,28 +330,26 @@ waterdragon.register_mob("waterdragon:rare_water_dragon", {
             end
         end
     end,
-    on_activate = function(self, staticdata, dtime_s)
-        if staticdata ~= "" then
-            local data = minetest.deserialize(staticdata)
-            if data and data.armour then
-                self.armour = data.armour
+    get_staticdata = function(self)
+        local data = {}
+
+        if self.armour then
+            data.armour = {
+                name = self.armour.name,
+                protection = self.armour.protection,
+                texture = self.armour.texture
+            }
+        end
+
+        if self.original_texture then
+            data.original_texture = self.original_texture
+        else
+            local props = self.object:get_properties()
+            if props and props.textures and props.textures[1] then
+                data.original_texture = props.textures[1]:gsub("%^.*", "")
             end
         end
-
-        if self.armour and self.armour.texture then
-            local props = self.object:get_properties()
-            props.textures[1] = self.armour.texture
-            self.object:set_properties(props)
-        end
-
-        if self.dragon_activate then
-            self.dragon_activate(self)
-        end
-    end,
-    get_staticdata = function(self)
-        local data = {
-            armour = self.armour,
-        }
+        
         return minetest.serialize(data)
     end,
     death_func = function(self)

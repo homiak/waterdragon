@@ -23,6 +23,8 @@ Install via the Minetest Mod Menu, or download from ContentDB.
 
 More details can be found in the Book about Water Dragons — it's included in this mod, just search for it in your inventory.
 
+You’re also welcome to join the server at IP [85.215.240.79] to test everything in action.
+
 This mod is based on Draconis and Creatura and created by Scottii.
 
 # Release log
