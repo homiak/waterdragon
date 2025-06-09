@@ -124,3 +124,5 @@ Customize=
 Scottish Dragon Armour=
 Rare Water Dragon Armour=
 Pure Water Dragon Armour=
+a Nameless Water Dragon=
+Forged by=

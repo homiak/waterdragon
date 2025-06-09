@@ -249,13 +249,13 @@ local function cool_crucible(pos, ingot)
         local draconic_ingot = ItemStack(ingot)
         local ingot_meta = draconic_ingot:get_meta()
         local ingot_desc = minetest.registered_items[ingot].description
-        local dragon_name = "a Nameless Water Dragon"
+        local dragon_name = S("a Nameless Water Dragon")
         if waterdragon.waterdragons[wtd_id]
             and waterdragon.waterdragons[wtd_id].name then
             dragon_name = waterdragon.waterdragons[wtd_id].name
         end
         ingot_meta:set_string("wtd_id", wtd_id)
-        ingot_meta:set_string("description", ingot_desc .. "\n(Forged by " .. dragon_name .. ")")
+        ingot_meta:set_string("description", ingot_desc .. S("\n(Forged by" .. " " .. dragon_name .. ")"))
         inv:set_stack("output", 1, draconic_ingot)
         meta:set_int("cool_perc", 0)
     end
@@ -286,14 +286,13 @@ local function forge_particle(pos, animation)
 end
 
 local function register_draconic_forge(water_type)
-    local forge_name = "waterdragon:draconic_forge_" .. water_type
-    local ingot_name = "waterdragon:draconic_steel_ingot_" .. water_type
+    local forge_name = "waterdragon:draconic_forge_" .. water_type .. "_water"
+    local ingot_name = "waterdragon:draconic_steel_ingot_" .. water_type .. "_water"
     local particle_texture = "waterdragon_water_particle.png"
 
     minetest.register_node(forge_name, {
-        description = S(water_type:gsub("^%l", string.upper) .. " Water Draconic Steel Forge"),
+        description = S(water_type:gsub("_water", ""):gsub("^%l", string.upper) .. " Water Draconic Steel Forge"),
         tiles = {
-            "waterdragon_dragonstone_block_" .. water_type .. ".png",
             "waterdragon_dragonstone_block_" .. water_type .. ".png",
             "waterdragon_draconic_forge_" .. water_type .. ".png"
         },
@@ -495,7 +494,7 @@ register_draconic_forge("rare_water")
 ---------------------------
 
 minetest.register_node("waterdragon:scottish_dragon_forge", {
-    description = S("Scottish Dragon Steel Forge"),
+    description = S("Scottish Steel Forge"),
     tiles = {
         "waterdragon_scottish_dragon_forge_top.png",
         "waterdragon_scottish_dragon_forge_bottom.png",
