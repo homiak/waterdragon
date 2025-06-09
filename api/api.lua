@@ -3785,7 +3785,7 @@ local function process_dragon_chat(name, message)
 		local response = dragon_dialogue.conversations["what is your name"][math.random(3)]
 		minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. response .. (dragon.nametag or "Dragon"))
 		if dragon.nametag == "" then
-			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": My name is a secret, but you can call me 'Water Dragon'")
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": My name is a secret, but you can call me 'Water Dragon'.")
 		end
 		return true
 	end
