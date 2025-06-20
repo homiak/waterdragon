@@ -2956,7 +2956,7 @@ local dragon_dialogue = {
 			response = "*The Dragon spreads its magnificent wings*",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 				if dragon.transport_rider then
 					return false, "I can't fly now because I am taking you on my back"
@@ -3207,7 +3207,7 @@ local dragon_dialogue = {
 			response = "I shall accompany you on your journey.",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I follow only my chosen companion."
+					return false, "I follow only my chosen rider."
 				end
 
 				dragon.order = "follow"
@@ -3220,7 +3220,7 @@ local dragon_dialogue = {
 			response = "I shall guard this place.",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 
 				dragon.order = "stay"
@@ -3232,7 +3232,7 @@ local dragon_dialogue = {
 			response = "Thank you!",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 
 				dragon.order = "wander"
@@ -3244,7 +3244,7 @@ local dragon_dialogue = {
 			response = "Thank you",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 
 				dragon.fly_allowed = true
@@ -3256,7 +3256,7 @@ local dragon_dialogue = {
 			response = "I shall walk.",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 
 				dragon.fly_allowed = false
@@ -3289,7 +3289,7 @@ local dragon_dialogue = {
 					return false
 				end
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 
 				flying_to_owner(dragon, player)
@@ -3302,7 +3302,7 @@ local dragon_dialogue = {
 			response = "*The Dragon rears its head back and roars*",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
-					return false, "I take orders only from my chosen companion."
+					return false, "I take orders only from my chosen rider."
 				end
 				if not check_cooldown(player:get_player_name(), "roar") then
 					return false, "My voice needs rest."
@@ -3578,7 +3578,7 @@ end)
 
 local function handle_transport(dragon, player, message)
 	if dragon.owner and dragon.owner ~= player:get_player_name() then
-		return false, "I take orders only from my chosen companion."
+		return false, "I take orders only from my chosen rider."
 	end
 	if not dragon.owner then return end
 	-- Проверяем cooldown
@@ -3813,7 +3813,7 @@ local function process_dragon_chat(name, message)
 		end
 
 		if dragon.owner and dragon.owner ~= player:get_player_name() then
-			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": I only respond to my chosen companion.")
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": I only respond to my chosen rider.")
 			return true
 		end
 
