@@ -808,13 +808,13 @@ function waterdragon.action_repel(self)
 
 						-- Strong horizontal wind blast
 						local wind_force = {
-							x = dir.x * 200, -- Сильный горизонтальный толчок
-							y = 12, -- Минимальный подъем для реалистичности
-							z = dir.z * 200 -- Сильный горизонтальный толчок
+							x = dir.x * 100, -- Big horizontal blast
+							y = 12, -- Minimum lift for realism
+							z = dir.z * 100 -- Strong horizontal push
 						}
 
 						object:add_velocity(wind_force)
-						-- Нанесение урона
+						-- Inflict damage
 						if is_player then
 							object:set_hp(object:get_hp() - 3)
 						elseif ent and ent.health then
@@ -1589,7 +1589,7 @@ local function breathe_fire(self)
 
 	local dir
 	if self.rider then
-		-- Если есть всадник, используем направление его взгляда
+		-- If the Dragon has a rider, use the rider's look direction
 		local look_dir = self.rider:get_look_dir()
 		dir = vector.new(
 			look_dir.x,
@@ -1597,7 +1597,7 @@ local function breathe_fire(self)
 			look_dir.z
 		)
 	else
-		-- Если всадника нет, используем поворот дракона
+		-- If there is no rider, use the Dragon's rotation
 		local yaw = self.object:get_yaw()
 		local pitch = self.object:get_rotation().x
 		dir = vector.new(
@@ -1817,14 +1817,14 @@ waterdragon.register_utility("waterdragon:scottish_dragon_attack", function(self
 			local dist = vector.distance(pos, tgt_pos)
 
 			if _self.has_pegasus_fire and _self.fire and _self.fire > 0 and is_fire_attack then
-				-- Вычисляем направление к цели
+				-- Calculate direction to target
 				local dir = {
 					x = tgt_pos.x - pos.x,
 					y = tgt_pos.y - pos.y,
 					z = tgt_pos.z - pos.z
 				}
 
-				-- Нормализуем вектор
+				-- Normalize vector
 				local length = math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z)
 				if length > 0 then
 					dir.x = dir.x / length
@@ -1832,12 +1832,12 @@ waterdragon.register_utility("waterdragon:scottish_dragon_attack", function(self
 					dir.z = dir.z / length
 				end
 
-				-- Устанавливаем yaw и pitch
+				-- Set yaw and pitch
 				local yaw = math.atan2(dir.z, dir.x) - math.pi / 2
 				local pitch = -math.asin(dir.y)
 				_self.object:set_rotation({ x = pitch, y = yaw, z = 0 })
 
-				-- Огненная атака
+				-- Fire attack
 				_self:animate("hover")
 				_self:set_forward_velocity(-2)
 				_self.fire_breathing = true

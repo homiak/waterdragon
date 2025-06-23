@@ -492,18 +492,18 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
 		waterdragon.eat_dropped_item(self, item)
 		if self:timer(1) then                            -- Check every second
             local scale = self.growth_scale or 1
-            local hunger_threshold = (self.max_health * 0.2) * scale -- Hungry at 20% hunger
+            local hunger_threshold = (self.max_health * 0.1) * scale -- Hungry at 20% hunger
 
             if self.hunger and self.hunger < hunger_threshold then
                 local pos = self.object:get_pos()
                 if self.owner then
-                    -- Попытка найти мясо в ближайших объектах
+                    -- Attempt to find meat in nearby objects
                     local found_meat = false
                     if pos then
                         for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
                             local luaentity = obj:get_luaentity()
                             if luaentity and luaentity.name ~= self.name and luaentity.groups and luaentity.groups.meat then
-                                -- Телепортируем мясо к дракону
+                                -- Teleport meat to the Dragon
                                 obj:set_pos(vector.add(pos, { x = 0, y = 1, z = 0 }))
                                 found_meat = true
                                 break
@@ -511,7 +511,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                         end
                     end
 
-                    -- Если мясо не найдено, проверяем у ближайшего игрока
+                    -- If meat is not found, check the nearest player
                     if not found_meat then
                         for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 60)) do
                             if obj:is_player() then
@@ -519,7 +519,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                                 if inv then
                                     for _, stack in ipairs(inv:get_list("main")) do
                                         if minetest.get_item_group(stack:get_name(), "meat") > 0 then
-                                            -- Удаляем мясо из инвентаря игрока и создаём его объект возле дракона
+                                            -- Remove meat from the player's inventory and create its object near the Dragon
                                             inv:remove_item("main", stack:get_name())
                                             minetest.add_item(vector.add(pos, { x = 0, y = 1, z = 0 }), stack:get_name())
                                             found_meat = true
@@ -532,7 +532,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                         end
                     end
 
-                    -- Если мясо не найдено у игрока, ищем в ближайших сундуках
+                    -- If meat is not found, check the nearest chests
                     if not found_meat then
                         local node_pos = minetest.find_node_near(pos, 60, { "default:chest" })
                         if node_pos then
@@ -541,7 +541,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                             if inv then
                                 for _, stack in ipairs(inv:get_list("main")) do
                                     if minetest.get_item_group(stack:get_name(), "meat") > 0 then
-                                        -- Удаляем мясо из сундука и создаём его объект возле дракона
+                                        -- Remove meat from the chest and create its object near the Dragon
                                         inv:remove_item("main", stack:get_name())
                                         minetest.add_item(vector.add(pos, { x = 4, y = 1, z = 0 }), stack:get_name())
                                         found_meat = true
@@ -552,12 +552,12 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                         end
                     end
 
-                    -- Если еда всё равно не найдена, предупреждаем владельца
+                    -- If food is still not found, warn the owner
                     if not found_meat and not self.hunger_warning_time then
                         self.hunger_warning_time = minetest.get_gametime()
                     elseif not found_meat and minetest.get_gametime() - self.hunger_warning_time > 30 then
                         self.hunger_warning_time = nil
-                        -- Нападаем на ближайшую цель
+                        -- Attack the nearest target
                         for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
                             if (obj:get_luaentity() and obj:get_luaentity().name ~= self.name) and not obj:is_player() then
                                 self._target = obj
@@ -570,7 +570,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                         end
                     end
                 else
-                    -- Дикий дракон
+                    -- Wild Dragon behavior
                     if pos then
                         for _, obj in pairs(minetest.get_objects_inside_radius(pos, 80)) do
                             if obj:is_player() or (obj:get_luaentity() and obj:get_luaentity().name ~= self.name) then
@@ -581,7 +581,6 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
                     end
                 end
             else
-                -- Сбрасываем время предупреждения, если дракон насытился
                 self.hunger_warning_time = nil
             end
 		end

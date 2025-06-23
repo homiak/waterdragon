@@ -46,24 +46,21 @@ minetest.register_on_joinplayer(function(player)
             for _, obj in ipairs(objects) do
                 local ent = obj:get_luaentity()
                 if ent and ent.name == player_armor_state[name].dragon_name then
-                    -- Сохраняем оригинальную текстуру
+                    -- Re-apply the armour to the Dragon
                     local props = obj:get_properties()
-                    if props and props.textures and props.textures[1] then
-                        ent.original_texture = props.textures[1]:gsub("%^.*", "") -- Убираем старую броню если есть
-                    end
                     
-                    -- Устанавливаем броню
+                    -- Set up the armour
                     ent.armour = {
                         name = player_armor_state[name].armor_name,
                         protection = player_armor_state[name].protection,
                         texture = player_armor_state[name].texture
                     }
                     
-                    -- Накладываем текстуру брони поверх базовой
+                    -- Apply the armour texture over the base
                     props.textures[1] = ent.original_texture .. "^" .. ent.armour.texture
                     obj:set_properties(props)
                     
-                    -- Сохраняем в памяти
+                    -- Save in memory
                     ent:memorize("armour", ent.armour)
                     ent:memorize("original_texture", ent.original_texture)
                     
@@ -84,21 +81,21 @@ minetest.register_chatcommand("rem_wtd_armour", {
         if not player then return false, "Player not found" end
 
         local pos = player:get_pos()
-        local radius = 10
+        local radius = 70
         local found = false
 
         for _, obj in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
             local ent = obj:get_luaentity()
-            -- Ищем любого дракона с бронёй
+            -- Look for any Dragon with armour
             if ent and ent.name and ent.name:find("waterdragon:") and ent.armour then
-                -- Восстанавливаем оригинальную текстуру из memorize
+                -- Restore the original texture from memory
                 local props = obj:get_properties()
                 if props and props.textures then
                     local original_texture = ent:recall("original_texture")
                     if original_texture then
                         props.textures[1] = original_texture
                     else
-                        -- Определяем тип дракона и выбираем базовую текстуру
+                        -- Determine the type of Dragon and select the base texture
                         if ent.name == "waterdragon:scottish_dragon" then
                             props.textures[1] = "waterdragon_scottish_dragon.png^waterdragon_baked_in_shading.png"
                         elseif ent.name == "waterdragon:rare_water_dragon" then
@@ -110,16 +107,16 @@ minetest.register_chatcommand("rem_wtd_armour", {
                     obj:set_properties(props)
                 end
 
-                -- Сохраняем информацию об удаленной броне для возврата предмета
+                -- Save information about the removed armour for item return
                 local removed_armour = ent.armour.name
 
-                -- Удаляем информацию о броне
+                -- Remove armour information
                 ent.armour = nil
                 ent.original_texture = nil
                 ent:memorize("armour", nil)
                 ent:memorize("original_texture", nil)
 
-                -- Возвращаем предмет брони игроку
+                -- Return the armour item to the player
                 local armour_item = ItemStack("waterdragon:armour_" .. removed_armour)
                 local inv = player:get_inventory()
                 if inv:room_for_item("main", armour_item) then
@@ -161,20 +158,20 @@ waterdragon.register_mob_armour = function(name, def)
                         return itemstack
                     end
 
-                    -- Сохраняем базовую текстуру перед добавлением брони
+                    -- Save the base texture before adding the armour
                     local props = obj:get_properties()
                     if not props or not props.textures or not props.textures[1] then return itemstack end
 
                     ent.original_texture = props.textures[1]
 
-                    -- Сохраняем информацию о броне
+                    -- Save information about the armour
                     ent.armour = {
                         name = name,
                         protection = def.protection,
                         texture = def.dragon_armour_texture
                     }
 
-                    -- Запоминаем значения с помощью memorize
+                    -- Save the values using memorize
                     ent:memorize("armour", ent.armour)
                     ent:memorize("original_texture", ent.original_texture)
 
@@ -183,64 +180,12 @@ waterdragon.register_mob_armour = function(name, def)
                     -- Debug messages
                     minetest.chat_send_player(user:get_player_name(), "Armour has been put on the Dragon.")
 
-                    -- Уменьшаем количество предметов в стеке
+                    -- Decrease the item stack count
                     itemstack:take_item()
                     return itemstack
                 end
             end
             return itemstack
-        end
-    })
-
-    minetest.register_chatcommand("rem_wndd_armour", {
-        params = "",
-        description = S("Removes armour from the nearest Wind Dragon"),
-        func = function(name)
-            local player = minetest.get_player_by_name(name)
-            if not player then return false, S("Player not found") end
-
-            local pos = player:get_pos()
-            local radius = 70
-            local found = false
-
-            for _, obj in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
-                local ent = obj:get_luaentity()
-                if ent and ent.name == def.mob_name and ent.armour then
-                    -- Восстанавливаем оригинальную текстуру
-                    local props = obj:get_properties()
-                    if props and props.textures then
-                        props.textures[1] = ent.original_texture or
-                            "winddragon_dragon.png^winddragon_baked_in_shading.png"
-                        obj:set_properties(props)
-                    end
-
-                    -- Сохраняем информацию об удаленной броне для возврата предмета
-                    local removed_armour = ent.armour.name
-
-                    -- Удаляем информацию о броне
-                    ent.armour = nil
-                    ent.original_texture = nil
-                    ent:memorize("armour", nil)
-                    ent:memorize("original_texture", nil)
-
-                    -- Возвращаем предмет брони игроку
-                    local armour_item = ItemStack("waterdragon:armour_" .. removed_armour)
-                    local inv = player:get_inventory()
-                    if inv:room_for_item("main", armour_item) then
-                        inv:add_item("main", armour_item)
-                        found = true
-                        return true, S("Armour successfully removed from the Dragon and added to your inventory.")
-                    else
-                        minetest.add_item(pos, armour_item)
-                        found = true
-                        return true, S("Armour successfully removed from the Dragon and dropped nearby.")
-                    end
-                end
-            end
-
-            if not found then
-                return false, S("No Dragons with armour nearby")
-            end
         end
     })
 end

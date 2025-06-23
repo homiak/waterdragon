@@ -99,7 +99,7 @@ function breathe_pegasus_fire(self)
 
     local dir
     if self.rider then
-        -- Если есть всадник, используем направление его взгляда
+        -- If there is a rider, use their look direction
         local look_dir = self.rider:get_look_dir()
         dir = vector.new(
             look_dir.x,
@@ -107,7 +107,7 @@ function breathe_pegasus_fire(self)
             look_dir.z
         )
     else
-        -- Если всадника нет, используем поворот дракона
+        -- If there is no rider, use the Dragon's rotation
         local yaw = self.object:get_yaw()
         local pitch = self.object:get_rotation().x
         dir = vector.new(
@@ -1032,27 +1032,27 @@ waterdragon.register_utility("waterdragon:mount", function(self)
                     local dir = minetest.yaw_to_dir(yaw)
                     local pos = _self.object:get_pos()
                     local front_pos = {
-                        x = pos.x + (dir.x * 2.5), -- уменьшил множитель с 4 до 2.5
+                        x = pos.x + (dir.x * 2.5),
                         y = pos.y + 11.9,
-                        z = pos.z + (dir.z * 5.5)  -- уменьшил множитель с 5.5 до 4
+                        z = pos.z + (dir.z * 5.5)
                     }
 
                     local node_front = minetest.get_node(front_pos)
                     if minetest.get_item_group(node_front.name, "ice") > 0 or
                         minetest.get_item_group(node_front.name, "wood") > 0 or
                         minetest.get_item_group(node_front.name, "cracky") == 3 then
-                        -- Скользит на блоках из групп ice, wood и cracky = 3
+                        -- Slides down the wall on ice, wood, or nodes with "cracky = 3" group
                         _self:set_vertical_velocity(-2)
                         anim = "shoulder_idle"
                     else
-                        -- Висит на остальных блоках
+                        -- Hangs on other blocks
                         _self:set_vertical_velocity(0)
                         anim = "shoulder_idle"
                     end
 
                     _self:set_forward_velocity(0)
                     local last_sound_time = 0
-                    local sound_cooldown = 1 -- Интервал между воспроизведением звуков, в секундах
+                    local sound_cooldown = 1 -- Interval between sound plays, in seconds
                     local wall_slide_sound
                     local is_playing_sound = false
                     if not is_playing_sound and (minetest.get_gametime() - last_sound_time) >= sound_cooldown then

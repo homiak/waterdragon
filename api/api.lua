@@ -421,15 +421,15 @@ local wing_colors = {
 }
 
 function winddragon.safe_set_texture(self, texture_name)
-    -- Базовая текстура
+    -- Base texture
     local new_texture = texture_name
     
-    -- Если есть броня, добавляем её текстуру
+    -- If there is armor, add its texture
     if self.armour and self.armour.texture then
         new_texture = new_texture .. "^" .. self.armour.texture
     end
     
-    -- Применяем текстуру
+    -- Apply the textures
     local props = self.object:get_properties()
     if props and props.textures then
         props.textures[1] = new_texture
@@ -1329,10 +1329,10 @@ waterdragon.wtd_api = {
 		elseif not self:get_action("sleep") then
 			local eyes_texture
 			if is_night and self.eyes_peeled then
-				-- Если ночь и eyes_peeled, устанавливаем peeled текстуру глаз
+				-- If it's night and the eyes are peeled, use the peeled texture
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. "_peeled.png"
 			else
-				-- В остальных случаях используем обычные глаза
+				-- In all other cases, use the normal eyes texture
 				eyes_texture = "waterdragon_" .. dragon_type .. "_eyes_" .. self.eye_color .. ".png"
 			end
 
@@ -2766,12 +2766,12 @@ function throw_rider(self)
 		local throw_strength = 10
 		rider:add_velocity({
 			x = throw_dir.x * throw_strength,
-			y = 5, -- Подбрасываем игрока вверх
+			y = 5, -- Add some vertical force
 			z = throw_dir.z * throw_strength
 		})
 		minetest.after(0.1, function()
 			if rider:get_hp() > 0 then
-				rider:set_hp(rider:get_hp() - 5) -- Наносим небольшой урон при падении
+				rider:set_hp(rider:get_hp() - 5) -- Add some damage on throw
 			end
 		end)
 	end
@@ -2902,7 +2902,7 @@ local dragon_dialogue = {
 		},
 
 		["can you teach me magic"] = {
-			"Magic is not something I can teach—it is something you must discover within yourself... but it isn't for a long time. Are you sure?",
+			"Magic is not something I can teach — it is something you must discover within yourself... but it isn't for a long time. Are you sure?",
 			"I can guide you, but the true essence of magic lies in your connection to the world... but it isn't for a long time. Are you sure?",
 			"Magic flows through all things. If you are attuned, you may learn by observing my actions... but it isn't for a long time. Are you sure?"
 		},
@@ -3131,7 +3131,7 @@ local dragon_dialogue = {
 			name = "fire",
 			response = "*The Dragon begins to breathe water*",
 			action = function(dragon, player)
-				-- Проверяем тип дракона
+				-- Check the Dragon type
 				local dragon_name = dragon.object and dragon.object:get_luaentity() and
 					dragon.object:get_luaentity().name
 				if dragon_name == "waterdragon:rare_water_dragon" or dragon_name == "waterdragon:pure_water_dragon" then
@@ -3581,21 +3581,21 @@ local function handle_transport(dragon, player, message)
 		return false, "I take orders only from my chosen rider."
 	end
 	if not dragon.owner then return end
-	-- Проверяем cooldown
+	-- Check cooldown
 	if not check_cooldown(player:get_player_name(), "transport") then
 		return false, "I need rest before such a journey."
 	end
 	if dragon.age < 30 then
 		return false, "I am too young to carry you."
 	end
-	-- Получаем координаты из сообщения
+	-- Take coordinates from the message
 	local x, y, z
 	local coords = message:match("take me to[%s]+([%-%.%d%s]+)")
 	if coords then
 		x, y, z = coords:match("([%-%.%d]+)[%s]+([%-%.%d]+)[%s]+([%-%.%d]+)")
 	end
 
-	-- Проверяем координаты
+	-- Check the coordinates
 	if not (x and y and z) then
 		return false, "Tell me where to fly using: take me to X Y Z"
 	end
@@ -3613,13 +3613,13 @@ local function handle_transport(dragon, player, message)
 	if not dragon.object:get_pos() then
 		return false, "I cannot determine my position."
 	end
-	-- Проверяем дистанцию
+	-- Check the distance
 	local distance = vector.distance(start_pos, destination)
 	if distance > 100000 then
 		return false, "That's too far for me to fly."
 	end
 
-	-- Если игрок еще не на драконе, сажаем его
+	-- If the player is not on the dragon, attach it
 	if not dragon.rider then
 		local scale = dragon.growth_scale or 1
 		player:set_attach(dragon.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
@@ -3631,7 +3631,7 @@ local function handle_transport(dragon, player, message)
 		dragon.transport_rider = true
 	end
 
-	-- Начинаем полет
+	-- Start the flight
 	if dragon.touching_ground then
 		waterdragon.action_takeoff(dragon, 5)
 		minetest.after(1, function()
@@ -3676,7 +3676,7 @@ local function handle_transport(dragon, player, message)
 
 		check_sneak()
 	end)
-	-- По прибытии
+	-- Upon arrival
 	minetest.after(distance / 10 + 2, function()
 		if dragon and dragon.object and dragon.object:get_pos() then
 			if player:get_player_name() then
@@ -3700,7 +3700,7 @@ local function handle_transport(dragon, player, message)
 		waterdragon.detach_player(dragon, player)
 		dragon.transport_rider = false
 	end
-	-- Проверяем усталость каждую секунду
+	-- Check stamina every second
 	local function check_stamina()
 		if not dragon or not dragon.object or not dragon.object:get_pos() then
 			return
@@ -3796,7 +3796,7 @@ local function process_dragon_chat(name, message)
 			minetest.chat_send_player(name,
 				(dragon.nametag or "Dragon") .. ": *The Dragon's eyes glow as it studies the destination*")
 		else
-			-- Проверяем error_msg перед использованием
+			-- Check error_msg before use
 			minetest.chat_send_player(name,
 				(dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot make this journey right now."))
 		end
@@ -3928,104 +3928,6 @@ end
 
 -- Globalsteps for magic teaching
 
-
--- Wind magic
-waterdragon.wind_vortexes = {}
-
-minetest.register_globalstep(function(dtime)
-	if not waterdragon.players_with_wind_magic then return end
-
-	for _, player in ipairs(minetest.get_connected_players()) do
-		local name = player:get_player_name()
-		if waterdragon.players_with_wind_magic[name] then
-			local control = player:get_player_control()
-			local pos = player:get_pos()
-
-			-- Check if player is on ground
-			local check_ground = vector.new(pos.x, pos.y - 0.1, pos.z)
-			local node = minetest.get_node(check_ground)
-			local is_on_ground = minetest.registered_nodes[node.name].walkable
-
-			if control.aux1 and control.sneak and is_on_ground then
-				if not waterdragon.wind_vortexes[name] then
-					waterdragon.wind_vortexes[name] = {
-						start_pos = vector.round(vector.subtract(pos, { x = 0, y = 1, z = 0 })),
-						start_time = os.time(),
-						start_y = pos.y,
-						reached_max = false
-					}
-				end
-
-				local vortex = waterdragon.wind_vortexes[name]
-
-				local horizontal_dist = vector.distance(
-					{ x = pos.x, y = 0, z = pos.z },
-					{ x = vortex.start_pos.x, y = 0, z = vortex.start_pos.z }
-				)
-
-				local time_passed = os.time() - vortex.start_time
-				if time_passed > 15 then
-					waterdragon.wind_vortexes[name] = nil
-					-- Remove hover effect
-					player:set_physics_override({ gravity = 1 })
-					return
-				end
-
-				if horizontal_dist > 3 then
-					waterdragon.wind_vortexes[name] = nil
-					player:set_physics_override({ gravity = 1 })
-					return
-				end
-
-				-- Check height and apply effects
-				local height_diff = pos.y - vortex.start_y
-				if height_diff < 20 and not vortex.reached_max then
-					player:add_velocity({ x = 0, y = 4, z = 0 })
-					local block_pos = vector.round({ x = pos.x, y = pos.y - 1, z = pos.z })
-					if minetest.get_node(block_pos).name == "air" then
-						minetest.set_node(block_pos, { name = "default:sand" })
-					end
-					-- Spiral particles...
-					for i = 0, 10 do
-						local angle = i * math.pi / 5
-						local y_offset = i * 0.5
-						local radius = 3 - (y_offset / 10)
-						local particle_pos = {
-							x = pos.x + radius * math.cos(angle),
-							y = pos.y + y_offset,
-							z = pos.z + radius * math.sin(angle)
-						}
-
-						minetest.add_particlespawner({
-							amount = 3,
-							time = 0.1,
-							minpos = particle_pos,
-							maxpos = particle_pos,
-							minvel = { x = 0, y = 2, z = 0 },
-							maxvel = { x = 0, y = 4, z = 0 },
-							minacc = { x = 0, y = 0.5, z = 0 },
-							maxacc = { x = 0, y = 1, z = 0 },
-							minexptime = 1,
-							maxexptime = 2,
-							minsize = 2,
-							maxsize = 4,
-							texture = "waterdragon_particle_blue.png",
-						})
-					end
-				end
-			else
-				-- Check if we need to clear vortex
-				if waterdragon.wind_vortexes[name] then
-					local time_passed = os.time() - waterdragon.wind_vortexes[name].start_time
-					if time_passed > 15 then
-						waterdragon.wind_vortexes[name] = nil
-						player:set_physics_override({ gravity = 1 })
-					end
-				end
-			end
-		end
-	end
-end)
 
 
 -- Register chat command

@@ -128,26 +128,26 @@ local special_dragon_names = {
 
     -- Not very powerful names ..
     ["Suzie"] = {
-        health_multiplier = 0.3, -- 30% от обычного здоровья
-        damage_multiplier = 0.2, -- 20% от обычного урона
-        speed_multiplier = 0.4,
+        health_multiplier = 0.6, -- 60% of 1600
+        damage_multiplier = 0.7, -- 70% of 40
+        speed_multiplier = 0.4, -- 40% of 50
         effect = "cute"
     },
     ["Susie"] = {
-        health_multiplier = 0.3, -- 30% от обычного здоровья
-        damage_multiplier = 0.2, -- 20% от обычного урона
+        health_multiplier = 0.6, 
+        damage_multiplier = 0.7,
         speed_multiplier = 0.4,
         effect = "cute"
     },
     ["suzie"] = {
-        health_multiplier = 0.3, -- 30% от обычного здоровья
-        damage_multiplier = 0.2, -- 20% от обычного урона
+        health_multiplier = 0.6, 
+        damage_multiplier = 0.7,
         speed_multiplier = 0.4,
         effect = "cute"
     },
     ["susie"] = {
-        health_multiplier = 0.3, -- 30% от обычного здоровья
-        damage_multiplier = 0.2, -- 20% от обычного урона
+        health_multiplier = 0.6,
+        damage_multiplier = 0.7,
         speed_multiplier = 0.4,
         effect = "cute"
     },
@@ -240,31 +240,23 @@ local special_dragon_names = {
 function apply_name_bonuses(self)
     if not self or not self.nametag then return end
 
-    -- Безопасно получаем модификаторы для имени
     local modifiers = special_dragon_names[self.nametag]
     if not modifiers then return end
 
-    -- Проверяем тип эффекта и применяем соответствующие бонусы
     if modifiers.effect == "powerful" then
-        -- Проверяем наличие всех необходимых полей
         self.max_health = (self.max_health or 1600) + (modifiers.health_bonus or 0)
         self.hp = self.max_health
         self.damage = (self.damage or 40) + (modifiers.damage_bonus or 0)
         self.speed = (self.speed or 50) + (modifiers.speed_bonus or 0)
     elseif modifiers.effect == "cute" then
-        -- Используем безопасные множители с проверкой на nil
+        -- Decrease health and damage for cute Dragons
         self.max_health = math.floor(1600 * (modifiers.health_multiplier or 1))
         self.hp = self.max_health
         self.damage = math.floor(40 * (modifiers.damage_multiplier or 1))
         self.speed = math.floor(50 * (modifiers.speed_multiplier or 1))
-        -- Безопасно устанавливаем размер
-        self.growth_scale = (self.growth_scale or 1) * 0.7
-        if self.set_scale then
-            self:set_scale(self.growth_scale)
-        end
     end
 
-    -- Визуальные эффекты с проверками
+    -- Visual effects for powerful and cute Dragons
     minetest.after(0.1, function()
         if not (self and self.object and self.object:get_pos()) then return end
         
@@ -305,19 +297,19 @@ function apply_name_bonuses(self)
             })
         end
 
-        -- Безопасная отправка сообщений
+        -- Safe message sending
         if self.owner then
             if modifiers.effect == "powerful" then
                 minetest.chat_send_player(self.owner, "Your Dragon " .. self.nametag .. " feels powerful!")
             elseif modifiers.effect == "cute" then
                 minetest.chat_send_player(self.owner, 
                     "Your Dragon " .. self.nametag .. 
-                    " is adorable but very weak! You can better give him a more powerful name such as Braonach or Kirnach")
+                    " is adorable but very weak! You should consider giving him a more powerful name such as Braonach or Kirnach")
             end
         end
     end)
 
-    -- Изменяем звуки для милых драконов с проверкой
+    -- Change sounds for cute Dragons with checks
     if modifiers.effect == "cute" and self.sounds then
         self.sounds.random = {
             {name = "waterdragon_water_dragon_child_1", gain = 0.7, distance = 32},
