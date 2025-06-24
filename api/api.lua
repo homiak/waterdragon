@@ -420,7 +420,7 @@ local wing_colors = {
 	},
 }
 
-function winddragon.safe_set_texture(self, texture_name)
+function waterdragon.safe_set_texture(self, texture_name)
 	-- Base texture
 	local new_texture = texture_name
 
