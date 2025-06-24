@@ -2902,9 +2902,9 @@ local dragon_dialogue = {
 		},
 
 		["can you teach me magic"] = {
-			"Magic is not something I can teach — it is something you must discover within yourself... but it isn't for a long time. Are you sure?",
-			"I can guide you, but the true essence of magic lies in your connection to the world... but it isn't for a long time. Are you sure?",
-			"Magic flows through all things. If you are attuned, you may learn by observing my actions... but it isn't for a long time. Are you sure?"
+			"Magic is not something I can teach — it is something you must discover within yourself. Are you sure?",
+			"I can guide you, but the true essence of magic lies in your connection to the world... Are you sure?",
+			"Magic flows through all things. If you are attuned, you may learn by observing my actions. Are you sure?"
 		},
 
 		["do you have a family"] = {
@@ -3736,6 +3736,8 @@ local function handle_transport(dragon, player, message)
 	return true
 end
 
+local swimming_magic_players = {}
+
 -- Process chat messages
 local function process_dragon_chat(name, message)
 	local dragon = active_chats[name]
@@ -3802,7 +3804,27 @@ local function process_dragon_chat(name, message)
 		end
 		return true
 	end
-	-- Handle special commands with parameters
+	-- Handle special commands with parameters --
+	local swimming_physics = {}
+
+	-- Handle "yes" response after magic question
+    if message == "yes" and dragon.last_conversation == "can you teach me magic" then
+        minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": I bestow upon you the gift of swift swimming. You shall move through water as if born to it.")
+        
+        -- Save original player physics
+        if not swimming_physics[name] then
+            local physics = player:get_physics_override()
+            swimming_physics[name] = {
+                speed = physics.speed,
+                jump = physics.jump
+            }
+        end
+        
+        -- Add player to list of those with swimming magic
+        swimming_magic_players[name] = true
+        
+        return true
+    end
 	if message:match("^bring%s+me%s+to%s+%S") then
 		-- Extract the Dragon name with proper capitalization, allowing for spaces in the name
 		local dragon_name = message:match("^bring%s+me%s+to%s+(.+)$")
@@ -3926,9 +3948,77 @@ local function process_dragon_chat(name, message)
 end
 
 
--- Globalsteps for magic teaching
+-- Globalstep for magic of swimming --
 
+minetest.register_globalstep(function(dtime)
+    for name, has_magic in pairs(swimming_magic_players) do
+        if not has_magic then return end
+        
+        local player = minetest.get_player_by_name(name)
+        if not player then
+            swimming_magic_players[name] = nil
+            return
+        end
+        
+        -- Check if player is in water
+        local pos = player:get_pos()
+        local node = minetest.get_node({x=pos.x, y=pos.y, z=pos.z})
+        
+        if minetest.get_item_group(node.name, "water") > 0 then
+            -- In water - increase speed 5x
+            player:set_physics_override({
+                speed = (swimming_physics[name] and swimming_physics[name].speed or 1) * 5,
+                jump = (swimming_physics[name] and swimming_physics[name].jump or 1) * 1.5
+            })
+            
+            -- Add bubble effect under feet
+            minetest.add_particlespawner({
+                amount = 5,
+                time = 0.5,
+                minpos = {x=pos.x-0.3, y=pos.y-0.5, z=pos.z-0.3},
+                maxpos = {x=pos.x+0.3, y=pos.y, z=pos.z+0.3},
+                minvel = {x=-0.5, y=0.5, z=-0.5},
+                maxvel = {x=0.5, y=1, z=0.5},
+                minacc = {x=0, y=0, z=0},
+                maxacc = {x=0, y=0, z=0},
+                minexptime = 0.5,
+                maxexptime = 1,
+                minsize = 0.5,
+                maxsize = 1,
+                collisiondetection = false,
+                texture = "default_water_flowing_animated.png^[verticalframe:16:1"
+            })
+        else
+            -- Not in water - restore normal speed
+            local default = swimming_physics[name] or {speed=1, jump=1}
+            player:set_physics_override({
+                speed = default.speed,
+                jump = default.jump
+            })
+        end
+    end
+end)
 
+-- Save and load magic data when server restarts
+local storage = minetest.get_mod_storage()
+
+minetest.register_on_shutdown(function()
+    storage:set_string("swimming_magic_players", minetest.serialize(swimming_magic_players))
+    storage:set_string("swimming_physics", minetest.serialize(swimming_physics))
+end)
+
+minetest.register_on_mods_loaded(function()
+    local saved_players = storage:get_string("swimming_magic_players")
+    local saved_physics = storage:get_string("swimming_physics")
+    
+    if saved_players and saved_players ~= "" then
+        swimming_magic_players = minetest.deserialize(saved_players) or {}
+    end
+    
+    if saved_physics and saved_physics ~= "" then
+        swimming_physics = minetest.deserialize(saved_physics) or {}
+    end
+end)
 
 -- Register chat command
 minetest.register_chatcommand("talk_wtd", {
