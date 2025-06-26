@@ -29,6 +29,10 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 
 # Release log
 
+### Release v 4.5.1
+- Fix the bug with undefined variable "winddragon"
+- Add more conversations to the Dragon dialogue
+
 ### Release v 4.5.0
 - Fix bugs
 - Fix grammatical errors
