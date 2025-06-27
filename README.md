@@ -19,7 +19,7 @@
 - autopilot - Toggles the Water Dragon’s autopilot mode when mounted.
 
 ## Installation
-Install via the `Minetest Mod Menu`, or download from `ContentDB`.
+Install via the `Luanti Mod Menu`, or download from `ContentDB`.
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 	
@@ -31,8 +31,8 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 
 ### Release v 4.5.1
 - Fix the bug with undefined variable "winddragon"
-- Add more conversations to the Dragon dialogue
-
+- Adds more conversations to the Dragon dialogue
+	
 ### Release v 4.5.0
 - Fix bugs
 - Fix grammatical errors
@@ -47,7 +47,7 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 ### Release v 4.2.0
 - Fix bugs
 - Remove Scottish Dragon Crate
-- Ability to store Scottish Dragons in Dragon Horns
+- Adds the ability to store Scottish Dragons in Dragon Horns
 
 ### Release v 4.1.0
 - Fix bugs
@@ -62,13 +62,13 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 ### Release v 3.1.0
 - Fix bugs
 - Fix Scottish Dragon mounting
-- Add Wing Horn throwing
+- Adds Wing Horn throwing
 - Better bowing
 
 ### Release v 3.0.0
-- Add the Water Dragon Armour
+- Adds the Water Dragon Armour
 - Fix bugs
-- Add the rescue behavior for Pegasi (mod: Pegasus)
+- Adds the rescue behavior for Pegasi (mod: Pegasus)
 - Fix slam
 - Minor tweaks
 
@@ -77,11 +77,11 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 
 ### Release v 2.2.0
 - Fix bugs
-- Add shields
+- Adds shields
 - A new function for the Scottish Dragon Crate
-- Add the Water Dragon Eye craftitem
-- Add bowing
-- Add healing water
+- Adds the Water Dragon Eye craftitem
+- Adds bowing
+- Adds healing water
 
 ### Release v 2.1.0
 - Adds the Scottish Water Dragon
@@ -92,7 +92,7 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 - A new chatcommand
 
 ### Release v. 1.1.0
-- Add the throwable Wing Horn
+- Adds the throwable Wing Horn
 - A new chatcomannd - call_wtd
 - Fix bugs
 - Fix view points
