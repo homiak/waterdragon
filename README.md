@@ -18,8 +18,26 @@
 - wtd_mount_settings - Opens the Water Dragon mount settings form.
 - autopilot - Toggles the Water Dragon’s autopilot mode when mounted.
 
+
+## Dragon Dialogue commands
+- *take me to <x, y, z>* - The Dragon transports the player to specific coordinates.
+- *bring me to <dragon_name>* - The Water Dragon brings you to another Dragon with the specified name.
+- *fire* - The Dragon unleashes a powerful water breath attack in the forward direction, damaging enemies and potentially affecting the environment.
+- *attack* - The Water Dragon attacks whatever target the player is looking at, except for other Dragons and players.
+- *fly* - The Water Dragon takes off and performs a circular flight pattern.
+- *land* - The Dragon descends and lands on the ground.
+
+- stop - The Dragon halts all current actions.
+- *stay* - The Dragon remains at its current position as a guardian.
+- *wander* - Allows the Dragon to move around freely in the area.
+- *follow* - The Dragon follows the player during its travels.
+- *roar* - The Dragon emits a powerful roar.
+- *come here* - The Dragon flies directly to the player.
+- *ride* - Allows the player to mount and ride the Water Dragon.
+	
+	
 ## Installation
-Install via the `Minetest Mod Menu`, or download from `ContentDB`.
+Install via the `Luanti Mod Menu`, or download from `ContentDB`.
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 	
@@ -31,8 +49,8 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 
 ### Release v 4.5.1
 - Fix the bug with undefined variable "winddragon"
-- Add more conversations to the Dragon dialogue
-
+- Adds more conversations to the Dragon dialogue
+	
 ### Release v 4.5.0
 - Fix bugs
 - Fix grammatical errors
@@ -47,7 +65,7 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 ### Release v 4.2.0
 - Fix bugs
 - Remove Scottish Dragon Crate
-- Ability to store Scottish Dragons in Dragon Horns
+- Adds the ability to store Scottish Dragons in Dragon Horns
 
 ### Release v 4.1.0
 - Fix bugs
@@ -62,13 +80,13 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 ### Release v 3.1.0
 - Fix bugs
 - Fix Scottish Dragon mounting
-- Add Wing Horn throwing
+- Adds Wing Horn throwing
 - Better bowing
 
 ### Release v 3.0.0
-- Add the Water Dragon Armour
+- Adds the Water Dragon Armour
 - Fix bugs
-- Add the rescue behavior for Pegasi (mod: Pegasus)
+- Adds the rescue behavior for Pegasi (mod: Pegasus)
 - Fix slam
 - Minor tweaks
 
@@ -77,11 +95,11 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 
 ### Release v 2.2.0
 - Fix bugs
-- Add shields
+- Adds shields
 - A new function for the Scottish Dragon Crate
-- Add the Water Dragon Eye craftitem
-- Add bowing
-- Add healing water
+- Adds the Water Dragon Eye craftitem
+- Adds bowing
+- Adds healing water
 
 ### Release v 2.1.0
 - Adds the Scottish Water Dragon
@@ -92,7 +110,7 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 - A new chatcommand
 
 ### Release v. 1.1.0
-- Add the throwable Wing Horn
+- Adds the throwable Wing Horn
 - A new chatcomannd - call_wtd
 - Fix bugs
 - Fix view points
