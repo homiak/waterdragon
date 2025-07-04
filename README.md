@@ -1,12 +1,16 @@
 # Dragan-uisge means in Scottish Gaelic a Water Dragon.
 
-**Water Dragons:** This mod introduces three types of Dragons — the Pure Water Dragon, the Rare Water Dragon, and the Scottish Dragon. Each has some unique abilities, such as creating healing water and glowing at night.
+**Water Dragons**
+This mod introduces three types of Dragons — the Pure Water Dragon, the Rare Water Dragon, and the Scottish Dragon. Each has some unique abilities, such as creating healing water and glowing at night.
 
-**Useful things:** Water Dragons can rescue players in danger. There are many features to discover — some of them are quite special, like the one that lets you talk to Water Dragons.
+**Useful things**
+Water Dragons can rescue players in danger. There are many features to discover — some of them are quite special, like the one that lets you talk to Water Dragons.
 
-**Draconic Blocks:** The mod features various decorative and functional blocks, including Draconic Bricks, Draconic Stone, and more.
+**Draconic Blocks**
+The mod features various decorative and functional blocks, including Draconic Bricks, Draconic Stone, and more.
 
-**Water-Forged Draconic Tools and Armour:** Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great protection in battles, and the tools — forged in Dragon Water — are incredibly powerful, capable of killing some enemies in a single hit.
+**Water-Forged Draconic Tools and Armour**
+Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great protection in battles, and the tools — forged in Dragon Water — are incredibly powerful, capable of killing some enemies in a single hit.
 
 ## Chatcommands
 - *call_wtd <radius>*   --   Calls the nearest Water Dragon within the specified radius (default is 100) and teleports it to you.
