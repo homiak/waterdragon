@@ -1,4 +1,4 @@
-# Draigh-uisge means in Scottish Gaelic a Water Dragon.
+# Dragan-uisge means in Scottish Gaelic a Water Dragon.
 
 **Water Dragons:** This mod introduces three types of Dragons — the Pure Water Dragon, the Rare Water Dragon, and the Scottish Dragon. Each has some unique abilities, such as creating healing water and glowing at night.
 
@@ -9,14 +9,14 @@
 **Water-Forged Draconic Tools and Armour:** Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great protection in battles, and the tools — forged in Dragon Water — are incredibly powerful, capable of killing some enemies in a single hit.
 
 ## Chatcommands
-- call_wtd <radius> - Calls the nearest Water Dragon within the specified radius (default is 100) and teleports it to you.
-- set_wtd_owner <player_name> - Sets the owner of the pointed Water Dragon.
-- wtd_blacklist_add <player_name> - Adds a player to the Water Dragon Attack Blacklist.
-- wtd_blacklist_remove <player_name> - Removes a player from the Water Dragon Attack Blacklist.
-- wtd_blacklist_show - Shows all players currently in the Blacklist.
-- talk_wtd - Start a conversation with the nearest Water Dragon.
-- wtd_mount_settings - Opens the Water Dragon mount settings form.
-- autopilot - Toggles the Water Dragon’s autopilot mode when mounted.
+- *call_wtd <radius>*   --   Calls the nearest Water Dragon within the specified radius (default is 100) and teleports it to you.
+- *set_wtd_owner <player_name>*   --   Sets the owner of the pointed Water Dragon.
+- *wtd_blacklist_add <player_name>*   --   Adds a player to the Water Dragon Attack Blacklist.
+- *wtd_blacklist_remove <player_name>*   --   Removes a player from the Water Dragon Attack Blacklist.
+- *wtd_blacklist_show*   --   Shows all players currently in the Blacklist.
+- *talk_wtd*   --   Start a conversation with the nearest Water Dragon.
+- *wtd_mount_settings*   --   Opens the Water Dragon mount settings form.
+- *autopilot*   --   Toggles the Water Dragon’s autopilot mode when mounted.
 
 
 ## Dragon Dialogue commands
@@ -26,9 +26,9 @@
 - *attack* - The Water Dragon attacks whatever target the player is looking at, except for other Dragons and players.
 - *fly* - The Water Dragon takes off and performs a circular flight pattern.
 - *land* - The Dragon descends and lands on the ground.
-
+	
 - stop - The Dragon halts all current actions.
-- *stay* - The Dragon remains at its current position as a guardian.
+- *stay* - The Dragon remains at its current position.
 - *wander* - Allows the Dragon to move around freely in the area.
 - *follow* - The Dragon follows the player during its travels.
 - *roar* - The Dragon emits a powerful roar.
