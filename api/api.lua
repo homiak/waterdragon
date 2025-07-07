@@ -324,6 +324,11 @@ local water_eye_textures = {
 	"yellow"
 }
 
+local water_horn_textures = {
+	"blue",
+	"green",
+	"white",
+}
 
 ----------------------
 -- Global Utilities --
@@ -2020,10 +2025,12 @@ function waterdragon.dragon_activate(self)
 	self.pegasus_rescue_initialized = self.pegasus_rescue_initialized or false
 	generate_texture(self)
 	self.eye_color = self:recall("eye_color")
+
 	if not self.eye_color then
 		self.eye_color = water_eye_textures[random(4)]
 		self:memorize("eye_color", self.eye_color)
 	end
+
 	self.armour = self:recall("armour") or false
 	self.transport_rider = false
 	self.gender = self:recall("gender") or nil
@@ -2972,7 +2979,12 @@ local dragon_dialogue = {
 				if not dragon.fly_allowed then
 					return false, "I am not allowed to fly"
 				end
-
+				
+				if dragon.transport_rider and dragon.is_landed or dragon.touching_ground then
+					waterdragon.action_takeoff(dragon, 5)
+					waterdragon.action_fly(dragon, goal, 3, "waterdragon:fly_simple", 0.8, "fly")
+					return true
+				end
 				waterdragon.action_takeoff(dragon, 5)
 				local initial_pos = dragon.object:get_pos()
 				if not initial_pos then return end
@@ -3050,7 +3062,8 @@ local dragon_dialogue = {
 				end
 				if not dragon.age and dragon.name == "waterdragon:scottish_dragon" then
 					waterdragon.attach_player(dragon, player)
-					minetest.chat_send_player(player:get_player_name(), (dragon.nametag or "Dragon") .. ": You are now riding me.")
+					minetest.chat_send_player(player:get_player_name(),
+						(dragon.nametag or "Dragon") .. ": You are now riding me.")
 					return
 				end
 				if dragon.age < 30 then
@@ -3164,7 +3177,8 @@ local dragon_dialogue = {
 							continuous_actions[dragon.wtd_id] = nil
 							anim = "stand" -- Reset to default animation
 							if dragon.owner then
-								minetest.chat_send_player(dragon.owner, (dragon.nametag or "Dragon") .. ": I must rest my breath")
+								minetest.chat_send_player(dragon.owner,
+									(dragon.nametag or "Dragon") .. ": I must rest my breath")
 							end
 							return
 						end
@@ -3385,7 +3399,6 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 	local original_dir = nil
 	local maneuver_completed = false
 
-
 	-- Check obstacles in 3D space
 	local function check_obstacles(pos, dir, range)
 		local obstacles = {
@@ -3419,7 +3432,8 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 		return obstacles
 	end
 
-	local function handle_tired_dragon(self, goal)
+	local function handle_tired_dragon(self)
+		
 		if not walking_mode then
 			self:set_vertical_velocity(-20)
 			if self.touching_ground then
@@ -3793,7 +3807,7 @@ local function process_dragon_chat(name, message)
 	end
 	if message:find("who are you") then
 		local response = dragon_dialogue.conversations["who are you"][math.random(3)]
-		local type 
+		local type
 		if dragon.name == "waterdragon:rare_water_dragon" then
 			type = "Rare Water Dragon."
 		elseif dragon.name == "waterdragon:pure_water_dragon" then

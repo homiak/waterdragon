@@ -449,6 +449,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					["Cyan"] = "#2deded"
 				}
 			}
+			local horns = {
+				rare_water = {
+					["Blue"] = "blue",
+					["White"] = "white",
+					["Green"] = "green"
+				},
+				pure_water = {
+					["Blue"] = "blue",
+					["White"] = "white",
+					["Green"] = "green"
+				}
+			}
 			local eyes = {
 				rare_water = {
 					["Blue"] = "blue",
@@ -460,7 +472,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					["Red"] = "red",
 					["Orange"] = "orange",
 					["Blue"] = "blue",
-					["Yellow"] = "yellow"
+					["Yellow"] = "yellow",
+					["White"] = "white"
 				}
 			}
 
