@@ -45,9 +45,9 @@ Install via the `Luanti Mod Menu`, or download from `ContentDB`.
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 	
-You’re also welcome to join the server at IP `85.215.240.79` to test everything in action.
+You’re also welcome to join the server at IP `85.215.240.79 - Scotland the Brave` to test everything in action.
 
-This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
+This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatura](https://github.com/ElCeejo/creatura) and created by **Scottii**.
 
 # Release log
 
@@ -90,7 +90,7 @@ This mod is based on `Draconis` and `Creatura` and created by ***Scottii***.
 ### Release v 3.0.0
 - Adds the Water Dragon Armour
 - Fix bugs
-- Adds the rescue behavior for Pegasi (mod: Pegasus)
+- Adds the rescue behavior for Pegasi (mod: [Pegasus](https://github.com/homiak/pegasus))
 - Fix slam
 - Minor tweaks
 

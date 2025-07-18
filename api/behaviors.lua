@@ -1475,12 +1475,6 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 	local wing_horn_cooldown = 0
 
 	local function func(_self)
-		if not _self.fly_allowed then
-			return
-		end
-		if self.flight_stamina < 100 then
-			return
-		end
 
 		local target_alive, _, tgt_pos = _self:get_target(target)
 		if not target_alive then

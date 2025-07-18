@@ -2032,7 +2032,7 @@ function waterdragon.dragon_activate(self)
 	end
 
 	self.armour = self:recall("armour") or false
-	self.transport_rider = false
+	self.transport_rider = self:recall("transport_rider") or false
 	self.gender = self:recall("gender") or nil
 	if not self.gender then
 		local genders = { "male", "female" }
@@ -2080,6 +2080,7 @@ function waterdragon.dragon_activate(self)
 	self.attack_stamina = self:recall("attack_stamina") or 150
 	self.attack_disabled = self:recall("attack_disabled") or false
 	self.flight_stamina = self:recall("flight_stamina") or 300
+	self.wtd_walking_mode = self:recall("wtd_walking_mode") or false
 
 	-- Sound Data
 	self.flap_sound_timer = 5.0
@@ -2784,7 +2785,10 @@ function throw_rider(self)
 	end
 end
 
+------------------------
 -- Dragon Chat System --
+------------------------
+
 
 -- Storage for active chat sessions and cooldowns
 local active_chats = {}
@@ -2796,7 +2800,7 @@ local command_cooldowns = {
 	fly = 5,
 	fire = 8,
 	roar = 20,
-	transport = 20
+	transport = 20,
 }
 
 -- Utility function to check cooldowns
@@ -2848,7 +2852,7 @@ local dragon_dialogue = {
 		},
 
 		["thank you"] = {
-			"You are welcome. If you have something to ask, just ask me!"
+			"You are welcome."
 		},
 		["how much health do you have"] = {
 			"My health level is:",
@@ -2870,7 +2874,7 @@ local dragon_dialogue = {
 
 		["what can you do"] = {
 			"I possess many abilities, young one. I can take flight through the skies - simply ask me to 'fly'. If you prove worthy, you may even ride upon my back - just ask to 'ride'. When we soar together, know that I can 'land' at your word, or 'take me to' any destination you desire. Should you need my presence, ask me to 'follow', or bid me 'stay' to guard a place. And yes, I can demonstrate my voice with a mighty 'roar'. If you spot an enemy, simply tell me to 'attack' while looking at them.",
-			"The powers of ancient times flow through me. I can carry you through the skies - ask me to 'fly' or to 'ride'. My water breath brings doom to our foes - command 'water breath' or point me to 'attack' them. I will 'follow' your path or 'stay' at your word, and can 'land' when our flight is done. If you seek a specific place, simply tell me to 'take me to' your destination. And should you wish to hear my true voice, ask me to 'roar'.",
+			"The powers of ancient times flow through me. I can carry you through the skies - ask me to 'fly' or to 'ride'. My water breath brings doom to our foes - command 'fire' or point me to 'attack' them. I will 'follow' your path or 'stay' at your word, and can 'land' when our flight is done. If you seek a specific place, simply tell me to 'take me to' your destination. And should you wish to hear my true voice, ask me to 'roar'.",
 			"My abilities are yours to command, seeker. Bid me 'fly' and I shall soar, or ask to 'ride' upon my back. Have me 'attack' those you face. I shall 'follow' where you lead or 'stay' where you wish. If you need to reach a distant place, tell me to 'take me to' your destination. When we need return to earth, simply ask me to 'land'. And yes, I can 'roar' to shake the very skies."
 		},
 
@@ -2969,21 +2973,26 @@ local dragon_dialogue = {
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
 					return false, "I take orders only from my chosen rider."
 				end
-				if dragon.transport_rider then
-					return false, "I can't fly now because I am taking you on my back"
-				end
-				if not check_cooldown(player:get_player_name(), "fly") then
-					return false, "I must rest before taking flight again."
-				end
 
 				if not dragon.fly_allowed then
 					return false, "I am not allowed to fly"
 				end
-				
-				if dragon.transport_rider and dragon.is_landed or dragon.touching_ground then
-					waterdragon.action_takeoff(dragon, 5)
-					waterdragon.action_fly(dragon, goal, 3, "waterdragon:fly_simple", 0.8, "fly")
-					return true
+
+				if dragon.transport_rider then
+					if dragon.wtd_walking_mode and dragon.flight_stamina > 50 then
+						dragon.wtd_walking_mode = false
+						waterdragon.action_takeoff(dragon, 5)
+						minetest.chat_send_player(player:get_player_name(),
+							(dragon.nametag or "Dragon") .. ": To the skies!")
+						return true, ""
+					elseif not dragon.wtd_walking_mode and not (dragon.touching_ground or dragon.is_landed) then
+						return false, "I am already flying."
+					else
+						return false, "I am too tired to fly right now."
+					end
+				end
+				if not check_cooldown(player:get_player_name(), "fly") then
+					return false, "I must rest before taking flight again."
 				end
 				waterdragon.action_takeoff(dragon, 5)
 				local initial_pos = dragon.object:get_pos()
@@ -3092,9 +3101,25 @@ local dragon_dialogue = {
 				if dragon.is_landed and dragon.touching_ground then
 					return false, "I am already on the ground."
 				end
+				if dragon.transport_rider then
+					if not dragon.wtd_walking_mode then
+						dragon:set_vertical_velocity(-20)
+						if dragon.touching_ground then
+							dragon.wtd_walking_mode = true
+							waterdragon.action_land(dragon, 5)
+							minetest.chat_send_player(player:get_player_name(),
+								(dragon.nametag or "Dragon") .. ": To the land!")
+						end
+						return true, ""
+					elseif dragon.wtd_walking_mode and dragon.touching_ground then
+						return false, "I am already walking."
+					else
+						return false, "I cannot do that right now."
+					end
+				end
 				function action_flight_to_land(self)
 					if not self:get_action() then
-						waterdragon.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_to_land", 0.6, "fly")
+						waterdragon.action_move(self, self.object:get_pos(), 3, "waterdragon:fly_simple", 0.6, "fly")
 					end
 					if self.touching_ground then
 						waterdragon.action_land(self)
@@ -3105,9 +3130,7 @@ local dragon_dialogue = {
 				end
 
 				action_flight_to_land(dragon)
-				if dragon.transport_rider then
-					action_flight_to_land(dragon)
-				end
+
 				return true
 			end
 		},
@@ -3387,7 +3410,6 @@ local dragon_dialogue = {
 	}
 }
 
-local walking_mode = false
 waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", function(self)
 	local box = clamp(self.width, 0.5, 1.5)
 	local steer_to
@@ -3398,6 +3420,7 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 	local retreat_start_pos = nil
 	local original_dir = nil
 	local maneuver_completed = false
+	local mountain_detection_range = 120
 
 	-- Check obstacles in 3D space
 	local function check_obstacles(pos, dir, range)
@@ -3433,12 +3456,11 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 	end
 
 	local function handle_tired_dragon(self)
-		
-		if not walking_mode then
+		if not self.wtd_walking_mode then
 			self:set_vertical_velocity(-20)
 			if self.touching_ground then
 				waterdragon.action_land(self)
-				walking_mode = true
+				self.wtd_walking_mode = true
 				self:set_gravity(-5)
 				minetest.chat_send_player(self.owner,
 					(self.nametag or "Dragon") .. ": I need to rest my wings. I'll walk for a while.")
@@ -3446,7 +3468,7 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 			end
 		end
 
-		if walking_mode then
+		if self.wtd_walking_mode then
 			waterdragon.action_move(self, goal, 4000, "waterdragon:obstacle_avoidance", 1, "walk")
 			self:set_gravity(-5)
 
@@ -3460,13 +3482,11 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 		end
 
 		if self.flight_stamina >= 300 then
-			walking_mode = false
-			waterdragon.action_takeoff(self, 2)
 			if self.transport_rider then
 				local rider_name = self.transport_rider:get_player_name()
 				if rider_name then
 					minetest.chat_send_player(rider_name,
-						self.nametag or "Dragon" .. ": I feel rested now. Let's take to the skies!")
+						self.nametag or "Dragon" .. ": You can command me now to the skies.")
 				end
 			end
 		end
@@ -3476,6 +3496,24 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 		if maneuver_completed then
 			local pos = self.object:get_pos()
 			local current_dir = minetest.yaw_to_dir(self.object:get_yaw())
+
+			local vertical_offsets = { 5, 15, 30, 45 }
+			local hit_count = 0
+			for _, offset in ipairs(vertical_offsets) do
+				local start_pos = vector.add(pos, { x = 0, y = offset, z = 0 })
+				local end_pos = vector.add(start_pos, vector.multiply(current_dir, mountain_detection_range))
+				local ray = minetest.raycast(start_pos, end_pos, false, true)
+				for pointed_thing in ray do
+					if pointed_thing.type == "node" then
+						local node = minetest.get_node(pointed_thing.under)
+						if minetest.registered_nodes[node.name].walkable then
+							hit_count = hit_count + 1
+							break
+						end
+					end
+				end
+			end
+
 			local obstacles = check_obstacles(pos, current_dir, box * 3)
 
 			if obstacles.front then
@@ -3543,7 +3581,7 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 	end
 
 	local function func(_self, goal, speed_factor)
-		if _self.flight_stamina <= 100 and not walking_mode then
+		if _self.flight_stamina <= 100 and not _self.wtd_walking_mode then
 			handle_tired_dragon(_self, goal)
 			return
 		end
@@ -3588,7 +3626,7 @@ waterdragon.register_movement_method("waterdragon:fly_obstacle_avoidance", funct
 			_self:set_forward_velocity(speed * 0.33)
 		end
 
-		if not walking_mode then
+		if not _self.wtd_walking_mode then
 			_self:set_vertical_velocity(speed * goal_dir.y)
 		end
 		_self:turn_to(goal_yaw, turn_rate)
@@ -3662,14 +3700,14 @@ local function handle_transport(dragon, player, message)
 					"fly")
 				minetest.chat_send_player(player:get_player_name(),
 					(dragon.nametag or "Dragon") .. ": I feel rested now. Let's take to the skies!")
-			elseif dragon and dragon.object and dragon.object:get_pos() and walking_mode then
+			elseif dragon and dragon.object and dragon.object:get_pos() and dragon.wtd_walking_mode then
 				waterdragon.action_move(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 1, "walk")
 			end
 		end)
 	else
-		if not walking_mode then
+		if not dragon.wtd_walking_mode then
 			waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance", 0.5, "fly")
-		elseif walking_mode then
+		elseif dragon.wtd_walking_mode then
 			waterdragon.action_move(dragon, destination, distance / 10, "waterdragon:obstacle_avoidance", 1, "walk")
 		end
 	end
@@ -3731,7 +3769,7 @@ local function handle_transport(dragon, player, message)
 		if dragon.flight_stamina <= 100 then
 			minetest.chat_send_player(player:get_player_name(),
 				(dragon.nametag or "Dragon") .. ": I need to rest my wings. I will walk for a while.")
-			walking_mode = true
+			dragon.wtd_walking_mode = true
 
 			minetest.after(10, function()
 				if dragon and dragon.object and dragon.object:get_pos() then
@@ -3742,7 +3780,7 @@ local function handle_transport(dragon, player, message)
 					end
 					if dragon.flight_stamina >= 300 then
 						waterdragon.action_takeoff(dragon, 5)
-						walking_mode = false
+						dragon.wtd_walking_mode = false
 						waterdragon.action_fly(dragon, destination, distance / 10, "waterdragon:fly_obstacle_avoidance",
 							0.5,
 							"fly")

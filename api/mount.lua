@@ -1228,7 +1228,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         local velocity = self.object:get_velocity()
-        if is_air_below and velocity and velocity.y < 0 and (self._anim == "walk" or self._anim == "stand" or self._anim == "bite") then
+        if is_air_below and velocity and velocity.y < 0 and (self._anim == "walk" or self._anim == "bite") then
             waterdragon.action_takeoff(self, 2)
             is_landed = false
             self.is_flying = true
