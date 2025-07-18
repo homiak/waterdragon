@@ -51,6 +51,10 @@ This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatu
 
 # Release log
 
+### Release v 4.6.0
+- Fix bugs
+- Minor tweaks with "take me to" command
+
 ### Release v 4.5.1
 - Fix the bug with undefined variable "winddragon"
 - Adds more conversations to the Dragon dialogue
