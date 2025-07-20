@@ -31,34 +31,7 @@
 
 <body class="bg-gray-900 text-white font-sans min-h-screen flex">
 
-    <!-- Sidebar -->
-    <div class="sidebar p-4 overflow-y-auto flex flex-col">
-        <h2 class="text-xl font-bold mb-4">Pages</h2>
-        <!-- Search -->
-        <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
-        <!-- Page links -->
-        <nav id="pageLinks" class="flex flex-col space-y-2">
-            <a href="index.html" class="p-2 rounded">Home</a>
-
-            <div>
-                <button onclick="toggleMenu('about-submenu')"
-                    class="w-full flex justify-between items-center p-2 rounded">
-                    <span>About</span>
-                    <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
-                    <a href="about.html" class="p-2 rounded">Overview</a>
-                    <a href="craftitems.html" class="p-2 rounded">Craft Items</a>
-                    <a href="forge.html" class="p-2 rounded">Forging</a>
-                  </div>
-            </div>
-
-            <a href="donate.html" class="p-2 rounded active">Donate</a>
-        </nav>
-    </div>
+    <div id="sidebar-container"></div>
 
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-8">
@@ -81,6 +54,29 @@
     </main>
 
     <script>
+        // --- Universal Script for all pages ---
+
+        // Load sidebar
+        fetch('_sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+
+                // After sidebar is loaded, set active link and menu state
+                const currentPage = window.location.pathname.split("/").pop();
+                const links = document.querySelectorAll('#pageLinks a');
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPage) {
+                        link.classList.add('active');
+                    }
+                });
+
+                if (currentPage === 'about.html' || currentPage === 'craftitems.html' || currentPage === 'forge.html') {
+                    toggleMenu('about-submenu');
+                }
+            });
+
+        // Filter sidebar links based on input
         function filterPages(query) {
             const normalizedQuery = query.toLowerCase();
             document.querySelectorAll("#pageLinks > a, #pageLinks > div").forEach(el => {
@@ -109,17 +105,17 @@
             });
         }
 
+        // Toggle submenu visibility
         function toggleMenu(id) {
-            document.getElementById(id).classList.toggle('hidden');
-            document.getElementById(id.replace('-submenu', '-arrow')).classList.toggle('rotate-180');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const path = window.location.pathname.split("/").pop();
-            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
-                toggleMenu('about-submenu');
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+                const arrow = document.getElementById(id.replace('-submenu', '-arrow'));
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
             }
-        });
+        }
     </script>
 </body>
 

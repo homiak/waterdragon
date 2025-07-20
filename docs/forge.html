@@ -31,48 +31,101 @@
 
 <body class="bg-gray-900 text-white font-sans min-h-screen flex">
 
-    <!-- Sidebar -->
-    <div class="sidebar p-4 overflow-y-auto flex flex-col">
-        <h2 class="text-xl font-bold mb-4">Pages</h2>
-        <!-- Search -->
-        <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
-        <!-- Page links -->
-        <nav id="pageLinks" class="flex flex-col space-y-2">
-            <a href="index.html" class="p-2 rounded">Home</a>
+    <div id="sidebar-container"></div>
 
-            <div>
-                <button onclick="toggleMenu('about-submenu')"
-                    class="w-full flex justify-between items-center p-2 rounded">
-                    <span>About</span>
-                    <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
-                    <a href="about.html" class="p-2 rounded">Overview</a>
-                    <a href="craftitems.html" class="p-2 rounded">Craft Items</a>
-                    <a href="forge.html" class="p-2 rounded active">Forging</a>
-                </div>
-            </div>
-
-            <a href="donate.html" class="p-2 rounded">Donate</a>
-        </nav>
-    </div>
-
-    <main class="flex-1 p-8">
+    <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-8">
-            <h1 class="text-4xl font-bold mb-2">Forging Draconic Steel</h1>
+            <h1 class="text-4xl font-bold text-green-400 mb-2">Forging Draconic Steel</h1>
             <p class="text-gray-400 text-lg">Learn how to create powerful tools bonded to your Dragons.</p>
         </header>
 
         <section class="text-gray-300">
-            <p class="mb-4">To forge Draconic Steel, you must first build a special <strong>Dragon Forge</strong>. This structure requires rare materials found throughout the world. Once the forge is built, you can use it to infuse standard steel with the essence of a Water Dragon.</p>
-            <p>The process requires you to place a steel ingot in the forge, along with a scale from the specific Dragon you wish to bond the item to. The forge will then consume the items and produce a Draconic Steel Ingot, forever linked to that Dragon.</p>
+            <h2 class="text-3xl font-bold mb-4 text-blue-400">Building the Dragon Forge</h2>
+            <p class="mb-6">To forge Draconic Steel, you must first build a special <strong>Dragon Forge</strong>.
+                Follow these steps to construct it:</p>
+
+            <div class="space-y-8">
+                <!-- Step 1 -->
+                <div class="flex items-start space-x-4">
+                    <img src="images/forge-step-1.png" alt="Step 1" class="w-32 h-32 rounded-lg bg-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold">Step 1: The Base Platform</h3>
+                        <p>Place a 3x3 base of Dragostone Bricks (waterdragon:dragonstone_bricks_ .. rare_water or
+                            pure_water).</p>
+                    </div>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex items-start space-x-4">
+                    <img src="images/forge-step-2.png" alt="Step 2" class="w-32 h-32 rounded-lg bg-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold">Step 2: The Inner Stone</h3>
+                        <p>Place another 3x3 platform of Dragonstone Blocks on the first platform
+                            (waterdragon:dragonstone_block_ .. pure_water or rare_water) and the pillars to support the
+                            structure, also with Dragonstone blocks</p>
+                    </div>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex items-start space-x-4">
+                    <img src="images/forge-step-3.png" alt="Step 3" class="w-32 h-32 rounded-lg bg-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold">Step 3: The Chimney Base number 1</h3>
+                        <p>Place Dragonstone Blocks to connect the pillars.</p>
+                    </div>
+                </div>
+                <!-- Step 4 -->
+                <div class="flex items-start space-x-4">
+                    <img src="images/forge-step-4.png" alt="Step 4" class="w-32 h-32 rounded-lg bg-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold">Step 4: The Chimney Base number 2</h3>
+                        <p>Place the side pillars using Dragonstone Blocks to support the forge structure. And place
+                            four pillars above the structure to create a base for a chimney.</p>
+                    </div>
+                </div>
+                <!-- Step 5 -->
+                <div class="flex items-start space-x-4">
+                    <img src="images/forge-step-5.png" alt="Step 5" class="w-32 h-32 rounded-lg bg-gray-700">
+                    <div>
+                        <h3 class="text-2xl font-bold">Step 5: Outer Shell</h3>
+                        <p>Place the Dragonstone Bricks in a circular pattern to form the outer shell of the forge.
+                            Then, place a Dragon Forge node (waterdragon:draconic_forge_ .. pure_water or rare_water) in
+                            the center of the structure, and your forge is complete!</p>
+                    </div>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold mb-4 text-blue-400">Forging ingots</h2>
+            <p class="mb-6">Once your Forge is complete, you can start forging the Draconic Steel Ingots. First, have
+                your Dragon's breath into the Forge (check if the type is the same as the type of the Forge. For
+                example: a Rare Water Dragon cannot forge an ingot if you have built a Pure Water Forge!). Wait a few
+                seconds (something like 15-20) and your Ingot has been forged! If you see that it cools down, the
+                Crucible is not full, keep your Dragon's breath into the Forge. Make sure to monitor the process closely
+                to ensure successful forging.</p>
         </section>
     </main>
 
     <script>
+        // --- Universal Script for all pages ---
+
+        // Load sidebar
+        fetch('_sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+
+                // After sidebar is loaded, set active link and menu state
+                const currentPage = window.location.pathname.split("/").pop();
+                const links = document.querySelectorAll('#pageLinks a');
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPage) {
+                        link.classList.add('active');
+                    }
+                });
+
+                if (currentPage === 'about.html' || currentPage === 'craftitems.html' || currentPage === 'forge.html') {
+                    toggleMenu('about-submenu');
+                }
+            });
+
+        // Filter sidebar links based on input
         function filterPages(query) {
             const normalizedQuery = query.toLowerCase();
             document.querySelectorAll("#pageLinks > a, #pageLinks > div").forEach(el => {
@@ -101,17 +154,18 @@
             });
         }
 
+        // Toggle submenu visibility
         function toggleMenu(id) {
-            document.getElementById(id).classList.toggle('hidden');
-            document.getElementById(id.replace('-submenu', '-arrow')).classList.toggle('rotate-180');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const path = window.location.pathname.split("/").pop();
-            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
-                toggleMenu('about-submenu');
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+                const arrow = document.getElementById(id.replace('-submenu', '-arrow'));
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
             }
-        });
+        }
     </script>
 </body>
+
 </html>

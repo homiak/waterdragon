@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Craft Items - Dragan-uisge Wiki</title>
+    <title>Craftitems - Dragan-uisge Wiki</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {
@@ -31,120 +31,114 @@
 
 <body class="bg-gray-900 text-white font-sans min-h-screen flex">
 
-    <!-- Sidebar -->
-    <div class="sidebar p-4 overflow-y-auto flex flex-col">
-        <h2 class="text-xl font-bold mb-4">Pages</h2>
-        <!-- Search -->
-        <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
-        <!-- Page links -->
-        <nav id="pageLinks" class="flex flex-col space-y-2">
-            <a href="index.html" class="p-2 rounded">Home</a>
+    <div id="sidebar-container"></div>
 
-            <div>
-                <button onclick="toggleMenu('about-submenu')"
-                    class="w-full flex justify-between items-center p-2 rounded">
-                    <span>About</span>
-                    <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
-                    <a href="about.html" class="p-2 rounded">Overview</a>
-                    <a href="craftitems.html" class="p-2 rounded active">Craft Items</a>
-                    <a href="forge.html" class="p-2 rounded">Forging</a>
-                </div>
+    <main class="flex-1 p-8 overflow-y-auto">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-green-400">Craftitems and Tools</h1>
+            <p class="text-gray-400 text-lg">Discover the unique items you can craft in the Dragan-uisge mod.</p>
+        </header>
+
+        <section class="text-gray-300">
+            <h2 class="text-3xl font-bold mb-4 text-blue-400">Drops and Loot</h2>
+
+            <div class="ml-4">
+                <h3 class="text-2xl font-bold mt-6 mb-2">Water Dragon Scales</h3>
+                <p><strong>Water Dragon Scales</strong> are used to craft powerful armor and weapons, enhancing the
+                    player's abilities in combat. These can be obtained from defeating <strong>Water
+                        Dragons</strong>. The older the Dragon is - the more chance for more scales.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Water Dragon Bones</h3>
+                <p><strong>Water Dragon Bones</strong> are used in various crafting recipes as a handle for
+                    pickaxes, swords, axes and shovels. They also could be obtained by defeating Water Dragons.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Water Drops</h3>
+                <p><strong>Dragon Water Drops</strong> are a rare resource that can be collected from Water Dragons,
+                    and can be used for reviving Dragons, and other animals. If the animal dies, they completely
+                    recover the animal's strength and abilities. To revive a fallen creature, right-click it while
+                    holding this item.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Horns</h3>
+                <p><strong>Dragon Horns</strong> can be used in transporting and calling Dragons that are bonded to
+                    it. To bond a Dragon to a Dragon Horn, right-click the Dragon while holding the Horn. If you
+                    right-click a Dragon while the Horn is bonded to it, the Horn will capture the Dragon. To summon
+                    it back, simply hold the Horn and right-click while looking at a block. To call a Dragon from
+                    far away, right-click the sky while holding the Horn. If a Dragon who is
+                    linked to a Horn dies, the data of the Dragon will be cleared and the Horn will no longer be
+                    able to summon it.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Wing Horns</h3>
+                <p><strong>Wing Horns</strong> are special horns, located on the elbows of the wings of Dragons. If
+                    you get one, you will be able to throw it, and the Wing Horn will damage any enemies while in
+                    the air.</p>
+                <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Toothes</h3>
+                <p><strong>Dragon Toothes</strong> are not just drops; they have unique properties to command your
+                    level of being a Dragon Rider. If you use it multiple times (right-click a mob) and if Dragons
+                    trust you, they may even give you the title of a Dragon Rider, giving the privilege of
+                    commanding them. Or more simply said: they will give you the privilege "draigh-uisge", which
+                    means "Dragon Rider".</p>
+
             </div>
+        </section>
+        <section class="text-gray-300 mt-8">
+            <h2 class="text-3xl font-bold mb-4 text-blue-400">Draconic Steel</h2>
+            <p class="text-gray-400"><strong>Draconic Steel</strong> allows you to forge powerful tools and armor
+                linked to a specific Water Dragon. The power of these items is directly tied to your proximity to
+                the bonded Dragon — the closer you are, the more effective your tools will be. However, if the
+                Dragon that the tool is bonded to dies, the tool will lose its power and shatter.</p>
 
-            <a href="donate.html" class="p-2 rounded">Donate</a>
-        </nav>
-    </div>
+            <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Ingots</h3>
 
-    <main class="flex-1 p-8">
-        <main class="flex-1 p-8">
-            <header class="mb-8">
-                <h1 class="text-4xl font-bold text-green-400">Craftitems and Tools</h1>
-                <p class="text-gray-400 text-lg">Discover the unique items you can craft in the Dragan-uisge mod.</p>
-            </header>
+            <p class="text-gray-400"><strong>Draconic Steel Ingots</strong> are used to create various powerful
+                tools and armour made from Draconic Steel. Each ingot is linked to the Dragon who forged it, and
+                ingots forged from different Dragons cannot be crafted together.</p>
 
-            <section class="text-gray-300">
-                <h2 class="text-3xl font-bold mb-4 text-blue-400">Drops and Loot</h2>
+            <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Armour</h3>
 
-                <div class="ml-4">
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Water Dragon Scales</h3>
-                    <p><strong>Water Dragon Scales</strong> are used to craft powerful armor and weapons, enhancing the
-                        player's abilities in combat. These can be obtained from defeating <strong>Water
-                            Dragons</strong>. The older the Dragon is - the more chance for more scales.</p>
+            <p class="text-gray-400"><strong>Draconic Steel Armour</strong> provides enhanced protection and is
+                crafted using Draconic Steel Ingots. The armour's effectiveness increases with the bond to the
+                Dragon that forged it. Rare Water-Forged Draconic Steel Armour is more formidable, because of Rare
+                Water Dragons being more powerful than the others.</p>
 
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Water Dragon Bones</h3>
-                    <p><strong>Water Dragon Bones</strong> are used in various crafting recipes as a handle for
-                        pickaxes, swords, axes and shovels. They also could be obtained by defeating Water Dragons.</p>
+            <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Tools</h3>
 
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Water Drops</h3>
-                    <p><strong>Dragon Water Drops</strong> are a rare resource that can be collected from Water Dragons,
-                        and can be used for reviving Dragons, and other animals. If the animal dies, they completely
-                        recover the animal's strength and abilities. To revive a fallen creature, right-click it while
-                        holding this item.</p>
+            <p class="text-gray-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots
+                and
+                provide enhanced durability and effectiveness in various tasks. Draconic Steel Pickaxes can break
+                any type of block, while Draconic Steel Swords are known for their massive damage and durability
+                points.</p>
 
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Horns</h3>
-                    <p><strong>Dragon Horns</strong> can be used in transporting and calling Dragons that are bonded to
-                        it. To bond a Dragon to a Dragon Horn, right-click the Dragon while holding the Horn. If you
-                        right-click a Dragon while the Horn is bonded to it, the Horn will capture the Dragon. To summon
-                        it back, simply hold the Horn and right-click while looking at a block. To call a Dragon from
-                        far away, right-click the sky while holding the Horn. If a Dragon who is
-                        linked to a Horn dies, the data of the Dragon will be cleared and the Horn will no longer be
-                        able to summon it.</p>
-
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Wing Horns</h3>
-                    <p><strong>Wing Horns</strong> are special horns, located on the elbows of the wings of Dragons. If
-                        you get one, you will be able to throw it, and the Wing Horn will damage any enemies while in
-                        the air.</p>
-                    <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Toothes</h3>
-                    <p><strong>Dragon Toothes</strong> are not just drops; they have unique properties to command your
-                        level of being a Dragon Rider. If you use it multiple times (right-click a mob) and if Dragons
-                        trust you, they may even give you the title of a Dragon Rider, giving the privilege of
-                        commanding them. Or more simply said: they will give you the privilege "draigh-uisge", which
-                        means "Dragon Rider".</p>
-
-                </div>
-            </section>
-            <section class="text-gray-300">
-                <h2 class="text-3xl font-bold mb-4 text-blue-400">Draconic Steel</h2>
-                <p class="text-gray-400"><strong>Draconic Steel</strong> allows you to forge powerful tools and armor
-                    linked to a specific Water Dragon. The power of these items is directly tied to your proximity to
-                    the bonded Dragon — the closer you are, the more effective your tools will be. However, if the
-                    Dragon that the tool is bonded to dies, the tool will lose its power and shatter.</p>
-
-                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Ingots</h3>
-
-                <p class="text-gray-400"><strong>Draconic Steel Ingots</strong> are used to create various powerful
-                    tools and armour made from Draconic Steel. Each ingot is linked to the Dragon who forged it, and
-                    ingots forged from different Dragons cannot be crafted together.</p>
-
-                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Armour</h3>
-
-                <p class="text-gray-400"><strong>Draconic Steel Armour</strong> provides enhanced protection and is
-                    crafted using Draconic Steel Ingots. The armour's effectiveness increases with the bond to the
-                    Dragon that forged it. Rare Water-Forged Draconic Steel Armour is more formidable, because of Rare
-                    Water Dragons being more powerful than the others.</p>
-
-                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Tools</h3>
-
-                <p class="text-gray-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots
-                    and
-                    provide enhanced durability and effectiveness in various tasks. Draconic Steel Pickaxes can break
-                    any type of block, while Draconic Steel Swords are known for their massive damage and durability
-                    points.</p>
-
-                <h3 class="text-2xl font-bold mt-6 mb-2">The Dragonstone Crucible</h3>
-                <p class="text-gray-400"><strong>The Dragonstone Crucible</strong> is a special crafting station used
-                    to forge Draconic Steel Ingots. </p>
-                <a href="forge.html" class="p-2 rounded">How to forge Draconic Steel Ingots</a>
-            </section>
-        </main>
+            <h3 class="text-2xl font-bold mt-6 mb-2">The Dragonstone Crucible</h3>
+            <p class="text-gray-400"><strong>The Dragonstone Crucible</strong> is a special crafting station used
+                to forge Draconic Steel Ingots. </p>
+            <a href="forge.html" class="p-3 rounded">How to forge Draconic Steel Ingots</a>
+        </section>
     </main>
 
     <script>
+        // --- Universal Script for all pages ---
+
+        // Load sidebar
+        fetch('_sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+
+                // After sidebar is loaded, set active link and menu state
+                const currentPage = window.location.pathname.split("/").pop();
+                const links = document.querySelectorAll('#pageLinks a');
+                links.forEach(link => {
+                    if (link.getAttribute('href') === currentPage) {
+                        link.classList.add('active');
+                    }
+                });
+
+                if (currentPage === 'about.html' || currentPage === 'craftitems.html' || currentPage === 'forge.html') {
+                    toggleMenu('about-submenu');
+                }
+            });
+
+        // Filter sidebar links based on input
         function filterPages(query) {
             const normalizedQuery = query.toLowerCase();
             document.querySelectorAll("#pageLinks > a, #pageLinks > div").forEach(el => {
@@ -173,17 +167,17 @@
             });
         }
 
+        // Toggle submenu visibility
         function toggleMenu(id) {
-            document.getElementById(id).classList.toggle('hidden');
-            document.getElementById(id.replace('-submenu', '-arrow')).classList.toggle('rotate-180');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const path = window.location.pathname.split("/").pop();
-            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
-                toggleMenu('about-submenu');
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+                const arrow = document.getElementById(id.replace('-submenu', '-arrow'));
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
             }
-        });
+        }
     </script>
 </body>
 
