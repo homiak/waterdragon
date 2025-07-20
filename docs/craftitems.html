@@ -52,6 +52,7 @@
                 <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
                     <a href="about.html" class="p-2 rounded">Overview</a>
                     <a href="craftitems.html" class="p-2 rounded active">Craft Items</a>
+                    <a href="forge.html" class="p-2 rounded">Forging</a>
                 </div>
             </div>
 
@@ -98,12 +99,12 @@
                     <p><strong>Wing Horns</strong> are special horns, located on the elbows of the wings of Dragons. If
                         you get one, you will be able to throw it, and the Wing Horn will damage any enemies while in
                         the air.</p>
+                    <h3 class="text-2xl font-bold mt-6 mb-2">Dragon Toothes</h3>
                     <p><strong>Dragon Toothes</strong> are not just drops; they have unique properties to command your
                         level of being a Dragon Rider. If you use it multiple times (right-click a mob) and if Dragons
                         trust you, they may even give you the title of a Dragon Rider, giving the privilege of
                         commanding them. Or more simply said: they will give you the privilege "draigh-uisge", which
-                        means
-                        "Dragon Rider".</p>
+                        means "Dragon Rider".</p>
 
                 </div>
             </section>
@@ -113,17 +114,32 @@
                     linked to a specific Water Dragon. The power of these items is directly tied to your proximity to
                     the bonded Dragon — the closer you are, the more effective your tools will be. However, if the
                     Dragon that the tool is bonded to dies, the tool will lose its power and shatter.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Ingots</h3>
+
                 <p class="text-gray-400"><strong>Draconic Steel Ingots</strong> are used to create various powerful
                     tools and armour made from Draconic Steel. Each ingot is linked to the Dragon who forged it, and
                     ingots forged from different Dragons cannot be crafted together.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Armour</h3>
+
                 <p class="text-gray-400"><strong>Draconic Steel Armour</strong> provides enhanced protection and is
                     crafted using Draconic Steel Ingots. The armour's effectiveness increases with the bond to the
                     Dragon that forged it. Rare Water-Forged Draconic Steel Armour is more formidable, because of Rare
                     Water Dragons being more powerful than the others.</p>
-                <p class="text-gray-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots and
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Tools</h3>
+
+                <p class="text-gray-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots
+                    and
                     provide enhanced durability and effectiveness in various tasks. Draconic Steel Pickaxes can break
                     any type of block, while Draconic Steel Swords are known for their massive damage and durability
                     points.</p>
+
+                <h3 class="text-2xl font-bold mt-6 mb-2">The Dragonstone Crucible</h3>
+                <p class="text-gray-400"><strong>The Dragonstone Crucible</strong> is a special crafting station used
+                    to forge Draconic Steel Ingots. </p>
+                <a href="forge.html" class="p-2 rounded">How to forge Draconic Steel Ingots</a>
             </section>
         </main>
     </main>
@@ -164,7 +180,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname.split("/").pop();
-            if (path === 'about.html' || path === 'craftitems.html') {
+            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
                 toggleMenu('about-submenu');
             }
         });
