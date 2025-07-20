@@ -1,27 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About - Dragan-uisge Wiki</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-      .sidebar {
-        width: 16rem;
-        background-color: #1f2937;
-      }
-      .sidebar input {
-        background-color: #374151;
-        color: #f9fafb;
-      }
-      .sidebar a:hover, .sidebar button:hover {
-        background-color: #4b5563;
-      }
-      .sidebar .active {
-        background-color: #3b82f6; /* blue-600 */
-      }
+    .sidebar {
+      width: 16rem;
+      background-color: #1f2937;
+    }
+
+    .sidebar input {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+
+    .sidebar a:hover,
+    .sidebar button:hover {
+      background-color: #4b5563;
+    }
+
+    .sidebar .active {
+      background-color: #3b82f6;
+      /* blue-600 */
+    }
   </style>
 </head>
+
 <body class="bg-gray-900 text-white font-sans min-h-screen flex">
 
   <!-- Sidebar -->
@@ -32,11 +39,14 @@
     <!-- Page links -->
     <nav id="pageLinks" class="flex flex-col space-y-2">
       <a href="index.html" class="p-2 rounded">Home</a>
-      
+
       <div>
         <button onclick="toggleMenu('about-submenu')" class="w-full flex justify-between items-center p-2 rounded">
           <span>About</span>
-          <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
         </button>
         <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
           <a href="about.html" class="p-2 rounded active">Overview</a>
@@ -54,10 +64,12 @@
       <p class="text-gray-400 text-lg">Learn more about the lore and development of the Water Dragon mod.</p>
     </header>
 
-    <img src="images/minetest.png" alt="Water Dragon in Minetest" class="my-8 rounded-lg shadow-lg max-w-full h-auto" style="max-width: 600px;">
+    <img src="images/minetest.png" alt="Water Dragon in Minetest" class="my-8 rounded-lg shadow-lg max-w-full h-auto"
+      style="max-width: 600px;">
 
     <section class="text-gray-300 max-w-3xl">
-      <p>Dragan-uisge (Water Dragon) is a mod inspired by Celtic mythology and Scottish legends. It brings the mystical element of Water Dragons to the world of Minetest, enriching gameplay with unique creatures and magic.</p>
+      <p>Dragan-uisge (Water Dragon) is a mod inspired by Celtic mythology and Scottish legends. It brings the mystical
+        element of Water Dragons to the world of Minetest, enriching gameplay with unique creatures and magic.</p>
       <p>The mod is developed by the community and welcomes contributions from enthusiasts around the world.</p>
     </section>
   </main>
@@ -104,4 +116,5 @@
     });
   </script>
 </body>
+
 </html>
