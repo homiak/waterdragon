@@ -85,14 +85,14 @@ local function launch_fire_sphere(start_pos, direction)
     move_sphere()
 end
 
-function breathe_pegasus_fire(self)
+function breathe_fire(self)
     if not minetest.get_modpath("pegasus") then return end
     if not self.fire_breathing then return end
     if not self.fire or self.fire <= 0 then
         self.fire_breathing = false
         return
     end
-    self.fire_timer = self.fire_timer or 0
+    self.fire_timer = self.fire_timer or 10
 
     local pos = self.object:get_pos()
     if not pos then return end
@@ -214,7 +214,7 @@ function breathe_pegasus_fire(self)
 
     -- Schedule the next fire breath
     minetest.after(0.1, function()
-        breathe_pegasus_fire(self)
+        breathe_fire(self)
     end)
 end
 
@@ -1345,9 +1345,9 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         attack_cooldown = math.max(0, attack_cooldown - _self.dtime)
-        if control.right and minetest.get_modpath("pegasus") then
+        if control.right then
             _self.fire_breathing = true
-            breathe_pegasus_fire(_self)
+            breathe_fire(_self)
         elseif not control.right then
             _self.fire_breathing = false
         end

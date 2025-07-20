@@ -1472,7 +1472,6 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 	local land_init = false
 	local fov_timer = 0
 	local switch_timer = 20
-	local wing_horn_cooldown = 0
 
 	local function func(_self)
 
@@ -1503,7 +1502,6 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 		end
 
 		switch_timer = switch_timer - _self.dtime
-		wing_horn_cooldown = wing_horn_cooldown - _self.dtime
 
 		if not _self:get_action() then
 			if not init then
@@ -1544,9 +1542,7 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 			local attack_range = (is_landed and 8) or 16
 
 			if dist <= attack_range then
-				if wing_horn_cooldown <= 0 and math.random() < 0.3 then
-					throw_wing_horn(_self, target)
-					wing_horn_cooldown = 5
+				if math.random() < 0.3 then
 				else
 					if is_landed then
 						if fov_timer < 1 and target:is_player() then
@@ -1661,9 +1657,6 @@ local function breathe_fire(self)
 	for i = 0, 20, step do
 		local check_pos = vector.add(start_pos, vector.multiply(dir, i))
 		local node = minetest.get_node(check_pos)
-		if node.name ~= "air" and node.name ~= "waterdragon:fire_animated" then
-			minetest.set_node(check_pos, { name = "waterdragon:fire_animated" })
-		end
 
 		-- Check for entities at each step
 		local objects = minetest.get_objects_inside_radius(check_pos, 1)
@@ -1745,7 +1738,7 @@ function summon_fire_dragon(self)
 	-- First hover and breathe fire
 	waterdragon.action_idle(self, 3, "hover")
 	self.fire_breathing = true
-	breathe_pegasus_fire(self)
+	breathe_fire(self)
 
 	-- After 3 seconds, summon the Fire Dragon
 	minetest.after(3, function()

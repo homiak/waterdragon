@@ -166,9 +166,9 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
 		waterdragon.scottish_dragon_activate(self)
 		apply_name_bonuses(self)
 		self.has_pegasus_fire = self.has_pegasus_fire or false
-		self.fire = self.fire or 0
+		self.fire = self.fire or 10
 		self.fire_breathing = self.fire_breathing or false
-		self.fire_timer = 0
+		self.fire_timer = 10
 		local random = math.random
 		if not self.scottish_eye_colour then
 			local scottish_eye_textures = {
@@ -248,8 +248,8 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
 			self.fire_timer = (self.fire_timer or 0) + dtime
 
 			-- Check if we should breathe fire
-			if self.fire_breathing and minetest.get_modpath("pegasus") then
-				breathe_pegasus_fire(self)
+			if self.fire_breathing then
+				breathe_fire(self)
 			end
 		end
 		self:memorize("fire", self.fire)
