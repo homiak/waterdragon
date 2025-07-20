@@ -1,35 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>About - Dragan-uisge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About - Dragan-uisge Wiki</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+      .sidebar {
+        width: 16rem;
+        background-color: #1f2937;
+      }
+      .sidebar input {
+        background-color: #374151;
+        color: #f9fafb;
+      }
+      .sidebar a:hover {
+        background-color: #4b5563;
+      }
+      .sidebar .active {
+        background-color: #3b82f6; /* blue-600 */
+      }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-6">
-  <!-- Main container -->
-  <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
-    <h1 class="text-3xl font-bold mb-4">About Dragan-uisge</h1>
+<body class="bg-gray-900 text-white font-sans min-h-screen flex">
 
-    <!-- Image and text -->
-    <div class="flex items-center mb-4">
-      <img src="images/minetest-logo.png" alt="Minetest logo" class="w-20 h-20 mr-4">
-      <p class="text-lg">
-        <strong>Dragan-uisge</strong> is a fantasy mod for the voxel game engine 
-        <a href="https://www.minetest.net" class="text-blue-600 underline">Luanti</a>.
-        It introduces legendary Water Dragons, elemental magic, and a lore-driven experience.
-        <a href="features.html" class="text-blue-600 underline">Learn more about the features.</a>
-      </p>
-      
-    </div>
-
-    <p class="mt-4">
-      Designed for roleplayers, explorers, and modders alike, Dragan-uisge invites you to write your own stories within a dynamic, mysterious world.
-    </p>
-
-    <p class="mt-4 italic text-gray-500">
-      No in-game purchases, no ads. Just legends.
-    </p>
+  <!-- Sidebar -->
+  <div class="sidebar p-4 overflow-y-auto flex flex-col">
+    <h2 class="text-xl font-bold mb-4">Pages</h2>
+    <!-- Search -->
+    <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
+    <!-- Page links -->
+    <nav id="pageLinks" class="flex flex-col space-y-2">
+      <a href="index.html" class="p-2 rounded">Home</a>
+      <a href="about.html" class="p-2 rounded active">About</a>
+      <a href="donate.html" class="p-2 rounded">Donate</a>
+    </nav>
   </div>
+
+  <main class="flex-1 p-8">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-2">About Dragan-uisge</h1>
+      <p class="text-gray-400 text-lg">Learn more about the lore and development of the Water Dragon mod.</p>
+    </header>
+
+    
+
+    <section class="text-gray-300 max-w-3xl">
+      <p>Dragan-uisge (Water Dragon) is a mod inspired by Celtic mythology and Scottish legends. It brings the mystical element of Water Dragons to the world of Minetest, enriching gameplay with unique creatures and magic.</p>
+      <p>The mod is developed by the community and welcomes contributions from enthusiasts around the world.</p>
+    </section>
+  </main>
+
+  <script>
+    // Filter sidebar links based on input
+    function filterPages(query) {
+      const normalizedQuery = query.toLowerCase();
+      const links = document.querySelectorAll("#pageLinks a");
+      links.forEach(link => {
+        const text = link.textContent.toLowerCase();
+        if (text.includes(normalizedQuery)) {
+          link.style.display = 'block';
+        } else {
+          link.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>

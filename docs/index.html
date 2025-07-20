@@ -1,48 +1,73 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dragan-uisge Wiki Page</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-900 text-white font-sans min-h-screen flex">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dragan-uisge Wiki</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      body {
+        background-color: #111827;
+        color: #e5e7eb;
+      }
+      .sidebar {
+        width: 16rem;
+        background-color: #1f2937;
+      }
+      .sidebar input {
+        background-color: #374151;
+        color: #f9fafb;
+      }
+      .sidebar a:hover {
+        background-color: #4b5563;
+      }
+      .sidebar .active {
+        background-color: #3b82f6; /* blue-600 */
+      }
+    </style>
+  </head>
+  <body class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar p-4 overflow-y-auto flex flex-col">
+      <h2 class="text-xl font-bold mb-4">Pages</h2>
+      <!-- Search -->
+      <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
+      <!-- Page links -->
+      <nav id="pageLinks" class="flex flex-col space-y-2">
+        <a href="index.html" class="p-2 rounded active">Home</a>
+        <a href="about.html" class="p-2 rounded">About</a>
+        <a href="donate.html" class="p-2 rounded">Donate</a>
+      </nav>
+    </div>
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-gray-800 p-6 flex flex-col">
-    <input
-      type="search"
-      placeholder="Search pages..."
-      class="mb-6 px-3 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      disabled
-      title="Search will be implemented later"
-    />
-    <nav class="flex flex-col space-y-2 overflow-y-auto">
-      <a href="about.html" class="block px-3 py-2 rounded hover:bg-blue-700 transition">About</a>
-      <a href="docs.html" class="block px-3 py-2 rounded hover:bg-blue-700 transition">Docs</a>
-      <a href="features.html" class="block px-3 py-2 rounded hover:bg-blue-700 transition">Features</a>
-      <a href="installation.html" class="block px-3 py-2 rounded hover:bg-blue-700 transition">Installation</a>
-      <a href="support.html" class="block px-3 py-2 rounded hover:bg-blue-700 transition">Support</a>
-    </nav>
-  </aside>
+    <!-- Main content -->
+    <div class="flex-1 p-8">
+      <h1 class="text-4xl font-bold mb-6">Dragan-uisge (Water Dragon) Wiki Page</h1>
 
-  <!-- Main content -->
-  <main class="flex-1 p-8 flex flex-col items-center justify-center text-center">
-    <header class="mb-8 max-w-xl">
-      <h1 class="text-4xl font-bold mb-2">Dragan-uisge (Water Dragon) Wiki Page</h1>
-      <p class="text-gray-400 text-lg">Welcome to the official wiki for the mystical Dragan-uisge mod.</p>
-    </header>
+      <!-- Central buttons -->
+      <div class="flex space-x-4 mb-8">
+        <a href="about.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">About</a>
+        <a href="donate.html" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Donate</a>
+      </div>
 
-    <nav class="flex gap-4 mb-12">
-      <a href="about.html" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-xl shadow-md">About</a>
-      <a href="#" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-xl shadow-md">Donate</a>
-    </nav>
+      <p class="text-lg">Welcome to the official home wiki page for <strong>Dragan-uisge</strong>, the Water Dragon mod for Minetest or Luanti.</p>
+      <img src="images/minetest.png" alt="Minetest" class="my-8 rounded-lg shadow-lg max-w-full h-auto" style="max-width: 600px;">
+    </div>
 
-    <section class="text-gray-300 max-w-3xl">
-      <p>This wiki will soon contain full documentation, guides, and lore of the legendary Water Dragons.</p>
-      <p>Check back soon for updates.</p>
-    </section>
-  </main>
-
-</body>
+    <script>
+      // Filter sidebar links based on input
+      function filterPages(query) {
+        const normalizedQuery = query.toLowerCase();
+        const links = document.querySelectorAll("#pageLinks a");
+        links.forEach(link => {
+          const text = link.textContent.toLowerCase();
+          if (text.includes(normalizedQuery)) {
+            link.style.display = 'block';
+          } else {
+            link.style.display = 'none';
+          }
+        });
+      }
+    </script>
+  </body>
 </html>
