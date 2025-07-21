@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Donate - Dragan-uisge Wiki</title>
+    <title>Hatching - Dragan-uisge Wiki</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {
@@ -54,37 +54,27 @@
                     <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
                     <a href="forge.html" class="p-2 rounded">Forging</a>
                     <a href="hatch.html" class="p-2 rounded">Hatching</a>
-                    <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
+                    <a href="riding.html" class="p-2 rounded active">Riding Dragons</a>
                 </div>
             </div>
 
-            <a href="donate.html" class="p-2 rounded active">Donate</a>
+            <a href="donate.html" class="p-2 rounded">Donate</a>
         </nav>
     </div>
 
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-8">
-            <h1 class="text-4xl font-bold text-green-400 mb-2">Support the Project</h1>
-            <p class="text-gray-400 text-lg">Your contributions help keep the Dragan-uisge mod alive and growing.</p>
+            <h1 class="text-4xl font-bold text-green-400 mb-2">Riding Water Dragons</h1>
+            <p class="text-gray-400 text-lg">Learn how to ride your own Water Dragon and explore the skies.</p>
         </header>
 
-        <section class="text-gray-300 max-w-3xl">
-            <p class="mb-4">Dragan-uisge is a passion project developed by the community. If you enjoy the mod and want
-                to support its development, please consider making a donation. Every little bit helps and is greatly
-                appreciated!</p>
-            <p class="mb-6">Your support helps cover development time, server costs, and other expenses associated with
-                maintaining and improving the mod.</p>
-            <img src="images/dreaghal.png" alt="Water Dragon in Minetest"
-                class="my-8 rounded-lg shadow-lg max-w-full h-auto" style="max-width: 600px;">
-
-            <div class="flex space-x-4">
-                <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded text-lg">Donate
-                    via PayPal</a>
-            </div>
+        <section class="text-gray-300">
+            <p>Content about riding Dragons will go here.</p>
         </section>
     </main>
 
     <script>
+        // Filter sidebar links based on input
         function filterPages(query) {
             const normalizedQuery = query.toLowerCase();
             document.querySelectorAll("#pageLinks > a, #pageLinks > div").forEach(el => {
@@ -113,11 +103,19 @@
             });
         }
 
+        // Toggle submenu visibility
         function toggleMenu(id) {
-            document.getElementById(id).classList.toggle('hidden');
-            document.getElementById(id.replace('-submenu', '-arrow')).classList.toggle('rotate-180');
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('hidden');
+                const arrow = document.getElementById(id.replace('-submenu', '-arrow'));
+                if (arrow) {
+                    arrow.classList.toggle('rotate-180');
+                }
+            }
         }
 
+        // Open the correct submenu on page load
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname.split("/").pop();
             if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html') {

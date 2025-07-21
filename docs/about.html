@@ -52,6 +52,8 @@
           <a href="about.html" class="p-2 rounded active">Overview</a>
           <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
           <a href="forge.html" class="p-2 rounded">Forging</a>
+          <a href="hatch.html" class="p-2 rounded">Hatching</a>
+          <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
         </div>
       </div>
 
@@ -111,7 +113,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const path = window.location.pathname.split("/").pop();
-      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
+      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html') {
         toggleMenu('about-submenu');
       }
     });

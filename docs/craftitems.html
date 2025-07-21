@@ -53,6 +53,8 @@
                     <a href="about.html" class="p-2 rounded">Overview</a>
                     <a href="craftitems.html" class="p-2 rounded active">Craftitems</a>
                     <a href="forge.html" class="p-2 rounded">Forging</a>
+                    <a href="hatch.html" class="p-2 rounded">Hatching</a>
+                    <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
                 </div>
             </div>
 
@@ -110,34 +112,34 @@
             </section>
             <section class="text-gray-300">
                 <h2 class="text-3xl font-bold mb-4 text-blue-400">Draconic Steel</h2>
-                <p class="text-gray-400"><strong>Draconic Steel</strong> allows you to forge powerful tools and armor
+                <p class="text-white-400"><strong>Draconic Steel</strong> allows you to forge powerful tools and armor
                     linked to a specific Water Dragon. The power of these items is directly tied to your proximity to
                     the bonded Dragon — the closer you are, the more effective your tools will be. However, if the
                     Dragon that the tool is bonded to dies, the tool will lose its power and shatter.</p>
 
                 <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Ingots</h3>
 
-                <p class="text-gray-400"><strong>Draconic Steel Ingots</strong> are used to create various powerful
+                <p class="text-white-400"><strong>Draconic Steel Ingots</strong> are used to create various powerful
                     tools and armour made from Draconic Steel. Each ingot is linked to the Dragon who forged it, and
                     ingots forged from different Dragons cannot be crafted together.</p>
 
                 <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Armour</h3>
 
-                <p class="text-gray-400"><strong>Draconic Steel Armour</strong> provides enhanced protection and is
+                <p class="text-white-400"><strong>Draconic Steel Armour</strong> provides enhanced protection and is
                     crafted using Draconic Steel Ingots. The armour's effectiveness increases with the bond to the
                     Dragon that forged it. Rare Water-Forged Draconic Steel Armour is more formidable, because of Rare
                     Water Dragons being more powerful than the others.</p>
 
                 <h3 class="text-2xl font-bold mt-6 mb-2">Draconic Steel Tools</h3>
 
-                <p class="text-gray-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots
+                <p class="text-white-400"><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots
                     and
                     provide enhanced durability and effectiveness in various tasks. Draconic Steel Pickaxes can break
                     any type of block, while Draconic Steel Swords are known for their massive damage and durability
                     points.</p>
 
                 <h3 class="text-2xl font-bold mt-6 mb-2">The Dragonstone Crucible</h3>
-                <p class="text-gray-400"><strong>The Dragonstone Crucible</strong> is a special crafting station used
+                <p class="text-white-400"><strong>The Dragonstone Crucible</strong> is a special crafting station used
                     to forge Draconic Steel Ingots. </p>
                 <a href="forge.html" class="p-3 rounded">How to forge Draconic Steel Ingots</a>
             </section>
@@ -180,7 +182,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname.split("/").pop();
-            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
+            if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html') {
                 toggleMenu('about-submenu');
             }
         });

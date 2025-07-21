@@ -55,8 +55,10 @@
         </button>
         <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
           <a href="about.html" class="p-2 rounded">Overview</a>
-          <a href="craftitems.html" class="p-2 rounded">Craft Items</a>
+          <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
           <a href="forge.html" class="p-2 rounded">Forging</a>
+          <a href="hatch.html" class="p-2 rounded">Hatching</a>
+          <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
         </div>
       </div>
 
@@ -67,12 +69,6 @@
   <!-- Main content -->
   <div class="flex-1 p-8 overflow-y-auto">
     <h1 class="text-4xl font-bold text-green-400 mb-6">Dragan-uisge (Water Dragon) Wiki Page</h1>
-
-    <!-- Central buttons -->
-    <div class="flex space-x-4 mb-8">
-      <a href="about.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">About</a>
-      <a href="donate.html" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Donate</a>
-    </div>
 
     <p class="text-lg">Welcome to the official home wiki page for <strong>Dragan-uisge</strong>, the Water Dragon mod
       for Minetest or Luanti.</p>
@@ -125,7 +121,7 @@
     // Open the correct submenu on page load
     document.addEventListener('DOMContentLoaded', () => {
       const path = window.location.pathname.split("/").pop();
-      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html') {
+      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html') {
         toggleMenu('about-submenu');
       }
     });
