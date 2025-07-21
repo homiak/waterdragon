@@ -286,8 +286,8 @@ local function forge_particle(pos, animation)
 end
 
 local function register_draconic_forge(water_type)
-    local forge_name = "waterdragon:draconic_forge_" .. water_type .. "_water"
-    local ingot_name = "waterdragon:draconic_steel_ingot_" .. water_type .. "_water"
+    local forge_name = "waterdragon:draconic_forge_" .. water_type
+    local ingot_name = "waterdragon:draconic_steel_ingot_" .. water_type
     local particle_texture = "waterdragon_water_particle.png"
 
     minetest.register_node(forge_name, {
