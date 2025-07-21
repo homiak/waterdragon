@@ -5,11 +5,11 @@
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XG53E5WS0Z"></script>
   <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-      gtag('config', 'G-XG53E5WS0Z');
+    gtag('config', 'G-XG53E5WS0Z');
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,33 +39,27 @@
 </head>
 
 <body class="bg-gray-900 text-white font-sans min-h-screen flex">
-
+  <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
+    <a href="index.html" class="block p-4 text-white font-bold">Dragan-uisge</a>
+    <button id="hamburger-button" class="p-4 focus:outline-none focus:bg-gray-700">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+</div>
   <!-- Sidebar -->
   <div class="sidebar p-4 overflow-y-auto flex flex-col">
     <h2 class="text-xl font-bold mb-4">Pages</h2>
-    <!-- Search -->
-    <input type="text" placeholder="Search pages..." class="p-2 rounded mb-4" onkeyup="filterPages(this.value)" />
+
     <!-- Page links -->
     <nav id="pageLinks" class="flex flex-col space-y-2">
       <a href="index.html" class="p-2 rounded">Home</a>
-
-      <div>
-        <button onclick="toggleMenu('about-submenu')" class="w-full flex justify-between items-center p-2 rounded">
-          <span>About</span>
-          <svg class="w-4 h-4 transform transition-transform" id="about-arrow" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-        <div id="about-submenu" class="hidden pl-4 mt-2 flex flex-col space-y-2">
-          <a href="about.html" class="p-2 rounded active">Overview</a>
-          <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
-          <a href="forge.html" class="p-2 rounded">Forging Ingots</a>
-          <a href="hatch.html" class="p-2 rounded">Hatching</a>
-          <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
-          <a href="talking.html" class="p-2 rounded">Talking to Dragons</a>
-        </div>
-      </div>
+      <a href="about.html" class="p-2 rounded active">Overview</a>
+      <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
+      <a href="forge.html" class="p-2 rounded">Forging</a>
+      <a href="hatch.html" class="p-2 rounded">Hatching</a>
+      <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
+      <a href="talking.html" class="p-2 rounded">Talking to Dragons</a>
     </nav>
   </div>
 
@@ -86,46 +80,23 @@
   </main>
 
   <script>
-    function filterPages(query) {
-      const normalizedQuery = query.toLowerCase();
-      document.querySelectorAll("#pageLinks > a, #pageLinks > div").forEach(el => {
-        let hasMatch = false;
-        if (el.tagName === 'A') {
-          if (el.textContent.toLowerCase().includes(normalizedQuery)) {
-            hasMatch = true;
-          }
-        } else { // It's a div with a submenu
-          const button = el.querySelector('button');
-          const links = el.querySelectorAll('a');
-          let subMatch = false;
-          links.forEach(link => {
-            if (link.textContent.toLowerCase().includes(normalizedQuery)) {
-              link.style.display = 'block';
-              subMatch = true;
-            } else {
-              link.style.display = 'none';
-            }
-          });
-          if (button.textContent.toLowerCase().includes(normalizedQuery) || subMatch) {
-            hasMatch = true;
-          }
-        }
-        el.style.display = hasMatch ? 'block' : 'none';
-      });
-    }
+    // Hamburger menu functionality
+    const hamburgerButton = document.getElementById('hamburger-button');
+    const sidebar = document.getElementById('sidebar');
 
-    function toggleMenu(id) {
-      document.getElementById(id).classList.toggle('hidden');
-      document.getElementById(id.replace('-submenu', '-arrow')).classList.toggle('rotate-180');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const path = window.location.pathname.split("/").pop();
-      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html' || path === 'talking.html') {
-        toggleMenu('about-submenu');
-      }
+    hamburgerButton.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
     });
-  </script>
+
+    // Page filtering functionality
+    function filterPages(query) {
+        const normalizedQuery = query.toLowerCase();
+        document.querySelectorAll("#pageLinks > a").forEach(link => {
+            const hasMatch = link.textContent.toLowerCase().includes(normalizedQuery);
+            link.style.display = hasMatch ? 'block' : 'none';
+        });
+    }
+</script>
 </body>
 
 </html>
