@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XG53E5WS0Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-XG53E5WS0Z');
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Riding - Dragan-uisge Wiki</title>
@@ -68,8 +77,6 @@
                     <a href="riding.html" class="p-2 rounded active">Riding Dragons</a>
                 </div>
             </div>
-
-            <a href="donate.html" class="p-2 rounded">Donate</a>
         </nav>
     </div>
 
@@ -94,14 +101,23 @@
                 <img src="images/taming2.png" alt="Taming Pure Water Dragon" class="rounded-lg shadow-lg"
                     style="max-width: 45%;">
             </div>
-
+            <!-- Video Demonstration -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Video Demonstration</h2>
+                <div class="w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg bg-black">
+                    <video controls class="w-full h-full">
+                        <source src="videos/taming-demo.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </section>
             <div>
                 <h2 class="text-3xl font-bold mb-4 text-blue-400">Riding Controls</h2>
                 <p class="mb-4">Once you have tamed a Water Dragon, you can explore the skies. The controls are as
                     follows:</p>
                 <ul class="list-disc list-inside space-y-3">
                     <li><strong>Movement:</strong> Press <kbd>W</kbd> to move forward and use your mouse to steer. Use
-                        <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.</li>
+                        <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.
+                    </li>
                     <li><strong>Takeoff, Landing & Dismounting:</strong>
                         <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
                             <li>Press <kbd>Space</kbd> to take off. While flying, press <kbd>Space</kbd> again to fly
@@ -125,15 +141,6 @@
                         </ul>
                     </li>
                 </ul>
-            </div>
-        </section>
-        <!-- Video Demonstration -->
-        <section class="mb-12">
-            <h2 class="text-3xl font-bold mb-4 text-blue-400">Video Demonstration</h2>
-            <div class="w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg bg-black">
-                <video controls class="w-full h-full">
-                    <source src="videos/taming-demo.mp4" type="video/mp4">
-                </video>
             </div>
         </section>
     </main>
