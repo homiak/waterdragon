@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Hatching - Dragan-uisge Wiki</title>
+    <title>Riding - Dragan-uisge Wiki</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {
@@ -25,6 +25,17 @@
         .sidebar .active {
             background-color: #3b82f6;
             /* blue-600 */
+        }
+
+        /* Style for keyboard keys */
+        kbd {
+            background-color: #4b5563;
+            border: 1px solid #6b7280;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e5e7eb;
         }
     </style>
 </head>
@@ -65,11 +76,56 @@
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-8">
             <h1 class="text-4xl font-bold text-green-400 mb-2">Riding Water Dragons</h1>
-            <p class="text-gray-400 text-lg">Learn how to ride your own Water Dragon and explore the skies.</p>
+            <p class="text-gray-400 text-lg">Learn how to tame and ride your own Water Dragon.</p>
         </header>
 
-        <section class="text-gray-300">
-            <p>Content about riding Dragons will go here.</p>
+        <section class="text-gray-300 space-y-8">
+            <div>
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Taming Your Dragon</h2>
+                <p>To tame a Water Dragon, you first need to show respect by bowing to it (hold <kbd>Shift</kbd> for
+                    about a second). Then, right-click the Dragon to mount it. While mounted, hold 10 or more pieces of
+                    meat in your hand and do not dismount until the Dragon is tamed. Be patient, as this process can
+                    take some time.</p>
+            </div>
+
+            <div class="flex gap-8 justify-center">
+                <img src="images/taming1.png" alt="Taming Scottish Dragon" class="rounded-lg shadow-lg"
+                    style="max-width: 45%;">
+                <img src="images/taming2.png" alt="Taming Pure Water Dragon" class="rounded-lg shadow-lg"
+                    style="max-width: 45%;">
+            </div>
+
+            <div>
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Riding Controls</h2>
+                <p class="mb-4">Once you have tamed a Water Dragon, you can explore the skies. The controls are as
+                    follows:</p>
+                <ul class="list-disc list-inside space-y-3">
+                    <li><strong>Movement:</strong> Press <kbd>W</kbd> to move forward and use your mouse to steer. Use
+                        <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.</li>
+                    <li><strong>Takeoff, Landing & Dismounting:</strong>
+                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                            <li>Press <kbd>Space</kbd> to take off. While flying, press <kbd>Space</kbd> again to fly
+                                higher.</li>
+                            <li>To land, hold the <kbd>S</kbd> key.</li>
+                            <li>To dismount, press the <kbd>Shift</kbd> key.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Attacks:</strong>
+                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                            <li>Hold <kbd>Left-click</kbd> for a breath attack.</li>
+                            <li>While on the ground, <kbd>Right-click</kbd> for a powerful melee attack.</li>
+                            <li>Hold <kbd>S</kbd> + <kbd>Right-click</kbd> to create a strong gust of wind with the
+                                wings.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Special Abilities:</strong>
+                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                            <li>If you fly into a wall, the Dragon will automatically cling to it.</li>
+                            <li>To destroy blocks, hold <kbd>Left-click</kbd> while flying into a wall.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </section>
     </main>
 
