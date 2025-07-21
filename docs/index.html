@@ -68,6 +68,7 @@
           <a href="forge.html" class="p-2 rounded">Forging Ingots</a>
           <a href="hatch.html" class="p-2 rounded">Hatching</a>
           <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
+          <a href="talking.html" class="p-2 rounded">Talking to Dragons</a>
         </div>
       </div>
     </nav>
@@ -128,7 +129,7 @@
     // Open the correct submenu on page load
     document.addEventListener('DOMContentLoaded', () => {
       const path = window.location.pathname.split("/").pop();
-      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html') {
+      if (path === 'about.html' || path === 'craftitems.html' || path === 'forge.html' || path === 'hatch.html' || path === 'riding.html' || path === 'talking.html') {
         toggleMenu('about-submenu');
       }
     });

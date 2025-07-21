@@ -13,7 +13,7 @@
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Riding - Dragan-uisge Official Website</title>
+    <title>Hatching - Dragan-uisge Official Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {
@@ -34,17 +34,6 @@
         .sidebar .active {
             background-color: #3b82f6;
             /* blue-600 */
-        }
-
-        /* Style for keyboard keys */
-        kbd {
-            background-color: #4b5563;
-            border: 1px solid #6b7280;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #e5e7eb;
         }
     </style>
 </head>
@@ -74,8 +63,8 @@
                     <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
                     <a href="forge.html" class="p-2 rounded">Forging Ingots</a>
                     <a href="hatch.html" class="p-2 rounded">Hatching</a>
-                    <a href="riding.html" class="p-2 rounded active">Riding Dragons</a>
-                    <a href="talking.html" class="p-2 rounded">Talking to Dragons</a>
+                    <a href="riding.html" class="p-2 rounded">Riding Dragons</a>
+                    <a href="talking.html" class="p-2 rounded active">Talking to Dragons</a>
                 </div>
             </div>
         </nav>
@@ -83,65 +72,52 @@
 
     <main class="flex-1 p-8 overflow-y-auto">
         <header class="mb-8">
-            <h1 class="text-4xl font-bold text-green-400 mb-2">Riding Water Dragons</h1>
-            <p class="text-gray-400 text-lg">Learn how to tame and ride your own Water Dragon.</p>
+            <h1 class="text-4xl font-bold text-green-400 mb-2">Talking to Dragons</h1>
+            <p class="text-gray-400 text-lg">Learn how to communicate with Water Dragons.</p>
         </header>
 
-        <section class="text-gray-300 space-y-8">
+        <section class="text-gray-300 space-y-6">
+            <p>Water Dragons are ancient and intelligent beings. If you show them respect, you can communicate with them directly through a unique chat system. This allows you to ask them questions and give them commands.</p>
+            <img src="images/talk1.png" alt="A Dragon who talks" class="my-8 rounded-lg shadow-lg max-w-full h-auto"
+            style="max-width: 600px;">
             <div>
-                <h2 class="text-3xl font-bold mb-4 text-blue-400">Taming Your Dragon</h2>
-                <p>To tame a Water Dragon, you first need to show respect by bowing to it (hold <kbd>Shift</kbd> for
-                    about a second). Then, right-click the Dragon to mount it. While mounted, hold 10 or more pieces of
-                    meat in your hand and do not dismount until the Dragon is tamed. Be patient, as this process can
-                    take some time.</p>
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">How to Start a Conversation</h2>
+                <p>To begin a conversation, stand near a Water Dragon (within about 60 blocks) and type the following command in the chat:</p>
+                <div class="bg-gray-800 p-3 rounded-md my-2">
+                    <code>/talk_wtd</code>
+                </div>
+                <p>The Dragon will acknowledge you, and you can begin conversing by simply typing in the chat. To end the conversation, just say <kbd>bye</kbd>, <kbd>goodbye</kbd>, or <kbd>farewell</kbd>.</p>
             </div>
 
-            <div class="flex gap-8 justify-center">
-                <img src="images/taming1.png" alt="Taming Scottish Dragon" class="rounded-lg shadow-lg"
-                    style="max-width: 45%;">
-                <img src="images/taming2.png" alt="Taming Pure Water Dragon" class="rounded-lg shadow-lg"
-                    style="max-width: 45%;">
-            </div>
-            <!-- Video Demonstration -->
-            <section class="mb-12">
-                <h2 class="text-3xl font-bold mb-4 text-blue-400">Video Demonstration</h2>
-                <div class="w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg bg-black">
-                    <video controls class="w-full h-full">
-                        <source src="videos/taming-demo.mp4" type="video/mp4">
-                    </video>
-                </div>
-            </section>
             <div>
-                <h2 class="text-3xl font-bold mb-4 text-blue-400">Riding Controls</h2>
-                <p class="mb-4">Once you have tamed a Water Dragon, you can explore the skies. The controls are as
-                    follows:</p>
-                <ul class="list-disc list-inside space-y-3">
-                    <li><strong>Movement:</strong> Press <kbd>W</kbd> to move forward and use your mouse to steer. Use
-                        <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.
-                    </li>
-                    <li><strong>Takeoff, Landing & Dismounting:</strong>
-                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
-                            <li>Press <kbd>Space</kbd> to take off. While flying, press <kbd>Space</kbd> again to fly
-                                higher.</li>
-                            <li>To land, hold the <kbd>S</kbd> key.</li>
-                            <li>To dismount, press the <kbd>Shift</kbd> key.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Attacks:</strong>
-                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
-                            <li>Hold <kbd>Left-click</kbd> for a breath attack.</li>
-                            <li>While on the ground, <kbd>Right-click</kbd> for a powerful melee attack.</li>
-                            <li>Hold <kbd>S</kbd> + <kbd>Right-click</kbd> to create a strong gust of wind with the
-                                wings.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Special Abilities:</strong>
-                        <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
-                            <li>If you fly into a wall, the Dragon will automatically cling to it.</li>
-                            <li>To destroy blocks, hold <kbd>Left-click</kbd> while flying into a wall.</li>
-                        </ul>
-                    </li>
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Giving Commands</h2>
+                <p>Once in conversation, you can give your tamed Dragon direct orders. Note that most commands only work if you are the Dragon's owner, and some have a cooldown period before they can be used again.</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><kbd>fly</kbd> - Commands the Dragon to take off and fly in a circle.</li>
+                    <li><kbd>land</kbd> - Commands the Dragon to land if it is flying.</li>
+                    <li><kbd>ride</kbd> - Allows you to mount and ride the Dragon.</li>
+                    <li><kbd>attack</kbd> - Orders the Dragon to attack a creature you are looking at.</li>
+                    <li><kbd>fire</kbd> - Commands the Dragon to use its breath weapon.</li>
+                    <li><kbd>follow</kbd> - Orders the Dragon to follow you.</li>
+                    <li><kbd>stay</kbd> - Orders the Dragon to stay in its current position.</li>
+                    <li><kbd>wander</kbd> - Allows the Dragon to wander around freely.</li>
+                    <li><kbd>come here</kbd> - Calls the Dragon to your position.</li>
+                    <li><kbd>roar</kbd> - Asks the Dragon to let out a mighty roar.</li>
+                    <li><kbd>stop</kbd> - Halts any current continuous action, like a breath attack.</li>
+                    <li><kbd>take me to X Y Z</kbd> - Asks the Dragon to fly you to specific coordinates.</li>
                 </ul>
+            </div>
+
+            <div>
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Conversation Topics</h2>
+                <p>You can also ask the Dragon questions about itself and the world. Try asking about:</p>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Its health, stamina, or hunger levels (e.g., "how much health do you have?").</li>
+                    <li>Its name, age, or purpose.</li>
+                    <li>Its thoughts on humans or other Dragons.</li>
+                    <li>A special secret: try asking <kbd>can you teach me magic</kbd> and see what happens!</li>
+                </ul>
+                <p class="mt-4">The Dragon has a wide range of responses. Experiment with different questions to learn more about your companion and the lore of the world.</p>
             </div>
         </section>
     </main>
