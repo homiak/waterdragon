@@ -1304,7 +1304,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     waterdragon.action_land(_self)
                 end
 
-                if control.LMB and attack_cooldown <= 0 then
+                if control.RMB and attack_cooldown <= 0 then
                     local start_pos = _self.object:get_pos()
                     start_pos.y = start_pos.y + 1.5
                     local end_pos = vector.add(start_pos, vector.multiply(look_dir, 5))
@@ -1345,7 +1345,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
         end
 
         attack_cooldown = math.max(0, attack_cooldown - _self.dtime)
-        if control.right then
+        if control.LMB then
             _self.fire_breathing = true
             breathe_fire(_self)
         elseif not control.right then
@@ -1393,7 +1393,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     { x = 0, y = 0, z = 0 })
             end
         end
-        if control.jump and control.left and self.has_pegasus_fire and self.fire >= 3 then
+        if control.jump and control.left and self.fire >= 3 then
             local pos = self.object:get_pos()
             if pos then
                 pos.y = pos.y + 2
