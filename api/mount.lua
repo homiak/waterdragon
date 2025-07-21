@@ -1277,7 +1277,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     is_landed = false
                     waterdragon.action_takeoff(_self)
                 end
-                if control.LMB then
+                if control.RMB then
                     waterdragon.action_punch(_self)
                 end
             else
@@ -1348,7 +1348,7 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
         if control.LMB then
             _self.fire_breathing = true
             breathe_fire(_self)
-        elseif not control.right then
+        elseif not control.LMB then
             _self.fire_breathing = false
         end
         if view_point == 2 then
