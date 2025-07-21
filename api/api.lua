@@ -2228,7 +2228,8 @@ function waterdragon.dragon_step(self, dtime)
 		local player = minetest.get_player_by_name(self.owner)
 		if not player
 			or player:get_player_control().sneak == true
-			or self.age > 4 then
+			or self.age > 4
+			or self.hp == 0 then
 			self.object:set_detach()
 			self.shoulder_mounted = self:memorize("shoulder_mounted", false)
 		end
@@ -2607,28 +2608,32 @@ function waterdragon.dragon_rightclick(self, clicker)
 		return
 	end
 	local item_name = clicker:get_wielded_item():get_name() or ""
-	if self.owner and name == self.owner and item_name == "" then
-		if clicker:get_player_control().sneak then
-			self:show_formspec(clicker)
-		elseif not self.rider and self.age >= 20 then
-			waterdragon.attach_player(self, clicker)
-			if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
-				minetest.after(1, function()
-					if self.object:get_luaentity() then
-						waterdragon.action_fly_and_throw(self)
-					end
-				end)
-				minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
-			end
-		elseif self.age < 5 then
-			self.shoulder_mounted = self:memorize("shoulder_mounted", true)
-			self.object:set_attach(clicker, "",
-				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
-		end
-	end
-	if self.rider and not self.passenger and name ~= self.owner and item_name == "" then
-		waterdragon.send_passenger_request(self, clicker)
-	end
+    if self.owner and name == self.owner and item_name == "" then
+        if clicker:get_player_control().sneak then
+            self:show_formspec(clicker)
+        elseif not self.rider and self.age >= 30 then
+            if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
+                minetest.after(1, function()
+                    if self.object:get_luaentity() then
+                        waterdragon.action_fly_and_throw(self)
+                    end
+                end)
+                minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
+            else
+                waterdragon.attach_player(self, clicker)
+            end
+        elseif self.age < 5 and self.owner and not self.rider and not self.passenger then
+            self.shoulder_mounted = self:memorize("shoulder_mounted", true)
+            self.object:set_attach(clicker, "",
+                { x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
+        end
+    elseif not self.owner and item_name == "" then
+        self:initiate_utility("waterdragon:wtd_breaking", self, clicker)
+        waterdragon.attach_player(self, clicker)
+    end
+    if self.owner and self.rider and not self.passenger and name ~= self.owner and item_name == "" then
+        waterdragon.send_passenger_request(self, clicker)
+    end
 end
 
 ------------------
