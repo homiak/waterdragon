@@ -42,11 +42,11 @@
   <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
     <a href="index.html" class="block p-4 text-white font-bold">Dragan-uisge</a>
     <button id="hamburger-button" class="p-4 focus:outline-none focus:bg-gray-700">
-        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
     </button>
-</div>
+  </div>
   <!-- Sidebar -->
   <div class="sidebar p-4 overflow-y-auto flex flex-col">
     <h2 class="text-xl font-bold mb-4">Pages</h2>
@@ -74,7 +74,8 @@
 
     <section class="text-gray-300 max-w-3xl">
       <p>Dragan-uisge (Water Dragon) is a mod inspired by Celtic mythology and Scottish legends. It brings the mystical
-        element of Water Dragons to the world of Minetest, enriching gameplay with unique creatures and magic.</p>
+        element of Water Dragons to the world of Minetest, enriching gameplay with unique creatures and magic. The three
+        new types of Water Dragons include the <strong>Pure Water Dragon</strong>, <strong>the Rare Water Dragon</strong>, and the <strong>Scottish Dragon.</strong></p>
       <p>The mod is developed by the community and welcomes contributions from enthusiasts around the world.</p>
     </section>
   </main>
@@ -85,18 +86,18 @@
     const sidebar = document.getElementById('sidebar');
 
     hamburgerButton.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
+      sidebar.classList.toggle('-translate-x-full');
     });
 
     // Page filtering functionality
     function filterPages(query) {
-        const normalizedQuery = query.toLowerCase();
-        document.querySelectorAll("#pageLinks > a").forEach(link => {
-            const hasMatch = link.textContent.toLowerCase().includes(normalizedQuery);
-            link.style.display = hasMatch ? 'block' : 'none';
-        });
+      const normalizedQuery = query.toLowerCase();
+      document.querySelectorAll("#pageLinks > a").forEach(link => {
+        const hasMatch = link.textContent.toLowerCase().includes(normalizedQuery);
+        link.style.display = hasMatch ? 'block' : 'none';
+      });
     }
-</script>
+  </script>
 </body>
 
 </html>
