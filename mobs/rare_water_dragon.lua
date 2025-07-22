@@ -303,7 +303,7 @@ waterdragon.register_mob("waterdragon:rare_water_dragon", {
         if self.punch_data.count >= 6 then
             -- Reset the counter
             self.punch_data.count = 0
-            -- Make the dragon attack the puncher
+            -- Make the Dragon attack the puncher
             if puncher == self.rider then
                 waterdragon.detach_player(self, puncher)
                 self.fly_allowed = true
