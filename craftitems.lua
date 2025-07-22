@@ -127,6 +127,228 @@ minetest.register_craftitem("waterdragon:dragon_bone", {
 
 table.insert(wtd_drops, "waterdragon:dragon_bone")
 
+-- Water Dragon Eyes --
+
+local eye_cameras = {}
+
+function deactivate_eye_camera(playername)
+	local camera = eye_cameras[playername]
+	if not camera then return end
+
+	local player = minetest.get_player_by_name(playername)
+	if player then
+		player:set_physics_override({})
+		player:set_properties({ physical = true, pointable = true })
+
+		local privs = minetest.get_player_privs(playername)
+		privs.interact = true
+		minetest.set_player_privs(playername, privs)
+
+		local cam_ent = camera:get_luaentity()
+		if cam_ent and cam_ent.original_player_pos then
+			player:set_pos(cam_ent.original_player_pos)
+		end
+	end
+
+	if camera then
+		camera:remove()
+	end
+
+	eye_cameras[playername] = nil
+end
+
+local eye_cameras = {}
+
+minetest.register_entity("waterdragon:eye_camera", {
+	initial_properties = {
+		physical = false,
+		pointable = false,
+		visual = "blank",
+		collisionbox = { 0, 0, 0, 0, 0, 0 },
+		despawn_after = false,
+		armor_groups = { immortal = 1 },
+	},
+
+	on_activate = function(self, staticdata)
+        self.owner = staticdata
+        if not self.owner or self.owner == "" then
+            self.object:remove()
+            return
+        end
+
+        local player = minetest.get_player_by_name(self.owner)
+        if not player then
+            self.object:remove()
+            return
+        end
+
+        minetest.chat_send_player(self.owner,
+            S(
+            "You activated the Water Dragon Eye. This means that you are now in a special camera mode. Other users cannot see you. Use normal controls to move around."))
+
+        self.original_player_pos = player:get_pos()
+
+        -- Store original privileges and remove 'interact' to prevent world interaction
+        local privs = minetest.get_player_privs(self.owner)
+        self.had_interact_priv = privs.interact
+        privs.interact = nil
+        minetest.set_player_privs(self.owner, privs)
+
+        -- Store original armor and make player's body immortal
+        self.original_armor = player:get_armor_groups()
+        player:set_armor_groups({immortal = 1})
+
+        -- Freeze the player's body
+        player:set_physics_override({speed=0, jump=0, sneak=false})
+        player:set_properties({physical = false})
+
+        -- Attach player's view to the camera entity
+        player:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
+
+        eye_cameras[self.owner] = self.object
+    end,
+
+	on_step = function(self, dtime)
+		if not self.owner then
+			self.object:remove()
+			return
+		end
+
+		local player = minetest.get_player_by_name(self.owner)
+		if not player then
+			self.object:remove()
+			eye_cameras[self.owner] = nil
+			return
+		end
+
+		local ctrl = player:get_player_control()
+		local yaw = player:get_look_horizontal()
+		local pitch = player:get_look_vertical()
+
+		local dir = minetest.yaw_to_dir(yaw)
+		local speed = 6
+		local vel = { x = 0, y = 0, z = 0 }
+
+		if ctrl.up then
+			vel.x = vel.x + dir.x * speed
+			vel.z = vel.z + dir.z * speed
+		end
+		if ctrl.down then
+			vel.x = vel.x - dir.x * speed
+			vel.z = vel.z - dir.z * speed
+		end
+		if ctrl.right then
+			local left_dir = minetest.yaw_to_dir(yaw - math.pi / 2)
+			vel.x = vel.x + left_dir.x * speed
+			vel.z = vel.z + left_dir.z * speed
+		end
+		if ctrl.left then
+			local right_dir = minetest.yaw_to_dir(yaw + math.pi / 2)
+			vel.x = vel.x + right_dir.x * speed
+			vel.z = vel.z + right_dir.z * speed
+		end
+		if ctrl.jump then
+			vel.y = speed
+		elseif ctrl.sneak then
+			vel.y = -speed
+		end
+
+		self.object:set_velocity(vel)
+		self.object:set_rotation({ x = pitch, y = yaw, z = 0 })
+	end,
+
+	on_deactivate = function(self)
+		if not self.owner then return end
+
+		local player = minetest.get_player_by_name(self.owner)
+		if player then
+			player:set_detach()
+			player:set_physics_override({ speed = 1, jump = 1, sneak = true })
+			player:set_properties({
+				visual = "mesh",
+				visual_size = { x = 1, y = 1 },
+				physical = true,
+				pointable = true,
+			})
+			if self.original_player_pos then
+				player:set_pos(self.original_player_pos)
+			end
+			if self.original_item then
+				player:set_wielded_item(self.original_item)
+			end
+
+			local privs = minetest.get_player_privs(self.owner)
+			if had_interact_priv then
+				privs.interact = true
+			end
+
+			if not had_fly_priv then
+				minetest.after(0.1, function()
+					local p = minetest.get_player_by_name(self.owner)
+					if p then
+						local current = minetest.get_player_privs(self.owner)
+						current.fly = nil
+						minetest.set_player_privs(self.owner, current)
+					end
+				end)
+			end
+
+			minetest.set_player_privs(self.owner, privs)
+		end
+
+		eye_cameras[self.owner] = nil
+	end,
+})
+
+local function dragon_eye_on_use(itemstack, user, pointed_thing)
+	local name = user:get_player_name()
+	if eye_cameras[name] then
+		local cam = eye_cameras[name]
+		if cam and cam:get_luaentity() then
+			cam:remove()
+		end
+		eye_cameras[name] = nil
+		deactivate_eye_camera(user:get_player_name())
+		minetest.chat_send_player(name, S("You deactivated the Water Dragon Eye. You are now back to normal."))
+	else
+		minetest.add_entity(user:get_pos(), "waterdragon:eye_camera", name)
+	end
+	return itemstack
+end
+
+minetest.register_craftitem("waterdragon:wtd_eye_blue", {
+	description = S("Water Dragon Eye (Blue)"),
+	inventory_image = "waterdragon_wtd_eye_blue.png",
+	groups = { wtd_drops = 1 },
+	on_use = dragon_eye_on_use,
+})
+
+minetest.register_craftitem("waterdragon:wtd_eye_orange", {
+	description = S("Water Dragon Eye (Orange)"),
+	inventory_image = "waterdragon_wtd_eye_orange.png",
+	groups = { wtd_drops = 1 },
+	on_use = dragon_eye_on_use,
+})
+
+minetest.register_craftitem("waterdragon:wtd_eye_red", {
+	description = S("Water Dragon Eye (Red)"),
+	inventory_image = "waterdragon_wtd_eye_red.png",
+	groups = { wtd_drops = 1 },
+	on_use = dragon_eye_on_use,
+})
+
+minetest.register_craftitem("waterdragon:wtd_eye_yellow", {
+	description = S("Water Dragon Eye (Yellow)"),
+	inventory_image = "waterdragon_wtd_eye_yellow.png",
+	groups = { wtd_drops = 1 },
+	on_use = dragon_eye_on_use,
+})
+
+table.insert(wtd_drops, "waterdragon:wtd_eye_blue")
+table.insert(wtd_drops, "waterdragon:wtd_eye_orange")
+table.insert(wtd_drops, "waterdragon:wtd_eye_red")
+table.insert(wtd_drops, "waterdragon:wtd_eye_yellow")
+
 for color, hex in pairs(waterdragon.colors_rare_water) do
 	minetest.register_craftitem("waterdragon:scales_rare_water_dragon", {
 		description = S("Rare Water Dragon Scales"),

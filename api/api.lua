@@ -1185,12 +1185,14 @@ waterdragon.wtd_api = {
 		end
 		waterdragon.set_color_string(self)
 		local stage = self.growth_stage
+		local eye = self.eye_color or "blue"
 		local drops = {
 			[1] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 1, max = 3, chance = 2 },
 				{ name = "waterdragon:dragon_horn",                  min = 3, max = 6, chance = 1 },
 				{ name = "waterdragon:dragon_bone",                  min = 1, max = 3, chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3, chance = 2 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 3 },
 			},
 			[2] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 2 },
@@ -1199,6 +1201,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 3 },
 			},
 			[3] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
@@ -1207,6 +1210,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
 			},
 			[4] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
@@ -1215,6 +1219,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
 			},
 			[5] = {
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
@@ -1223,6 +1228,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:dragon_bone",                  min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
 			},
 		}
 		self.drops = drops[stage]
