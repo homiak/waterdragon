@@ -44,84 +44,91 @@ Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great 
 Install via the `Luanti Mod Menu`, or download from `ContentDB`.
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
-	
+
 You’re also welcome to join the server at IP `85.215.240.79 - Scotland the Brave` to test everything in action.
 
 This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatura](https://github.com/ElCeejo/creatura) and created by **Scottii**.
 
 # Release log
 
+### Release v5.0.0
+- Added the Water Dragon Eye craftitem
+- Added the [official website](https://homiak.github.io/waterdragon/)
+
+### Release v 4.6.1
+- Fix the taming utility bug - you are now able to tame Water Dragons the same way as Scottish Dragons
+	
 ### Release v 4.6.0
-- Fix bugs
+- Fixed bugs
 - Minor tweaks with "take me to" command
 
 ### Release v 4.5.1
-- Fix the bug with undefined variable "winddragon"
-- Adds more conversations to the Dragon dialogue
+- Fixed the bug with undefined variable "winddragon"
+- Added more conversations to the Dragon dialogue
 	
 ### Release v 4.5.0
-- Fix bugs
-- Fix grammatical errors
+- Fixed bugs
+- Fixed grammatical errors
 
 ### Release v 4.4.0
-- Fix bugs
-- Fix shoulder mount bug
+- Fixed bugs
+- Fixed shoulder mount bug
 
 ### Release v 4.3.0
-- Fix bugs
+- Fixed bugs
 
 ### Release v 4.2.0
-- Fix bugs
-- Remove Scottish Dragon Crate
-- Adds the ability to store Scottish Dragons in Dragon Horns
+- Fixed bugs
+- Removed Scottish Dragon Crate
+- Added the ability to store Scottish Dragons in Dragon Horns
 
 ### Release v 4.1.0
-- Fix bugs
+- Fixed bugs
 
 ### Release v 4.0.1
-- Fix bugs
+- Fixed bugs
 
 ### Release v 4.0.0
 - Core Integration
-- Fix bugs
+- Fixed bugs
 
 ### Release v 3.1.0
-- Fix bugs
-- Fix Scottish Dragon mounting
-- Adds Wing Horn throwing
+- Fixed bugs
+- Fixed Scottish Dragon mounting
+- Added Wing Horn throwing
 - Better bowing
 
 ### Release v 3.0.0
-- Adds the Water Dragon Armour
-- Fix bugs
-- Adds the rescue behavior for Pegasi (mod: [Pegasus](https://github.com/homiak/pegasus))
-- Fix slam
+- Added the Water Dragon Armour
+- Fixed bugs
+- Added the rescue behavior for Pegasi (mod: [Pegasus](https://github.com/homiak/pegasus))
+- Fixed slam
 - Minor tweaks
 
 ### Release v 2.3.1
-- Fix bugs
+- Fixed bugs
 
 ### Release v 2.2.0
-- Fix bugs
-- Adds shields
+- Fixed bugs
+- Added shields
 - A new function for the Scottish Dragon Crate
-- Adds the Water Dragon Eye craftitem
-- Adds bowing
-- Adds healing water
+- Added the Water Dragon Eye craftitem
+- Added bowing
+- Added healing water
 
 ### Release v 2.1.0
-- Adds the Scottish Water Dragon
-- Fix bugs
-- Fix translation
-- Fix Wing Horn
+- Addde the Scottish Water Dragon
+- Fixed bugs
+- Fixed translation
+- Fixed Wing Horn
 - A new setting
 - A new chatcommand
 
 ### Release v. 1.1.0
-- Adds the throwable Wing Horn
+- Added the throwable Wing Horn
 - A new chatcomannd - call_wtd
-- Fix bugs
-- Fix view points
+- Fixed bugs
+- Fixed view points
 - Translation
 
 ### Release v 1.0.0
