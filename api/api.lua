@@ -1775,8 +1775,8 @@ end)
 -- Commands --
 --------------
 
-minetest.register_privilege("draigh_uisge", {
-	description = "Allows Player to force Water Dragons",
+minetest.register_privilege("reileadair_an_dhragain", {
+	description = "Allows Player to force Water Dragons - Dragon Rider",
 	give_to_singleplayer = false,
 	give_to_admin = false
 })
@@ -1833,7 +1833,7 @@ minetest.register_chatcommand("call_wtd", {
 minetest.register_chatcommand("set_wtd_owner", {
 	description = S("Sets owner of pointed Water Dragon"),
 	params = "<name>",
-	privs = { draigh_uisge = true },
+	privs = { reileadair_an_dhragain = true },
 	func = function(name, params)
 		local player = minetest.get_player_by_name(name)
 		local param_name = params:match("%S+")
