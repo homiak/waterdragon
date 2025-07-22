@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XG53E5WS0Z"></script>
@@ -14,33 +15,79 @@
     <title>Riding - Dragan-uisge Official Website</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .sidebar { width: 16rem; background-color: #1f2937; }
-        .sidebar a:hover, .sidebar button:hover { background-color: #4b5563; }
-        .sidebar .active { background-color: #3b82f6; }
-        kbd { background-color: #4b5563; border: 1px solid #6b7280; border-radius: 0.25rem; padding: 0.125rem 0.375rem; font-family: monospace; font-size: 0.9em; color: #e5e7eb; }
+        .sidebar {
+            width: 16rem;
+            background-color: #1f2937;
+        }
+
+        .sidebar a:hover,
+        .sidebar button:hover {
+            background-color: #4b5563;
+        }
+
+        .sidebar .active {
+            background-color: #3b82f6;
+        }
+
+        kbd {
+            background-color: #4b5563;
+            border: 1px solid #6b7280;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e5e7eb;
+        }
     </style>
 </head>
+
 <body class="bg-gray-900 text-white font-sans">
     <div class="relative min-h-screen md:flex">
         <!-- Mobile menu button -->
         <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
             <a href="index.html" class="block p-4 text-white font-bold">Dragan-uisge</a>
             <button id="hamburger-button" class="p-4 focus:outline-none focus:bg-gray-700">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
             </button>
         </div>
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar p-4 space-y-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-20">
+        <div id="sidebar"
+            class="sidebar p-4 space-y-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-20">
             <h2 class="text-xl font-bold mb-4">Dragan-uisge Wiki</h2>
             <!-- Page links -->
             <nav id="pageLinks" class="flex flex-col space-y-2">
-                <a href="index.html" class="p-2 rounded">Home</a>
-                <a href="about.html" class="p-2 rounded">Overview</a>
-                <a href="craftitems.html" class="p-2 rounded">Craftitems</a>
-                <a href="forge.html" class="p-2 rounded">Forging</a>
-                <a href="hatch.html" class="p-2 rounded">Hatching</a>
-                <a href="riding.html" class="p-2 rounded active">Riding Dragons</a>
-                <a href="talking.html" class="p-2 rounded">Talking to Dragons</a>
+                <a href="index.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/hometex.png" alt="Home" class="w-5 h-5 mr-3">
+                    Home
+                </a>
+                <a href="about.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/abouttex.png" alt="Overview" class="w-5 h-5 mr-3">
+                    Overview
+                </a>
+                <a href="craftitems.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/craftitemstex.png" alt="Craftitems" class="w-5 h-5 mr-3">
+                    Craftitems
+                </a>
+                <a href="forge.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/forgingtex.png" alt="Forging" class="w-5 h-5 mr-3">
+                    Forging
+                </a>
+                <a href="hatch.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/hatchingtex.png" alt="Hatching" class="w-5 h-5 mr-3">
+                    Hatching
+                </a>
+                <a href="riding.html" class="p-2 rounded active flex items-center">
+                    <img src="images/icons/ridingtex.png" alt="Riding Dragons" class="w-5 h-5 mr-3">
+                    Riding Dragons
+                </a>
+                <a href="talking.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/talkingtex.png" alt="Talking to Dragons" class="w-5 h-5 mr-3">
+                    Talking to Dragons
+                </a>
             </nav>
         </div>
         <!-- Main content -->
@@ -52,42 +99,81 @@
             <section class="text-gray-300 space-y-8">
                 <div>
                     <h2 class="text-3xl font-bold mb-4 text-blue-400">Taming Your Dragon</h2>
-                    <p>To tame a Water Dragon, you first need to show respect by bowing to it (hold <kbd>Shift</kbd> for about a second). Then, right-click the dragon to mount it. While mounted, hold 10 or more pieces of meat in your hand and do not dismount until the dragon is tamed. Be patient, as this process can take some time.</p>
+                    <p>To tame a Water Dragon, you first need to show respect by bowing to it (hold <kbd>Shift</kbd> for
+                        about a second). Then, right-click the dragon to mount it. While mounted, hold 10 or more pieces
+                        of meat in your hand and do not dismount until the dragon is tamed. Be patient, as this process
+                        can take some time.</p>
                 </div>
                 <div class="flex gap-8 justify-center">
-                    <img src="images/taming1.png" alt="Taming Scottish Dragon" class="rounded-lg shadow-lg" style="max-width: 45%;">
-                    <img src="images/taming2.png" alt="Taming Pure Water Dragon" class="rounded-lg shadow-lg" style="max-width: 45%;">
+                    <img src="images/taming1.png" alt="Taming Scottish Dragon" class="rounded-lg shadow-lg"
+                        style="max-width: 45%;">
+                    <img src="images/taming2.png" alt="Taming Pure Water Dragon" class="rounded-lg shadow-lg"
+                        style="max-width: 45%;">
                 </div>
                 <section class="my-12">
                     <h2 class="text-3xl font-bold mb-4 text-blue-400">Video Demonstration</h2>
                     <div class="w-full max-w-4xl mx-auto rounded-lg overflow-hidden shadow-lg bg-black">
-                        <video controls class="w-full h-full"><source src="videos/taming-demo.mp4" type="video/mp4">Your browser does not support the video tag.</video>
+                        <video controls class="w-full h-full">
+                            <source src="videos/taming-demo.mp4" type="video/mp4">Your browser does not support the
+                            video tag.
+                        </video>
                     </div>
                 </section>
                 <div>
                     <h2 class="text-3xl font-bold mb-4 text-blue-400">Riding Controls</h2>
-                    <p class="mb-6">Once you have tamed a Dragon, you can explore the skies. The controls vary depending on the Dragon's type.</p>
+                    <p class="mb-6">Once you have tamed a Dragon, you can explore the skies. The controls vary depending
+                        on the Dragon's type.</p>
                     <div class="space-y-10">
                         <!-- Water Dragon Controls -->
                         <div>
                             <h3 class="text-2xl font-semibold mb-3 text-cyan-300">Water Dragon</h3>
                             <ul class="list-disc list-inside space-y-3">
-                                <li><strong>Movement:</strong> Press <kbd>W</kbd> to move forward and use your mouse to steer. Use <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.</li>
-                                <li><strong>Takeoff, Landing & Dismounting:</strong><ul class="list-disc list-inside ml-6 mt-2 space-y-2"><li>Press <kbd>Space</kbd> to take off. While flying, press <kbd>Space</kbd> again to fly higher.</li><li>To land, hold the <kbd>S</kbd> key.</li><li>To dismount, press the <kbd>Shift</kbd> key.</li></ul></li>
-                                <li><strong>Attacks:</strong><ul class="list-disc list-inside ml-6 mt-2 space-y-2"><li>Hold <kbd>Left-click</kbd> for a breath attack.</li><li>While on the ground, <kbd>Right-click</kbd> for a powerful melee attack.</li><li>Hold <kbd>S</kbd> + <kbd>Right-click</kbd> to create a strong gust of wind with the wings.</li></ul></li>
-                                <li><strong>Special Abilities:</strong><ul class="list-disc list-inside ml-6 mt-2 space-y-2"><li>If you fly into a wall, the Dragon will automatically cling to it.</li><li>To destroy blocks, hold <kbd>Left-click</kbd> while flying into a wall.</li><li>To change your viewpoint, press <kbd>Aux1</kbd> (<kbd>E</kbd> by default).</li></ul></li>
+                                <li><strong>Movement:</strong> Press <kbd>W</kbd> to move forward and use your mouse to
+                                    steer. Use <kbd>A</kbd> and <kbd>D</kbd> to walk on the ground.</li>
+                                <li><strong>Takeoff, Landing & Dismounting:</strong>
+                                    <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                                        <li>Press <kbd>Space</kbd> to take off. While flying, press <kbd>Space</kbd>
+                                            again to fly higher.</li>
+                                        <li>To land, hold the <kbd>S</kbd> key.</li>
+                                        <li>To dismount, press the <kbd>Shift</kbd> key.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Attacks:</strong>
+                                    <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                                        <li>Hold <kbd>Left-click</kbd> for a breath attack.</li>
+                                        <li>While on the ground, <kbd>Right-click</kbd> for a powerful melee attack.
+                                        </li>
+                                        <li>Hold <kbd>S</kbd> + <kbd>Right-click</kbd> to create a strong gust of wind
+                                            with the wings.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Special Abilities:</strong>
+                                    <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                                        <li>If you fly into a wall, the Dragon will automatically cling to it.</li>
+                                        <li>To destroy blocks, hold <kbd>Left-click</kbd> while flying into a wall.</li>
+                                        <li>To change your viewpoint, press <kbd>Aux1</kbd> (<kbd>E</kbd> by default).
+                                        </li>
+                                    </ul>
+                                </li>
                             </ul>
                         </div>
                         <!-- Scottish Dragon Controls -->
                         <div>
                             <h3 class="text-2xl font-semibold mb-3 text-blue-400">Scottish Dragon</h3>
-                            <p class="mb-4">Scottish Dragons are powerful flyers with a unique momentum-based system and are built for battle.</p>
+                            <p class="mb-4">Scottish Dragons are powerful flyers with a unique momentum-based system and
+                                are built for battle.</p>
                             <ul class="list-disc list-inside space-y-3">
-                                <li><strong>Combat Abilities:</strong><ul class="list-disc list-inside ml-6 mt-2 space-y-2">
-                                    <li><strong>Melee Attack:</strong> Press <kbd>Left-click</kbd> to lunge forward and bite, both on the ground and in the air.</li>
-                                    <li><strong>Fire Breath:</strong> Hold <kbd>Right-click</kbd> to unleash a continuous stream of fire.</li>
-                                    <li><strong>Explosive Fireball:</strong> While flying, press <kbd>Space</kbd> + <kbd>A</kbd> (Jump + Left) to launch a massive, terrain-destroying fireball. This has a high cost and a cooldown.</li>
-                                </ul></li>
+                                <li><strong>Combat Abilities:</strong>
+                                    <ul class="list-disc list-inside ml-6 mt-2 space-y-2">
+                                        <li><strong>Melee Attack:</strong> Press <kbd>Left-click</kbd> to lunge forward
+                                            and bite, both on the ground and in the air.</li>
+                                        <li><strong>Fire Breath:</strong> Hold <kbd>Right-click</kbd> to unleash a
+                                            continuous stream of fire.</li>
+                                        <li><strong>Explosive Fireball:</strong> While flying, press <kbd>Space</kbd> +
+                                            <kbd>A</kbd> (Jump + Left) to launch a massive, terrain-destroying fireball.
+                                            This has a high cost and a cooldown.</li>
+                                    </ul>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -104,4 +190,5 @@
         });
     </script>
 </body>
+
 </html>
