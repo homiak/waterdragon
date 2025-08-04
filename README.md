@@ -53,7 +53,7 @@ This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatu
 
 ### Release v5.1.0
 - Fix bugs
-- Added the optional dependency for [Pegasus](https://content.luanti.org/packages/margo/pegasus/)
+- Added the optional dependency for mod [Pegasus](https://content.luanti.org/packages/margo/pegasus/)
 - Improved Dragon dialogue system
 
 ### Release v5.0.0
