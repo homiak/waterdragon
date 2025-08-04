@@ -41,13 +41,13 @@ Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great 
 	
 	
 ## Installation
-Install via the `Luanti Mod Menu`, or download from [ContentDB Luanti](https://content.luanti.org.packages/homiak/waterdragon/).
+Install via the `Luanti Mod Menu`, or download from [ContentDB Luanti](https://content.luanti.org/packages/homiak/waterdragon/).
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 
 You’re also welcome to join the server at IP `85.215.240.79 - Scotland the Brave` to test everything in action.
 
-This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatura](https://github.com/ElCeejo/creatura) and created by **Scottii**.
+This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/draconis/) and [Creatura](https://content.luanti.org/packages/ElCeejo/creatura/) and created by **Scottii**.
 
 # Release log
 
