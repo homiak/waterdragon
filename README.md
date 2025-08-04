@@ -41,7 +41,7 @@ Forge powerful gear from `Water-Forged Draconic Steel`. The armour offers great 
 	
 	
 ## Installation
-Install via the `Luanti Mod Menu`, or download from `ContentDB`.
+Install via the `Luanti Mod Menu`, or download from [ContentDB Luanti](https://content.luanti.org.packages/homiak/waterdragon/).
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 
@@ -50,6 +50,11 @@ You’re also welcome to join the server at IP `85.215.240.79 - Scotland the Bra
 This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatura](https://github.com/ElCeejo/creatura) and created by **Scottii**.
 
 # Release log
+
+### Release v5.1.0
+- Fix bugs
+- Added the optional dependency for [Pegasus](https://content.luanti.org/packages/margo/pegasus/)
+- Improved Dragon dialogue system
 
 ### Release v5.0.0
 - Added the Water Dragon Eye craftitem
@@ -101,7 +106,7 @@ This mod is based on [Draconis](https://github.com/ElCeejo/draconis) and [Creatu
 ### Release v 3.0.0
 - Added the Water Dragon Armour
 - Fixed bugs
-- Added the rescue behavior for Pegasi (mod: [Pegasus](https://github.com/homiak/pegasus))
+- Added the rescue behavior for Pegasi (mod: [Pegasus](https://content.luanti.org/packages/margo/pegasus/))
 - Fixed slam
 - Minor tweaks
 
