@@ -51,6 +51,9 @@ This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/drac
 
 # Release log
 
+### Release v5.1.1
+- Fix nest spawning bug
+
 ### Release v5.1.0
 - Fix bugs
 - Added the optional dependency for mod [Pegasus](https://content.luanti.org/packages/margo/pegasus/)
