@@ -163,9 +163,43 @@ minetest.register_entity("waterdragon:pure_water_eyes", {
 
 minetest.register_node("waterdragon:spawn_node", {
     drawtype = "airlike",
-    pointable = false,
+    paramtype = "light",
+    sunlight_propagates = true,
     walkable = false,
-    diggable = false
+    pointable = false,
+    diggable = false,
+    buildable_to = true,
+    is_ground_content = false,
+    drop = "",
+    groups = {not_in_creative_inventory=1},
+})
+
+minetest.register_abm({
+    label = "Water Dragon Spawner",
+    nodenames = { "waterdragon:spawn_node" },
+    interval = 5,
+    chance = 1,
+    action = function(pos, node)
+        local meta = minetest.get_meta(pos)
+        local mob_name = meta:get_string("mob")
+        local gender = meta:get_string("gender")
+
+        if mob_name and mob_name ~= "" then
+            local obj = minetest.add_entity(pos, mob_name)
+            if obj then
+                local lua_ent = obj:get_luaentity()
+                if lua_ent and gender and gender ~= "" then
+                    lua_ent.gender = gender
+                    if lua_ent.memorize then
+                        lua_ent:memorize("gender", gender)
+                    end
+                end
+            end
+        end
+
+        
+        minetest.remove_node(pos)
+    end,
 })
 
 minetest.register_abm({

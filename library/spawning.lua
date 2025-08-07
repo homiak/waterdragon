@@ -353,15 +353,6 @@ end
 
 -- Mapgen --
 
-minetest.register_node("waterdragon:spawn_node", {
-	drawtype = "airlike",
-	groups = {not_in_creative_inventory = 1},
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true
-})
-
 local mapgen_spawning = false
 local mapgen_spawning_int = tonumber(minetest.settings:get("waterdragon_mapgen_spawn_interval")) or 64
 
