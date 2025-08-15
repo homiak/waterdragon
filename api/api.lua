@@ -627,7 +627,7 @@ function waterdragon.head_tracking(self)
 		local tyaw = dir2yaw(dir)
 		if self.bow_timer and self.bow_timer > 0 then
 			self.bow_timer = self.bow_timer - (self.dtime or 1)
-			-- Make the Dragon look down in a bow, but keep the yaw towards the player
+			-- Kilgara looks down in a bow, but keeps the yaw towards Scottii
 			self:move_head(tyaw, -1.5) -- Use calculated yaw, but fixed pitch for bowing
 			return
 		end
@@ -1245,7 +1245,7 @@ waterdragon.wtd_api = {
 	play_sound = function(self, sound)
 		if self.time_from_last_sound < 6 then return end
 		local sounds = self.sounds
-		if self.age < 15 then
+		if self.age < 10 then
 			sounds = self.child_sounds
 		end
 		local spec = sounds and sounds[sound]
