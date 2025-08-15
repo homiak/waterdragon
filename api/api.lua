@@ -28,6 +28,9 @@ local function finish_bow(player_name, dragon)
 		max_hear_distance = 20,
 		loop = false
 	})
+	if dragon.wtd_id == "120740" and dragon.nametag == "Kilgara" then
+		dragon.bow_timer = 2
+	end
 end
 
 function has_bowed_to_dragon(player_name, dragon)
@@ -622,6 +625,12 @@ function waterdragon.head_tracking(self)
 			return
 		end
 		local tyaw = dir2yaw(dir)
+		if self.bow_timer and self.bow_timer > 0 then
+			self.bow_timer = self.bow_timer - (self.dtime or 1)
+			-- Make the Dragon look down in a bow, but keep the yaw towards the player
+			self:move_head(tyaw, -1.5) -- Use calculated yaw, but fixed pitch for bowing
+			return
+		end
 		self:move_head(tyaw, dir.y)
 		return
 	elseif self:timer(random(4, 6)) then
@@ -1201,7 +1210,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
-				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 3 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2,  chance = 3 },
 			},
 			[3] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
@@ -1210,7 +1219,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
-				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2,  chance = 1 },
 			},
 			[4] = {
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
@@ -1219,7 +1228,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:draconic_tooth",               min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
-				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2,  chance = 1 },
 			},
 			[5] = {
 				{ name = "waterdragon:dragon_water_drop",            min = 1, max = 3,  chance = 2 },
@@ -1228,7 +1237,7 @@ waterdragon.wtd_api = {
 				{ name = "waterdragon:dragon_bone",                  min = 3, max = 6,  chance = 1 },
 				{ name = "waterdragon:scales_" .. type .. "_dragon", min = 5, max = 16, chance = 1 },
 				{ name = "waterdragon:wing_horn",                    min = 1, max = 3,  chance = 2 },
-				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2, chance = 1 },
+				{ name = "waterdragon:wtd_eye_" .. eye,              min = 1, max = 2,  chance = 1 },
 			},
 		}
 		self.drops = drops[stage]
@@ -1453,9 +1462,10 @@ waterdragon.wtd_api = {
 			local y_diff = diff(tyaw, yaw)
 			local n_yaw = (tyaw ~= yaw and y_diff / 6) or 0
 			if abs(deg(n_yaw)) > 22 then n_yaw = 0 end
-			local dir = yaw2dir(n_yaw)
-			dir.y = pitch or 0
-			local n_pitch = -(sqrt(dir.x ^ 2 + dir.y ^ 2) / dir.z) / 4
+
+			-- Corrected pitch calculation. It now directly uses the input pitch.
+			local n_pitch = (pitch or 0) / 6
+
 			if abs(deg(n_pitch)) > 22 then n_pitch = 0 end
 			if self.dtime then
 				local rate = self.dtime * 3
@@ -1468,6 +1478,7 @@ waterdragon.wtd_api = {
 				local pitch_w = math.min(rate, abs(diff(rad(rot.x), n_pitch)) % (pi2))
 				n_pitch = interp_angle(rad(rot.x), n_pitch, pitch_w)
 			end
+			-- Set bone position directly. Negative pitch will look down, positive will look up.
 			self.object:set_bone_position(bone_name, data.pos, { x = deg(n_pitch), y = data.rot.y, z = deg(n_yaw) })
 		end
 	end,
@@ -2080,6 +2091,7 @@ function waterdragon.dragon_activate(self)
 	self.aux_setting = self:recall("aux_setting") or "toggle_view"
 	self.pitch_fly = self:recall("pitch_fly") or false
 	self.shoulder_mounted = false
+	self.bow_timer = 0
 	activate_nametag(self)
 	-- Movement Data
 	self.is_landed = self:recall("is_landed") or false
@@ -2614,32 +2626,32 @@ function waterdragon.dragon_rightclick(self, clicker)
 		return
 	end
 	local item_name = clicker:get_wielded_item():get_name() or ""
-    if self.owner and name == self.owner and item_name == "" then
-        if clicker:get_player_control().sneak then
-            self:show_formspec(clicker)
-        elseif not self.rider and self.age >= 30 then
-            if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
-                minetest.after(1, function()
-                    if self.object:get_luaentity() then
-                        waterdragon.action_fly_and_throw(self)
-                    end
-                end)
-                minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
-            else
-                waterdragon.attach_player(self, clicker)
-            end
-        elseif self.age < 5 and self.owner and not self.rider and not self.passenger then
-            self.shoulder_mounted = self:memorize("shoulder_mounted", true)
-            self.object:set_attach(clicker, "",
-                { x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
-        end
-    elseif not self.owner and item_name == "" then
-        self:initiate_utility("waterdragon:wtd_breaking", self, clicker)
-        waterdragon.attach_player(self, clicker)
-    end
-    if self.owner and self.rider and not self.passenger and name ~= self.owner and item_name == "" then
-        waterdragon.send_passenger_request(self, clicker)
-    end
+	if self.owner and name == self.owner and item_name == "" then
+		if clicker:get_player_control().sneak then
+			self:show_formspec(clicker)
+		elseif not self.rider and self.age >= 30 then
+			if not has_bowed_to_dragon(name, self) and self.rider and self.owner then
+				minetest.after(1, function()
+					if self.object:get_luaentity() then
+						waterdragon.action_fly_and_throw(self)
+					end
+				end)
+				minetest.chat_send_player(name, S("You didn't bow to the Water Dragon. Hold on tight!"))
+			else
+				waterdragon.attach_player(self, clicker)
+			end
+		elseif self.age < 5 and self.owner and not self.rider and not self.passenger then
+			self.shoulder_mounted = self:memorize("shoulder_mounted", true)
+			self.object:set_attach(clicker, "",
+				{ x = 3 - self.growth_scale, y = 11.5, z = -1.5 - (self.growth_scale * 5) }, { x = 0, y = 0, z = 0 })
+		end
+	elseif not self.owner and item_name == "" then
+		self:initiate_utility("waterdragon:wtd_breaking", self, clicker)
+		waterdragon.attach_player(self, clicker)
+	end
+	if self.owner and self.rider and not self.passenger and name ~= self.owner and item_name == "" then
+		waterdragon.send_passenger_request(self, clicker)
+	end
 end
 
 ------------------
