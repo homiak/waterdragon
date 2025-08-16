@@ -477,7 +477,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				}
 			}
 
-			-- Check for wing color changes
+			-- Check for wing colour changes
 			if fields.drp_wing and wings[type] and wings[type][fields.drp_wing] then
 				if ent.object:get_properties() then
 					ent.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. wings[type][fields.drp_wing] .. ")"

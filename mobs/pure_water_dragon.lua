@@ -245,7 +245,7 @@ local function on_dragon_step(self, dtime)
 	waterdragon.dragon_step(self, dtime)
 end
 
-local colors = { "pure_water" }
+local colours = { "pure_water" }
 
 waterdragon.register_mob("waterdragon:pure_water_dragon", {
 	-- Stats

@@ -202,7 +202,7 @@ minetest.register_entity("waterdragon:eye_camera", {
 
 		-- Interaction is now blocked by global callbacks. No need to change privs.
 
-		-- Store original armor and make player's body immortal
+		-- Store original armour and make player's body immortal
 		self.original_armor = player:get_armor_groups()
 		player:set_armor_groups({ immortal = 1 })
 

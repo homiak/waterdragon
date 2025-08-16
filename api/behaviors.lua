@@ -406,7 +406,7 @@ local function toggle_taming_ability(name)
 	minetest.chat_send_player(name, "You" .. status .. "can interact with the Water Dragons")
 end
 
-for color, hex in pairs(waterdragon.colors_pure_water) do
+for colour, hex in pairs(waterdragon.colors_pure_water) do
 	minetest.register_craftitem("waterdragon:scales_pure_water_dragon", {
 		description = S("Pure Water Dragon Scales"),
 		inventory_image = "waterdragon_wtd_scales.png^[multiply:#" .. hex,

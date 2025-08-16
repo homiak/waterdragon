@@ -432,7 +432,7 @@ function waterdragon.safe_set_texture(self, texture_name)
 	-- Base texture
 	local new_texture = texture_name
 
-	-- If there is armor, add its texture
+	-- If there is armour, add its texture
 	if self.armour and self.armour.texture then
 		new_texture = new_texture .. "^" .. self.armour.texture
 	end
@@ -453,8 +453,8 @@ local function generate_texture(self, force)
 	}
 	self.wing_overlay = self:recall("wing_overlay") or nil
 	if not self.wing_overlay then
-		local color = wing_colors[self.color][random(#wing_colors[self.color])]
-		self.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. color .. ")"
+		local colour = wing_colors[self.colour][random(#wing_colors[self.colour])]
+		self.wing_overlay = "(waterdragon_wing_fade.png^[multiply:" .. colour .. ")"
 		self:memorize("wing_overlay", self.wing_overlay)
 	end
 	if self:get_props().textures[1]:find("wing_fade") and not force then return end
@@ -558,11 +558,11 @@ end
 function waterdragon.set_color_string(self)
 	if self.name == "waterdragon:pure_water_dragon" then
 		if self.texture_no == 1 then
-			self.color = "pure_water"
+			self.colour = "pure_water"
 		end
 	elseif self.name == "waterdragon:rare_water_dragon" then
 		if self.texture_no == 1 then
-			self.color = "rare_water"
+			self.colour = "rare_water"
 		end
 	end
 end
@@ -1320,11 +1320,11 @@ waterdragon.wtd_api = {
 			texture = texture .. "^" .. self.wing_overlay
 		end
 		self._glow_level = level
-		local color = math.ceil(level / minetest.LIGHT_MAX * 255)
-		if color > 255 then
-			color = 255
+		local colour = math.ceil(level / minetest.LIGHT_MAX * 255)
+		if colour > 255 then
+			colour = 255
 		end
-		local modifier = ("^[multiply:#%02X%02X%02X"):format(color, color, color)
+		local modifier = ("^[multiply:#%02X%02X%02X"):format(colour, colour, colour)
 		local dragon_type = "rare_water"
 		if self.name == "waterdragon:pure_water_dragon" then
 			dragon_type = "pure_water"

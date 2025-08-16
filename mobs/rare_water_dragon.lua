@@ -31,7 +31,7 @@ function dragon_stay_behavior(self)
     end
 end
 
-local colors = { "rare_water" }
+local colours = { "rare_water" }
 
 waterdragon.register_mob("waterdragon:rare_water_dragon", {
     max_health = 1600,

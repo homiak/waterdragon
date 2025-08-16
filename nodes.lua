@@ -118,7 +118,7 @@ register_node("waterdragon:stone_bricks_wet", {
 -- Scale Blocks --
 ------------------
 
-for color in pairs(waterdragon.colors_pure_water) do
+for colour in pairs(waterdragon.colors_pure_water) do
     register_node("waterdragon:dragonhide_block_pure_water", {
         description = S("Pure Water Dragonhide Block"),
         tiles = {
@@ -134,7 +134,7 @@ for color in pairs(waterdragon.colors_pure_water) do
     })
 end
 
-for color in pairs(waterdragon.colors_rare_water) do
+for colour in pairs(waterdragon.colors_rare_water) do
     register_node("waterdragon:dragonhide_block_rare_water", {
         description = S("Pure Water Dragonhide Block"),
         tiles = {

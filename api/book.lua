@@ -3,7 +3,7 @@
 -----------
 
 local S = waterdragon.S
-local color = minetest.colorize
+local colour = minetest.colorize
 
 local book_bg = {
 	"formspec_version[3]",
@@ -467,14 +467,14 @@ local function prepare_element(def, meta, playername)
 				end
 				local total_offset = (offset_x + (0.35 - 0.35 * font_size_x)) .. "," .. offset_y
 				form = form ..
-					"hypertext[" .. total_offset .. ";8,9;text;<global color=#000000 size="
+					"hypertext[" .. total_offset .. ";8,9;text;<global colour=#000000 size="
 					.. font_size .. " halign=center>" .. full_text .. "]"
 				file:close()
 			end
 		else
 			form = form .. "style_type[label;font_size=" .. font_size .. "]"
 			local line = def.text
-			form = form .. "label[" .. offset_x .. "," .. offset_y .. ";" .. color("#000000", line .. "\n") .. "]"
+			form = form .. "label[" .. offset_x .. "," .. offset_y .. ";" .. colour("#000000", line .. "\n") .. "]"
 		end
 	else
 		-- Add Images/Interaction
