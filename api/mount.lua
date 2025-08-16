@@ -10,8 +10,7 @@ local ceil = math.ceil
 
 -- Special fire abilities
 
-local function create_fire_sphere(pos, radius)
-    if not minetest.get_modpath("pegasus") then return end
+local function create_fireball(pos, radius)
     minetest.sound_play("waterdragon_fireball_crash", {
         pos = pos,
         gain = 1.0,
@@ -36,7 +35,7 @@ local function create_fire_sphere(pos, radius)
 end
 
 -- Add this function to create the traveling fireball
-local function launch_fire_sphere(start_pos, direction)
+local function launch_fireball(start_pos, direction)
     if not minetest.get_modpath("pegasus") then return end
     local pos = vector.new(start_pos)
     local distance = 0
@@ -62,9 +61,9 @@ local function launch_fire_sphere(start_pos, direction)
     end
 
     -- Move the fireball and check for collisions
-    local function move_sphere()
+    local function move_fireball()
         if distance >= 40 then
-            create_fire_sphere(pos, sphere_radius)
+            create_fireball(pos, sphere_radius)
             return
         end
 
@@ -72,21 +71,20 @@ local function launch_fire_sphere(start_pos, direction)
         local node = minetest.get_node(next_pos)
 
         if node.name ~= "air" then
-            create_fire_sphere(pos, sphere_radius)
+            create_fireball(pos, sphere_radius)
             return
         end
 
         pos = next_pos
         distance = distance + 1
         spawn_fire_trail()
-        minetest.after(0.001, move_sphere)
+        minetest.after(0.001, move_fireball)
     end
 
-    move_sphere()
+    move_fireball()
 end
 
 function breathe_fire(self)
-    if not minetest.get_modpath("pegasus") then return end
     if not self.fire_breathing then return end
     if not self.fire or self.fire <= 0 then
         self.fire_breathing = false
@@ -1393,12 +1391,12 @@ waterdragon.register_utility("waterdragon:scottish_dragon_mount", function(self)
                     { x = 0, y = 0, z = 0 })
             end
         end
-        if control.jump and control.left and self.fire >= 3 then
+        if control.jump and control.left and self.fire >= 3 and not self.touching_ground then
             local pos = self.object:get_pos()
             if pos then
                 pos.y = pos.y + 2
                 local direction = vector.normalize(look_dir)
-                launch_fire_sphere(pos, direction)
+                launch_fireball(pos, direction)
                 self.fire = self.fire - 3 -- Consume 3 fire charges
                 self:memorize("fire", self.fire)
 
