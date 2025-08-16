@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XG53E5WS0Z"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XG53E5WS0Z');
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Dragan-uisge Official Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .sidebar {
+      width: 16rem;
+      background-color: #1f2937;
+    }
+
+    .sidebar input {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+
+    .sidebar a:hover,
+    .sidebar button:hover {
+      background-color: #4b5563;
+    }
+
+    .sidebar .active {
+      background-color: #3b82f6;
+    }
+
+    kbd {
+      background-color: #4b5563;
+      border: 1px solid #6b7280;
+      border-radius: 0.25rem;
+      padding: 0.125rem 0.375rem;
+      font-family: monospace;
+      font-size: 0.9em;
+      color: #e5e7eb;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-900 text-white font-sans">
+  <div class="relative min-h-screen md:flex">
+    <!-- Burger button -->
+    <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
+      <a href="index.html" class="block p-4 text-white font-bold">Dragan-uisge</a>
+      <button id="hamburger-button" class="p-4 focus:outline-none focus:bg-gray-700">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar"
+      class="sidebar p-4 space-y-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-20">
+      <h2 class="text-xl font-bold mb-4">Pages</h2>
+
+      <!-- Links -->
+      <nav id="pageLinks" class="flex flex-col space-y-2">
+        <a href="index.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/hometex.png" alt="Home" class="w-5 h-5 mr-3">
+          Home
+        </a>
+        <a href="about.html" class="p-2 rounded active flex items-center">
+          <img src="images/icons/abouttex.png" alt="Overview" class="w-5 h-5 mr-3">
+          Overview
+        </a>
+        <a href="craftitems.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/craftitemstex.png" alt="Craftitems" class="w-5 h-5 mr-3">
+          Craftitems
+        </a>
+        <a href="forge.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/forgingtex.png" alt="Forging" class="w-5 h-5 mr-3">
+          Forging
+        </a>
+        <a href="hatch.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/hatchingtex.png" alt="Hatching" class="w-5 h-5 mr-3">
+          Hatching
+        </a>
+        <a href="riding.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/ridingtex.png" alt="Taming and Riding" class="w-5 h-5 mr-3">
+          Taming and Riding
+        </a>
+        <a href="talking.html" class="p-2 rounded flex items-center">
+          <img src="images/icons/talkingtex.png" alt="Talking to Dragons" class="w-5 h-5 mr-3">
+          Talking to Dragons
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <header class="mb-8">
+        <h1 class="text-4xl font-bold text-green-400 mb-2">About Dragan-uisge</h1>
+        <p class="text-gray-400 text-lg">Learn more about the development of the Water Dragon mod.</p>
+      </header>
+
+      <img src="images/kilgara.png" alt="Water Dragon in Minetest" class="my-8 rounded-lg shadow-lg max-w-full h-auto"
+        style="max-width: 600px;">
+
+      <section class="text-gray-300 max-w-3xl">
+        <p>Dragan-uisge (Water Dragon) is a mod inspired by Celtic mythology and Scottish legends. It brings the
+          mystical element of Water Dragons to the world of Minetest Game, enriching gameplay with unique creatures and
+          magic. The three new types of Water Dragons include the <strong>Pure Water Dragon</strong>, <strong>the Rare
+            Water Dragon</strong>, and the <strong>Scottish Dragon.</strong></p>
+        <p>The mod is developed by user Scottii and welcomes contributions from enthusiasts around the world.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Script for hamburger menu
+    const hamburgerButton = document.getElementById('hamburger-button');
+    const sidebar = document.getElementById('sidebar');
+
+    hamburgerButton.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // page filtering function
+    function filterPages(query) {
+      const normalizedQuery = query.toLowerCase();
+      document.querySelectorAll("#pageLinks > a").forEach(link => {
+        const hasMatch = link.textContent.toLowerCase().includes(normalizedQuery);
+        link.style.display = hasMatch ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+
+</html>

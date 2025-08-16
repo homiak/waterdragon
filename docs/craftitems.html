@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XG53E5WS0Z"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-XG53E5WS0Z');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Craftitems - Dragan-uisge Official Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar {
+            width: 16rem;
+            background-color: #1f2937;
+        }
+
+        .sidebar a:hover,
+        .sidebar button:hover {
+            background-color: #4b5563;
+        }
+
+        .sidebar .active {
+            background-color: #3b82f6;
+        }
+
+        kbd {
+            background-color: #4b5563;
+            border: 1px solid #6b7280;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #e5e7eb;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white font-sans">
+    <div class="relative min-h-screen md:flex">
+        <!-- Mobile menu button -->
+        <div class="bg-gray-800 text-gray-100 flex justify-between md:hidden">
+            <a href="index.html" class="block p-4 text-white font-bold">Dragan-uisge</a>
+            <button id="hamburger-button" class="p-4 focus:outline-none focus:bg-gray-700">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <!-- Sidebar -->
+        <div id="sidebar"
+            class="sidebar p-4 space-y-4 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-20">
+            <h2 class="text-xl font-bold mb-4">Pages</h2>
+            <nav id="pageLinks" class="flex flex-col space-y-2">
+                <a href="index.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/hometex.png" alt="Home" class="w-5 h-5 mr-3">
+                    Home
+                </a>
+                <a href="about.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/abouttex.png" alt="Overview" class="w-5 h-5 mr-3">
+                    Overview
+                </a>
+                <a href="craftitems.html" class="p-2 rounded active flex items-center">
+                    <img src="images/icons/craftitemstex.png" alt="Craftitems" class="w-5 h-5 mr-3">
+                    Craftitems
+                </a>
+                <a href="forge.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/forgingtex.png" alt="Forging" class="w-5 h-5 mr-3">
+                    Forging
+                </a>
+                <a href="hatch.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/hatchingtex.png" alt="Hatching" class="w-5 h-5 mr-3">
+                    Hatching
+                </a>
+                <a href="riding.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/ridingtex.png" alt="Taming and Riding" class="w-5 h-5 mr-3">
+                    Taming and Riding
+                </a>
+                <a href="talking.html" class="p-2 rounded flex items-center">
+                    <img src="images/icons/talkingtex.png" alt="Talking to Dragons" class="w-5 h-5 mr-3">
+                    Talking to Dragons
+                </a>
+            </nav>
+        </div>
+        <!-- Main content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <header class="mb-8">
+                <h1 class="text-4xl font-bold text-green-400">Craftitems and Tools</h1>
+                <p class="text-gray-400 text-lg">Discover the unique items you can craft in the Dragan-uisge mod.</p>
+            </header>
+            <section class="text-gray-300">
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Drops and Loot</h2>
+                <div class="ml-4 space-y-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Water Dragon Scales</h3>
+                        <p><strong>Water Dragon Scales</strong> are used to craft powerful armour and weapons, enhancing
+                            the player's abilities in combat. These can be obtained from defeating <strong>Water
+                                Dragons</strong>. The older the Dragon is - the more chance for more scales.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Water Dragon Bones</h3>
+                        <p><strong>Water Dragon Bones</strong> are used in various crafting recipes as a handle for
+                            pickaxes, swords, axes and shovels. They also could be obtained by defeating Water Dragons.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Dragon Water Drops</h3>
+                        <p><strong>Dragon Water Drops</strong> are a rare resource that can be collected from Water
+                            Dragons, and can be used for reviving Dragons, and other animals. If the animal dies, they
+                            completely recover the animal's strength and abilities. To revive a fallen creature,
+                            right-click it while holding this item.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Dragon Horns</h3>
+                        <p><strong>Dragon Horns</strong> can be used in transporting and calling Dragons that are bound
+                            to it. To bind a Dragon to a Dragon Horn, right-click the Dragon while holding the Horn. If
+                            you right-click a Dragon while the Horn is bound to it, the Horn will capture the Dragon.
+                            To summon it back, simply hold the Horn and right-click while looking at a block. To call a
+                            Dragon from far away, right-click the sky while holding the Horn. If a Dragon who is linked
+                            to a Horn dies, the data of the Dragon will be cleared and the Horn will no longer be able
+                            to summon it.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Wing Horns</h3>
+                        <p><strong>Wing Horns</strong> are special horns, located on the elbows of the wings of Dragons.
+                            If you get one, you will be able to throw it, and the Wing Horn will damage any enemies
+                            while in the air.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Dragon Teeth</h3>
+                        <p><strong>Dragon Teeth</strong> are not just drops; they have unique properties to command your
+                            level of being a Dragon Rider. If you use it multiple times (right-click a mob) and if
+                            Dragons trust you, they may even give you the title of a Dragon Rider, giving the privilege
+                            of commanding them. Or more simply said: they will give you the privilege "reileadair_an_dhragain",
+                            which means "Dragon Rider".</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Dragon Eyes</h3>
+                        <p><strong>Dragon Eyes</strong> allow you to project your vision into a free-floating, invisible
+                            camera. To activate, right-click while holding the eye and looking at the sky. Your view
+                            will detach from your body, allowing you to fly freely and pass through walls as a
+                            spectator. This is perfect for scouting caves, exploring hidden areas, or observing the
+                            world from any angle. Be aware that your physical body remains stationary and vulnerable
+                            while in this mode. To return to your body, right-click the sky again.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="text-gray-300 mt-8">
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Spawner Eggs and other craftitems</h2>
+                <div class="ml-4 space-y-6 mt-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Creative Rare Water Dragon Eggs</h3>
+                        <p><strong>Creative Rare Water Dragon Eggs</strong> are used to spawn full-grown and wild Rare
+                            Water Dragons in the world. Pretty good for testing.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Creative Pure Water Dragon Eggs</h3>
+                        <p><strong>Creative Pure Water Dragon Eggs</strong> can spawn full-grown and wild Pure Water
+                            Dragons in the world. Ideal for testing and exploration.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Buckets of Dragon Water</h3>
+                        <p><strong>Buckets of Dragon Water</strong> are crafted from Dragon Water Drops. They are
+                            capable of taming creatures, such as <strong>Dragons</strong> and other mythical beasts. To
+                            tame them, right-click them while holding this item.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Books about Water Dragons</h3>
+                        <p><strong>Books about Water Dragons</strong> are more than just a guide; they are a living bestiary whose secrets are only revealed to a true Dragon Rider. Its enchanted pages will remain blank until you prove your worth. The journey begins with your first right-click on a Water Dragon, unlocking the initial chapters. As you deepen your bond—discovering different species (by right-clicking a Scottish Dragon), taking to the skies on Dragonback, and even mastering the art of forging with Dragon Water (drop a boulder block on the ground and have your Dragon's breath on it) — the book will magically fill with new knowledge, guiding you on your path to becoming a legendary "<strong>Reileadair an Dhragain</strong>", the Dragon Rider.</p>
+                    </div>
+                </div>
+            </section>
+            <section class="text-gray-300 mt-8">
+                <h2 class="text-3xl font-bold mb-4 text-blue-400">Draconic Steel</h2>
+                <p><strong>Draconic Steel</strong> allows you to forge powerful tools and armour linked to a specific
+                    Water Dragon. The power of these items is directly tied to your proximity to the bonded Dragon — the
+                    closer you are, the more effective your tools will be. However, if the Dragon that the tool is
+                    bonded to dies, the tool will lose its power and shatter.</p>
+                <div class="ml-4 space-y-6 mt-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Draconic Steel Ingots</h3>
+                        <p><strong>Draconic Steel Ingots</strong> are used to create various powerful tools and armour
+                            made from Draconic Steel. Each ingot is linked to the Dragon who forged it, and ingots
+                            forged from different Dragons cannot be crafted together.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Draconic Steel Armour</h3>
+                        <p><strong>Draconic Steel Armour</strong> provides enhanced protection and is crafted using
+                            Draconic Steel Ingots. The armour's effectiveness increases with the bond to the Dragon that
+                            forged it. Rare Water-Forged Draconic Steel Armour is more formidable, because of Rare Water
+                            Dragons being more powerful than the others.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">Draconic Steel Tools</h3>
+                        <p><strong>Draconic Steel Tools</strong> are crafted using Draconic Steel Ingots and provide
+                            enhanced durability and effectiveness in various tasks. Draconic Steel Pickaxes can break
+                            any type of block, while Draconic Steel Swords are known for their massive damage and
+                            durability points.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 text-cyan-300">The Dragonstone Crucible</h3>
+                        <p><strong>The Dragonstone Crucible</strong> is a special crafting station used to forge
+                            Draconic Steel Ingots. <a href="forge.html" class="text-blue-400 hover:underline">Learn how
+                                to forge Draconic Steel Ingots here.</a></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script>
+        // Hamburger menu functionality
+        const hamburgerButton = document.getElementById('hamburger-button');
+        const sidebar = document.getElementById('sidebar');
+        hamburgerButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+        });
+    </script>
+</body>
+
+</html>
