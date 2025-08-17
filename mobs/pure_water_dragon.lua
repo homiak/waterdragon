@@ -637,7 +637,7 @@ waterdragon.register_mob("waterdragon:pure_water_dragon", {
 				waterdragon.detach_player(self, puncher)
 				self.fly_allowed = true
 			end
-			-- Make the dragon attack the puncher
+			-- Make the Dragon attack the puncher
 			self._target = puncher
 			local tgt_pos = puncher:get_pos()
 			self:breath_attack(tgt_pos)

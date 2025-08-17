@@ -2960,7 +2960,7 @@ local dragon_dialogue = {
 		["where do you come from"] = {
 			"I emerged from the first waters, born of magic and the elements.",
 			"My origins lie in a realm where water and sky merge into endless horizons.",
-			"I come from a place older than memory, where dragons first learned to fly and waters sang their songs."
+			"I come from a place older than memory, where Dragons first learned to fly and waters sang their songs."
 		},
 
 		["what is magic to you"] = {
@@ -3702,7 +3702,7 @@ local function handle_transport(dragon, player, message)
 		return false, "That's too far for me to fly."
 	end
 
-	-- If the player is not on the dragon, attach it
+	-- If the player is not on the Dragon, attach it
 	if not dragon.rider then
 		local scale = dragon.growth_scale or 1
 		player:set_attach(dragon.object, "Torso.2", { x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
