@@ -51,6 +51,9 @@ This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/drac
 
 # Release log
 
+### Release v5.3.0
+- Fix bugs
+
 ### Release v5.2.0
 - Fix bugs
 
