@@ -1,0 +1,11 @@
+You can command them
+to "fly", "land", "follow",
+"stay", "attack", "fire" 
+and more. Your Water Dragon
+will speak more openly with
+you if you're bonded and
+remember your relationship.
+To end conversation just say
+"bye" or "farewell". Dragons will 
+only fully respond to 
+their bonded rider.

@@ -1,0 +1,4 @@
+<!-- filepath: /home/scottii/dev/waterdragon/docs/robots.txt -->
+User-agent: *
+Allow: /
+Sitemap: https://homiak.github.io/waterdragon/sitemap.xml
