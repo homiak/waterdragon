@@ -1344,7 +1344,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "waterdragon:draconic_steel_forge_rare_water",
+	output = "waterdragon:draconic_forge_rare_water",
 	recipe = {
 		{ "waterdragon:dragonstone_block_rare_water", "waterdragon:dragonstone_block_rare_water", "waterdragon:dragonstone_block_rare_water" },
 		{ "waterdragon:dragonstone_block_rare_water", "default:furnace",                          "waterdragon:dragonstone_block_rare_water" },
@@ -1353,7 +1353,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "waterdragon:draconic_steel_forge_pure_water",
+	output = "waterdragon:draconic_forge_pure_water",
 	recipe = {
 		{ "waterdragon:dragonstone_block_pure_water", "waterdragon:dragonstone_block_pure_water", "waterdragon:dragonstone_block_pure_water" },
 		{ "waterdragon:dragonstone_block_pure_water", "default:furnace",                          "waterdragon:dragonstone_block_pure_water" },

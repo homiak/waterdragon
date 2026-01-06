@@ -1549,10 +1549,18 @@ waterdragon.wtd_api = {
 		local offset = self.frame_offset or 0
 		if offset > 20
 			and not self.flap_sound_played then
-			minetest.sound_play("waterdragon_flap", {
+			local possibilities = {
+				"waterdragon_fly1.ogg",
+				"waterdragon_fly2.ogg",
+				"waterdragon_fly3.ogg",
+				"waterdragon_fly4.ogg",
+				"waterdragon_fly5.ogg",
+			}
+			local sound = possibilities[math.random(#possibilities)]
+			minetest.sound_play(sound, {
 				object = self.object,
-				gain = 2.5,
-				max_hear_distance = 60,
+				gain = 3.0,
+				max_hear_distance = 128,
 				loop = false,
 			})
 			self.flap_sound_played = true
@@ -1756,11 +1764,20 @@ waterdragon.scottish_wtd_api = {
 		local offset = self.frame_offset or 0
 		if offset > 20
 			and not self.flap_sound_played then
-			minetest.sound_play("waterdragon_flap", {
+			local possibilities = {
+				"waterdragon_fly1.ogg",
+				"waterdragon_fly2.ogg",
+				"waterdragon_fly3.ogg",
+				"waterdragon_fly4.ogg",
+				"waterdragon_fly5.ogg",
+			}
+			local sound = possibilities[math.random(#possibilities)]
+			minetest.sound_play(sound, {
 				object = self.object,
-				gain = 3.0,
-				max_hear_distance = 128,
+				gain = 4.0,
+				max_hear_distance = 64,
 				loop = false,
+				pitch = 0.9 + random() * 0.2,
 			})
 			self.flap_sound_played = true
 		elseif offset < 10 then
@@ -2159,7 +2176,15 @@ function play_wing_sound(self)
 
 	-- Play sound at specific frame point (when wings are at highest position)
 	if offset > 20 and not self.flap_sound_played then
-		minetest.sound_play("waterdragon_flap", {
+		local possibilities = {
+			"waterdragon_fly1.ogg",
+			"waterdragon_fly2.ogg",
+			"waterdragon_fly3.ogg",
+			"waterdragon_fly4.ogg",
+			"waterdragon_fly5.ogg",
+		}
+		local sound = possibilities[math.random(#possibilities)]
+		minetest.sound_play(sound, {
 			object = self.object,
 			gain = 3.0,
 			max_hear_distance = 128,
@@ -2266,8 +2291,8 @@ function waterdragon.dragon_step(self, dtime)
 		self:do_growth()
 		-- Misc
 		self.time_from_last_sound = self.time_from_last_sound + 1
-		self.anim_frame = -1
-		self._anim = nil -- Initialize animation state as nil to be set by animate function
+		-- self.anim_frame = -1
+		-- self._anim = nil -- Initialize animation state as nil to be set by animate function
 		if self.time_in_horn then
 			self.growth_timer = self.growth_timer - self.time_in_horn / 2
 			self.time_in_horn = nil
@@ -2302,7 +2327,7 @@ function waterdragon.dragon_step(self, dtime)
 		local obj = next(self._ignore_obj)
 		if obj then self._ignore_obj[obj] = nil end
 	end
-	if is_flying then
+	if is_flying or (current_anim and current_anim:find("hover")) then
 		self:play_wing_sound()
 	end
 	-- Switch Aerial/Terrestrial States
@@ -2405,7 +2430,7 @@ function waterdragon.scottish_dragon_step(self, dtime)
 		if random(16) < 2 then
 			self:play_sound("random")
 		end
-		play_wing_sound(self)
+		self:play_wing_sound()
 		self.speed = 32
 		self.turn_rate = 5
 		-- Dynamic Stats
