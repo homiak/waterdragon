@@ -276,7 +276,7 @@ waterdragon.register_mob("waterdragon:rare_water_dragon", {
         if time_from_last_punch < 0.66 or (self.passenger and puncher == self.passenger) or (self.rider and puncher == self.rider) then return end
         waterdragon.basic_punch_func(self, puncher, time_from_last_punch, tool_capabilities, direction, damage)
         if not self.is_landed then
-            self.flight_stamina = self:memorize("flight_stamina", self.flight_stamina - 10)
+            self.flight_stamina = self:memorize("flight_stamina", math.max(self.flight_stamina - 10, 0))
         end
         self.alert_timer = self:memorize("alert_timer", 15)
         local puncher_name = puncher:get_player_name() or puncher:get_luaentity().name

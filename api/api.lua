@@ -1502,9 +1502,20 @@ waterdragon.wtd_api = {
 			if self.hp < (self.max_health * scale) then
 				self:heal(self.max_health / 5)
 			end
+			-- Restore some stamina when eating
+			local fly_stam = self.flight_stamina or 1200
+			local atk_stam = self.attack_stamina or 150
+			if fly_stam < 1200 then
+				fly_stam = math.min(fly_stam + 60, 1200)
+				self.flight_stamina = self:memorize("flight_stamina", fly_stam)
+			end
+			if atk_stam < 150 then
+				atk_stam = math.min(atk_stam + 10, 150)
+				self.attack_stamina = self:memorize("attack_stamina", atk_stam)
+			end
 			if self.hunger
 				and self.hunger < (self.max_health * 0.4) * scale then
-				self.hunger = self.hunger + 5
+				self.hunger = self.hunger + 15
 				self:memorize("hunger", self.hunger)
 			end
 			if item_name:find("cooked") then
@@ -2306,7 +2317,7 @@ function waterdragon.dragon_step(self, dtime)
 		local atk_stam = self.attack_stamina or 150
 		local alert_timer = self.alert_timer or 0
 		if is_flying
-			and not self.in_liquid then -- Drain Stamina when flying
+			and not self.in_liquid then -- Drain Stamina when flying, not when swimming
 			fly_stam = fly_stam - 1
 		else
 			if fly_stam < 300 then -- Regen Stamina when landed

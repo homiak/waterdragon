@@ -909,7 +909,10 @@ waterdragon.register_utility("waterdragon:sleep", function(self)
         
         minetest.after(1, function()
             if _self.flight_stamina < 300 then
-                _self.flight_stamina = math.min(_self.flight_stamina + (_self.flight_stamina * 0.2), 300)
+				if _self.flight_stamina < 0 then
+					_self.flight_stamina = 0
+				end
+                _self.flight_stamina = math.min(_self.flight_stamina + 60, 300)
                 func(_self) 
             end
         end)
