@@ -1464,12 +1464,10 @@ minetest.register_entity("waterdragon:wing_horn", {
 
 
 waterdragon.register_utility("waterdragon:attack", function(self, target)
-	if not self.fly_allowed then
-		-- If the Water Dragon is not allowed to fly
-		return
-	end
-	if self.target == self.object then return end
-	local is_landed = true
+	if self._target == self.object then return end
+	-- If fly is not allowed, force ground combat
+	local can_fly = self.fly_allowed
+	local is_landed = not can_fly
 	local init = false
 	local takeoff_init = false
 	local land_init = false
@@ -1484,13 +1482,8 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 			return true
 		end
 
-		if target:get_luaentity() and (target:get_luaentity().name == "waterdragon:pure_water_dragon" or target:get_luaentity().name == "waterdragon:rare_water_dragon" or target:get_luaentity().name == "pegasus:pegasus" or target:get_luaentity().name == "waterdragon:scottish_dragon" or target:get_luaentity().name == "winddragon:winddragon") then
-			_self._target = nil
-			return true
-		end
-
-		local target_alive, _, tgt_pos = _self:get_target(target)
-		if not target_alive then
+		local ent = target:get_luaentity()
+		if ent and (ent.name == "waterdragon:pure_water_dragon" or ent.name == "waterdragon:rare_water_dragon" or ent.name == "pegasus:pegasus" or ent.name == "waterdragon:scottish_dragon" or ent.name == "winddragon:winddragon") then
 			_self._target = nil
 			return true
 		end
@@ -1508,20 +1501,24 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 
 		if not _self:get_action() then
 			if not init then
-				local dist2floor = waterdragon.sensor_floor(_self, 7, true)
-				if dist2floor > 6 or waterdragon.is_target_flying(target) then
-					is_landed = false
+				if can_fly then
+					local dist2floor = waterdragon.sensor_floor(_self, 7, true)
+					if dist2floor > 6 or waterdragon.is_target_flying(target) then
+						is_landed = false
+					end
 				end
 				init = true
 			elseif switch_timer <= 0 then
-				local switch_chance = (is_landed and 6) or 3
-				is_landed = math.random(switch_chance) > 1
-				takeoff_init = not is_landed
-				land_init = is_landed
+				if can_fly then
+					local switch_chance = (is_landed and 6) or 3
+					is_landed = math.random(switch_chance) > 1
+					takeoff_init = not is_landed
+					land_init = is_landed
+				end
 				switch_timer = 20
 			end
 
-			if land_init then
+			if land_init and can_fly then
 				if not _self.touching_ground then
 					local pos2 = tgt_pos
 					if waterdragon.is_target_flying(target) then
@@ -1535,7 +1532,7 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 				return
 			end
 
-			if takeoff_init and _self.touching_ground then
+			if takeoff_init and can_fly and _self.touching_ground then
 				waterdragon.action_takeoff(_self)
 				takeoff_init = false
 				return
@@ -1545,22 +1542,21 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 			local attack_range = (is_landed and 8) or 16
 
 			if dist <= attack_range then
-				if math.random() < 0.3 then
-				else
-					if is_landed then
-						if fov_timer < 1 and target:is_player() then
-							waterdragon.action_repel(_self, target)
-						else
-							waterdragon.action_slam(_self, target)
-							is_landed = false
-							fov_timer = 0
-						end
+				if is_landed then
+					if fov_timer < 1 and target:is_player() then
+						waterdragon.action_repel(_self, target)
 					else
-						if math.random(3) < 2 then
-							waterdragon.action_flight_pure_water(_self, target, 12)
-						else
-							waterdragon.action_hover_water(_self, target, 3)
+						waterdragon.action_slam(_self, target)
+						if can_fly then
+							is_landed = false
 						end
+						fov_timer = 0
+					end
+				else
+					if math.random(3) < 2 then
+						waterdragon.action_flight_pure_water(_self, target, 12)
+					else
+						waterdragon.action_hover_water(_self, target, 3)
 					end
 				end
 			else

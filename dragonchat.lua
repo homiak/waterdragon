@@ -256,22 +256,48 @@ local dragonchat = {
 					return false, "I need more time to recover my strength."
 				end
 
-				if dragon.age < 25 then
+				if dragon.age and dragon.age < 25 then
 					return false, "I am too young to attack."
 				end
 
 				local pos = player:get_pos()
+				pos.y = pos.y + player:get_properties().eye_height
 				local look_dir = player:get_look_dir()
-				local target_pos = vector.add(pos, vector.multiply(look_dir, 20))
 
-				for _, obj in ipairs(minetest.get_objects_inside_radius(target_pos, 40)) do
-					local ent = obj:get_luaentity()
-					if ent and not (ent.name:match("^waterdragon:") or ent.name:match("^winddragon:") or obj:is_player()) then
-						dragon._target = obj
-						return true
+				-- Find best target: closest mob along look direction
+				local best_target = nil
+				local best_score = math.huge
+
+				for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 60)) do
+					if not obj:is_player() then
+						local ent = obj:get_luaentity()
+						if ent and not (ent.name:match("^waterdragon:") or ent.name:match("^winddragon:") or ent.name:match("^pegasus:")) then
+							local obj_pos = obj:get_pos()
+							if obj_pos then
+								local dir_to_obj = vector.direction(pos, obj_pos)
+								local dot = look_dir.x * dir_to_obj.x + look_dir.y * dir_to_obj.y + look_dir.z * dir_to_obj.z
+								local dist = vector.distance(pos, obj_pos)
+								-- Target must be roughly in front of the player (dot > 0.3 ~ within ~72 degrees)
+								if dot > 0.3 then
+									local score = dist * (1.1 - dot) -- Prefer close + aligned targets
+									if score < best_score then
+										best_score = score
+										best_target = obj
+									end
+								end
+							end
+						end
 					end
 				end
-				return false, "I see no worthy targets in that direction."
+
+				if not best_target then
+					return false, "I see no worthy targets in that direction."
+				end
+
+				dragon._target = best_target
+				-- Force attack utility to start immediately
+				dragon:initiate_utility("waterdragon:attack", dragon, best_target)
+				return true
 			end
 		},
 

@@ -1,7 +1,5 @@
 local special_dragon_names = {
-    ["Keallach"] = { health_bonus = 215, damage_bonus = 12, speed_bonus = 4, effect = "powerful" },
     ["Ceardach"] = { health_bonus = 200, damage_bonus = 10, speed_bonus = 3, effect = "powerful" },
-    ["Gillean"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
     ["Aon-Adharc"] = { health_bonus = 220, damage_bonus = 13, speed_bonus = 4, effect = "powerful" },
     ["Glenfinnan"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
     ["Tasglann"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 3, effect = "powerful" },
@@ -12,7 +10,7 @@ local special_dragon_names = {
     ["Teannarach"] = { health_bonus = 210, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
     ["Creagneach"] = { health_bonus = 250, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
     ["Cridheach-Teine"] = { health_bonus = 225, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
-    ["Deanach"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
+    ["Dearnach"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 4, effect = "powerful" },
     ["Teanndraigh"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 3, effect = "powerful" },
     ["Gleanach"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
     ["Kirnach"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
@@ -28,7 +26,7 @@ local special_dragon_names = {
     ["Dreaganach"] = { health_bonus = 250, damage_bonus = 15, speed_bonus = 4, effect = "powerful" },
     ["Cranach"] = { health_bonus = 210, damage_bonus = 11, speed_bonus = 3, effect = "powerful" },
     ["Teangach"] = { health_bonus = 230, damage_bonus = 13, speed_bonus = 4, effect = "powerful" },
-    ["Dallachan"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 3, effect = "powerful" },
+    ["Dalarach"] = { health_bonus = 205, damage_bonus = 10, speed_bonus = 3, effect = "powerful" },
     ["Kaldallan"] = { health_bonus = 240, damage_bonus = 14, speed_bonus = 4, effect = "powerful" },
     ["Tarraingeach"] = { health_bonus = 220, damage_bonus = 12, speed_bonus = 3, effect = "powerful" },
     ["Keangalach"] = { health_bonus = 215, damage_bonus = 11, speed_bonus = 4, effect = "powerful" },
@@ -77,7 +75,7 @@ local special_dragon_names = {
         speed_bonus = 8,
         effect = "powerful"
     },
-    ["Loch Nis"] = {
+    ["Ternach"] = {
         health_bonus = 200,
         damage_bonus = 10,
         speed_bonus = 8,
