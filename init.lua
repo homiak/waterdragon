@@ -55,6 +55,54 @@ waterdragon.colors_rare_water = {
     ["rare_water"] = "0f66f2"
 }
 
+-- Food --
+
+-- Everything a Dragon will accept as food. Mods tag their meat and fish very
+-- differently (some only set food_meat_raw, some only set meat), so every
+-- common group is listed here instead of relying on a single one.
+waterdragon.dragon_food = {
+    -- Meat
+    "group:meat",
+    "group:raw_meat",
+    "group:cooked_meat",
+    "group:food_meat",
+    "group:food_meat_raw",
+    "group:flesh",
+    -- Fish and other seafood
+    "group:fish",
+    "group:raw_fish",
+    "group:cooked_fish",
+    "group:food_fish",
+    "group:food_fish_raw",
+    "group:seafood",
+    "group:food_crab",
+    "group:food_shrimp",
+    -- Items from mods that tag no usable group of their own
+    "ethereal:fish_raw",
+    "ethereal:fish_cooked",
+    "fishing:fish_raw",
+    "fishing:fish_cooked",
+    "mobs_fish:clownfish",
+    "mobs_fish:tropical",
+    "xocean:fish_edible",
+}
+
+-- True if the named item is something a Dragon eats
+function waterdragon.is_dragon_food(item_name)
+    if not item_name or item_name == "" then return false end
+    for _, entry in ipairs(waterdragon.dragon_food) do
+        local group = entry:match("^group:(.+)$")
+        if group then
+            if minetest.get_item_group(item_name, group) > 0 then
+                return true
+            end
+        elseif item_name == entry then
+            return true
+        end
+    end
+    return false
+end
+
 waterdragon.global_nodes = {}
 
 waterdragon.global_nodes["pure_water"] = "default:water_flowing"

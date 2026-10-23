@@ -36,6 +36,79 @@ local function check_cooldown(player_name, command)
 	return true
 end
 
+-- Like check_cooldown, but it does not start the cooldown. Commands that can
+-- still fail after the check use this and call start_cooldown once they
+-- actually went through, so a failed order doesn't block the next attempt.
+local function peek_cooldown(player_name, command)
+	local cooldowns = player_cooldowns[player_name]
+	return not cooldowns or minetest.get_gametime() >= (cooldowns[command] or 0)
+end
+
+local function start_cooldown(player_name, command)
+	if not player_cooldowns[player_name] then
+		player_cooldowns[player_name] = {}
+	end
+	player_cooldowns[player_name][command] = minetest.get_gametime() + (command_cooldowns[command] or 0)
+end
+
+-- Something the Dragon can actually fight: a living mob, not an item, not a
+-- Dragon, not a mount
+local function is_attackable(object)
+	if not object or object:is_player() then return false end
+	local ent = object:get_luaentity()
+	if not ent or not ent.name then return false end
+	if ent.name:match("^waterdragon:")
+		or ent.name:match("^winddragon:")
+		or ent.name:match("^pegasus:") then
+		return false
+	end
+	-- Dropped items and other lifeless entities have no health, and an attack
+	-- on them ends the moment it starts
+	return waterdragon.is_alive(object)
+end
+
+-- The mob the player is pointing at. What they are looking straight at wins;
+-- otherwise the closest mob roughly in front of them is taken.
+local function find_attack_target(player)
+	local pos = player:get_pos()
+	pos.y = pos.y + player:get_properties().eye_height
+	local look_dir = player:get_look_dir()
+
+	local ray = minetest.raycast(pos, vector.add(pos, vector.multiply(look_dir, 120)), true, false)
+	for pointed in ray do
+		if pointed.type == "object" and is_attackable(pointed.ref) then
+			return pointed.ref
+		end
+		if pointed.type == "node" then
+			break -- The view is blocked from here on
+		end
+	end
+
+	local best_target = nil
+	local best_score = math.huge
+
+	for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 60)) do
+		if is_attackable(obj) then
+			local obj_pos = obj:get_pos()
+			if obj_pos then
+				local dir_to_obj = vector.direction(pos, obj_pos)
+				local dot = look_dir.x * dir_to_obj.x + look_dir.y * dir_to_obj.y + look_dir.z * dir_to_obj.z
+				local dist = vector.distance(pos, obj_pos)
+				-- Target must be roughly in front of the player (dot > 0.3 ~ within ~72 degrees)
+				if dot > 0.3 then
+					local score = dist * (1.1 - dot) -- Prefer close + aligned targets
+					if score < best_score then
+						best_score = score
+						best_target = obj
+					end
+				end
+			end
+		end
+	end
+
+	return best_target
+end
+
 -- Dragon dialogue options
 local dragonchat = {
 	greetings = {
@@ -252,7 +325,11 @@ local dragonchat = {
 			name = "attack",
 			response = "*The Dragon's eyes narrow, focusing on your target*",
 			action = function(dragon, player)
-				if not check_cooldown(player:get_player_name(), "attack") then
+				local name = player:get_player_name()
+				if dragon.owner and dragon.owner ~= name then
+					return false, "I take orders only from my chosen rider."
+				end
+				if not peek_cooldown(name, "attack") then
 					return false, "I need more time to recover my strength."
 				end
 
@@ -260,43 +337,19 @@ local dragonchat = {
 					return false, "I am too young to attack."
 				end
 
-				local pos = player:get_pos()
-				pos.y = pos.y + player:get_properties().eye_height
-				local look_dir = player:get_look_dir()
-
-				-- Find best target: closest mob along look direction
-				local best_target = nil
-				local best_score = math.huge
-
-				for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 60)) do
-					if not obj:is_player() then
-						local ent = obj:get_luaentity()
-						if ent and not (ent.name:match("^waterdragon:") or ent.name:match("^winddragon:") or ent.name:match("^pegasus:")) then
-							local obj_pos = obj:get_pos()
-							if obj_pos then
-								local dir_to_obj = vector.direction(pos, obj_pos)
-								local dot = look_dir.x * dir_to_obj.x + look_dir.y * dir_to_obj.y + look_dir.z * dir_to_obj.z
-								local dist = vector.distance(pos, obj_pos)
-								-- Target must be roughly in front of the player (dot > 0.3 ~ within ~72 degrees)
-								if dot > 0.3 then
-									local score = dist * (1.1 - dot) -- Prefer close + aligned targets
-									if score < best_score then
-										best_score = score
-										best_target = obj
-									end
-								end
-							end
-						end
-					end
-				end
-
-				if not best_target then
+				local target = find_attack_target(player)
+				if not target then
 					return false, "I see no worthy targets in that direction."
 				end
 
-				dragon._target = best_target
-				-- Force attack utility to start immediately
-				dragon:initiate_utility("waterdragon:attack", dragon, best_target)
+				start_cooldown(name, "attack")
+				-- Mark it as an ordered target, which outranks stay, follow and
+				-- the Dragon's stance in the behaviour stack
+				waterdragon.set_ordered_target(dragon, target)
+				-- Start attacking right away instead of waiting for the next
+				-- behaviour tick, with a score no other behaviour beats
+				dragon:initiate_utility(waterdragon.get_attack_utility(dragon), dragon, target)
+				dragon:set_utility_score(1.5)
 				return true
 			end
 		},
@@ -400,7 +453,8 @@ local dragonchat = {
 					action_stopped = true
 				end
 
-				if dragon._target then
+				if dragon._target or dragon._ordered_target then
+					waterdragon.clear_ordered_target(dragon)
 					dragon._target = nil
 					action_stopped = true
 				end
@@ -424,7 +478,7 @@ local dragonchat = {
 					local anim
 					-- Check attack stamina
 					if dragon.attack_stamina <= 0 then
-						return false, "I must rest to regain my breath power."
+						return false, "I must regain my breath power."
 					end
 
 					if not check_cooldown(player:get_player_name(), "attack") then
@@ -495,6 +549,7 @@ local dragonchat = {
 					return false, "I follow only my chosen rider."
 				end
 
+				waterdragon.clear_ordered_target(dragon)
 				dragon.order = "follow"
 				return true
 			end
@@ -508,25 +563,27 @@ local dragonchat = {
 					return false, "I take orders only from my chosen rider."
 				end
 
+				waterdragon.clear_ordered_target(dragon)
 				dragon.order = "stay"
 				return true
 			end
 		},
 		["wander"] = {
 			name = "wander",
-			response = "Thank you!",
+			response = "I will roam this place.",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
 					return false, "I take orders only from my chosen rider."
 				end
 
+				waterdragon.clear_ordered_target(dragon)
 				dragon.order = "wander"
 				return true
 			end
 		},
 		["i allow you to fly"] = {
 			name = "allow_fly",
-			response = "Thank you",
+			response = "I will fly alongside the storm.",
 			action = function(dragon, player)
 				if dragon.owner and dragon.owner ~= player:get_player_name() then
 					return false, "I take orders only from my chosen rider."
@@ -577,6 +634,7 @@ local dragonchat = {
 					return false, "I take orders only from my chosen rider."
 				end
 
+				waterdragon.clear_ordered_target(dragon)
 				flying_to_owner(dragon, player)
 				return true
 			end
@@ -1235,6 +1293,20 @@ local function process_dragon_chat(name, message)
 		end
 		return true
 	end
+	-- An attack is rarely ordered with the bare word, so take anything that
+	-- starts with it ("attack it", "attack that mob", "kill them")
+	if message:match("^attack") or message:match("^kill") then
+		local cmd = dragonchat.commands["attack"]
+		local success, error_msg = cmd.action(dragon, player)
+		if success then
+			minetest.chat_send_player(name, (dragon.nametag or "Dragon") .. ": " .. cmd.response)
+		else
+			minetest.chat_send_player(name,
+				(dragon.nametag or "Dragon") .. ": " .. (error_msg or "I cannot do that now."))
+		end
+		return true
+	end
+
 	-- Handle standard commands
 	for cmd_name, cmd in pairs(dragonchat.commands) do
 		if message == cmd_name then

@@ -4,6 +4,44 @@
 
 local S = waterdragon.S
 
+-- Ordered attacks
+
+-- How long an attack ordered through Dragon chat keeps priority over the
+-- Dragon's other behaviours (in seconds)
+local ordered_attack_time = 60
+
+-- The utility that makes a Dragon of this type attack
+function waterdragon.get_attack_utility(self)
+	if self.name == "waterdragon:scottish_dragon" then
+		return "waterdragon:scottish_dragon_attack"
+	end
+	return "waterdragon:attack"
+end
+
+function waterdragon.set_ordered_target(self, target)
+	self._target = target
+	self._ordered_target = target
+	self._ordered_target_expire = minetest.get_gametime() + ordered_attack_time
+end
+
+function waterdragon.clear_ordered_target(self)
+	self._ordered_target = nil
+	self._ordered_target_expire = nil
+end
+
+-- The target the owner ordered the Dragon to attack, as long as it is still
+-- alive and the order has not run out
+function waterdragon.get_ordered_target(self)
+	local target = self._ordered_target
+	if not target then return end
+	if not waterdragon.is_alive(target)
+		or minetest.get_gametime() > (self._ordered_target_expire or 0) then
+		waterdragon.clear_ordered_target(self)
+		return
+	end
+	return target
+end
+
 -- Bowing
 
 local bow_players = {}
@@ -732,7 +770,7 @@ minetest.register_entity("waterdragon:dragon_pure_water", {
 					local n_drops = table.copy(ent.drops)
 					for n = 1, #n_drops do
 						local name = n_drops[n].name
-						if minetest.get_item_group(name, "food_meat") > 0 then
+						if waterdragon.is_dragon_food(name) then
 							local output = minetest.get_craft_result({
 								method = "cooking",
 								width = 1,
@@ -2756,8 +2794,6 @@ end
 
 -- Register globalstep to manage healing water around Rare Water Dragons
 minetest.register_globalstep(function()
-	remove_healing_water()
-
 	for _, obj in pairs(minetest.luaentities) do
 		if obj.name == "waterdragon:rare_water_dragon" then
 			local pos = obj.object:get_pos()
@@ -2769,6 +2805,9 @@ minetest.register_globalstep(function()
 			end
 		end
 	end
+
+	-- Revert healing water once no rare water Dragon is nearby.
+	remove_healing_water()
 
 	-- Heal players in healing water
 	for _, player in ipairs(minetest.get_connected_players()) do
@@ -2789,9 +2828,9 @@ minetest.register_abm({
 	label = "Revert healing water",
 	nodenames = { "waterdragon:healing_water" },
 	interval = 1,
-	chance = 2,
+	chance = 1,
 	action = function(pos, node)
-		local objects = minetest.get_objects_inside_radius(pos, 200)
+		local objects = minetest.get_objects_inside_radius(pos, 8)
 		local rare_dragon_nearby = false
 		for _, obj in ipairs(objects) do
 			local ent = obj:get_luaentity()

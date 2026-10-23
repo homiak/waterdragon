@@ -60,9 +60,7 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
 		}
 	},
 	drops = {}, -- Set in on_activate
-	follow = {
-		"group:meat"
-	},
+	follow = waterdragon.dragon_food,
 	dynamic_anim_data = {
 		yaw_factor = 0.35,
 		swing_factor = -0.4,
@@ -264,7 +262,8 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
                     if pos then
                         for _, obj in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
                             local luaentity = obj:get_luaentity()
-                            if luaentity and luaentity.name ~= self.name and luaentity.groups and luaentity.groups.meat then
+                            if luaentity and luaentity.name == "__builtin:item" and luaentity.itemstring
+                                and waterdragon.is_dragon_food(ItemStack(luaentity.itemstring):get_name()) then
                                 -- Teleport meat to the Dragon
                                 obj:set_pos(vector.add(pos, { x = 0, y = 1, z = 0 }))
                                 found_meat = true
@@ -280,7 +279,7 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
                                 local inv = obj:get_inventory()
                                 if inv then
                                     for _, stack in ipairs(inv:get_list("main")) do
-                                        if minetest.get_item_group(stack:get_name(), "meat") > 0 then
+                                        if waterdragon.is_dragon_food(stack:get_name()) then
                                             -- Remove meat from the player's inventory and create its object near the Dragon
                                             inv:remove_item("main", stack:get_name())
                                             minetest.add_item(vector.add(pos, { x = 0, y = 1, z = 0 }), stack:get_name())
@@ -302,7 +301,7 @@ waterdragon.register_mob("waterdragon:scottish_dragon", {
                             local inv = meta:get_inventory()
                             if inv then
                                 for _, stack in ipairs(inv:get_list("main")) do
-                                    if minetest.get_item_group(stack:get_name(), "meat") > 0 then
+                                    if waterdragon.is_dragon_food(stack:get_name()) then
                                         -- Remove meat from the chest and create its object near the Dragon
                                         inv:remove_item("main", stack:get_name())
                                         minetest.add_item(vector.add(pos, { x = 4, y = 1, z = 0 }), stack:get_name())

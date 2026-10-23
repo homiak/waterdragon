@@ -1135,8 +1135,8 @@ waterdragon.register_utility("waterdragon:scottish_dragon_breaking", function(se
 		local item = player:get_wielded_item()
 		local item_name = item:get_name()
 		local def = minetest.registered_items[item_name]
-		local has_meat = minetest.get_item_group(item_name, "meat") == 1 or
-			minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
+		local has_meat = waterdragon.is_dragon_food(item_name)
+			or minetest.get_item_group(item_name, "cooked") == 1
 
 		-- Check if player has bowed and has meat
 		if not has_bowed_to_scottish_dragon(name, self) or not has_meat then
@@ -1232,8 +1232,8 @@ waterdragon.register_utility("waterdragon:wtd_breaking", function(self, player)
 		local item = player:get_wielded_item()
 		local item_name = item:get_name()
 		local def = minetest.registered_items[item_name]
-		local has_meat = minetest.get_item_group(item_name, "meat") == 1 or
-			minetest.get_item_group(item_name, "food_meat") == 1 or minetest.get_item_group(item_name, "cooked") == 1
+		local has_meat = waterdragon.is_dragon_food(item_name)
+			or minetest.get_item_group(item_name, "cooked") == 1
 
 		-- Check if player has bowed and has meat
 		if not has_bowed_to_dragon(name, self) or not has_meat then
@@ -1498,6 +1498,18 @@ waterdragon.register_utility("waterdragon:attack", function(self, target)
 		end
 
 		switch_timer = switch_timer - _self.dtime
+
+		-- An ordered attack on a distant target is flown, not walked
+		if can_fly
+			and waterdragon.get_ordered_target(_self) == target
+			and vec_dist(pos, tgt_pos) > 16 then
+			if is_landed then
+				is_landed = false
+				takeoff_init = true
+				land_init = false
+			end
+			switch_timer = 20
+		end
 
 		if not _self:get_action() then
 			if not init then
@@ -1956,6 +1968,13 @@ waterdragon.dragon_behavior = {
 			
 			local pos = self.object:get_pos()
 			if not pos then return end
+			-- A target the owner ordered through Dragon chat outranks every
+			-- other order, no matter the stance
+			local ordered = waterdragon.get_ordered_target(self)
+			if ordered then
+				self._target = ordered
+				return 1.5, { self, ordered }
+			end
 			local stance = (self.owner and self.stance) or "aggressive"
 			local skip = self.age < 15 or stance == "passive"
 			if skip then return 0 end -- Young/Passive Water Dragons don't attack
@@ -2259,6 +2278,11 @@ waterdragon.scottish_dragon_behavior = {
 		get_score = function(self)
 			local pos = self.object:get_pos()
 			if not pos then return end
+			local ordered = waterdragon.get_ordered_target(self)
+			if ordered then
+				self._target = ordered
+				return 1.5, { self, ordered }
+			end
 			local stance = (self.owner and self.stance) or "neutral"
 			if stance == "passive" then return 0 end
 			local target = self._target
