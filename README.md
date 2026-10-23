@@ -52,6 +52,7 @@ This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/drac
 ### Release v5.5.0
 - Fixed healing water flood bug
 - added Dragon Horn functionality for Scottish Dragons
+- added more foods for the Dragons to eat
 
 ### Release v5.3.0
 - Fix bugs
