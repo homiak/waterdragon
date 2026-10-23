@@ -45,11 +45,13 @@ Install via the `Luanti Mod Menu`, or download from [ContentDB Luanti](https://c
 
 More details can be found in the `Book about Water Dragons` — it's included in this mod, just search for it in your inventory.
 
-You’re also welcome to join the server at IP `85.215.240.79 - Scotland the Brave` to test everything in action.
-
-This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/draconis/) and [Creatura](https://content.luanti.org/packages/ElCeejo/creatura/) and created by **Scottii**.
+This mod is based on [Draconis](https://content.luanti.org/packages/ElCeejo/draconis/) and [Creatura](https://content.luanti.org/packages/ElCeejo/creatura/) and created by **Tarnagh**.
 
 # Release log
+
+### Release v5.5.0
+- Fixed healing water flood bug
+- added Dragon Horn functionality for Scottish Dragons
 
 ### Release v5.3.0
 - Fix bugs
