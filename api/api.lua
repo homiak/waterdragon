@@ -2096,6 +2096,61 @@ end)
 
 -- Water Dragon
 
+-- Global Dragon data. The Dragon Horn, the storage file and the bonding list
+-- all look a Dragon up by its wtd_id, so every kind of Dragon registers here
+-- when it activates. Returns true if the Dragon was removed because the Horn
+-- called it away from this spot.
+function waterdragon.register_dragon_data(self)
+	local global_data = waterdragon.waterdragons[self.wtd_id] or {}
+	if global_data.removal_queue
+		and #global_data.removal_queue > 0 then
+		for i = #global_data.removal_queue, 1, -1 do
+			if global_data.removal_queue[i]
+				and vector.equals(vec_round(global_data.removal_queue[i]), vec_round(self.object:get_pos())) then
+				waterdragon.waterdragons[self.wtd_id].removal_queue[i] = nil
+				self.object:remove()
+				return true
+			end
+		end
+	end
+	waterdragon.waterdragons[self.wtd_id] = {
+		last_pos = self.object:get_pos(),
+		owner = self.owner or nil,
+		staticdata = self:get_staticdata(),
+		removal_queue = global_data.removal_queue or {},
+		stored_in_item = global_data.stored_in_item or false
+	}
+	local owner = waterdragon.waterdragons[self.wtd_id].owner
+	if owner
+		and minetest.get_player_by_name(owner)
+		and (not waterdragon.bonded_wtd[owner]
+			or not is_value_in_table(waterdragon.bonded_wtd[owner], self.wtd_id)) then
+		waterdragon.bonded_wtd[owner] = waterdragon.bonded_wtd[owner] or {}
+		table.insert(waterdragon.bonded_wtd[owner], self.wtd_id)
+	end
+end
+
+-- Keeps the global Dragon data in step with the Dragon, and removes the Dragon
+-- once it has been stored in a Dragon Horn
+function waterdragon.update_dragon_data(self)
+	if self.hp <= 0 then
+		waterdragon.waterdragons[self.wtd_id] = nil
+		return
+	end
+	local global_data = waterdragon.waterdragons[self.wtd_id] or {}
+	waterdragon.waterdragons[self.wtd_id] = {
+		last_pos = self.object:get_pos(),
+		owner = self.owner or nil,
+		name = self.nametag or nil,
+		staticdata = self:get_staticdata(),
+		removal_queue = global_data.removal_queue or {},
+		stored_in_item = global_data.stored_in_item or false
+	}
+	if waterdragon.waterdragons[self.wtd_id].stored_in_item then
+		self.object:remove()
+	end
+end
+
 function waterdragon.dragon_activate(self)
 	if not self.object or not self.object:get_pos() then
 		return
@@ -2181,33 +2236,7 @@ function waterdragon.dragon_activate(self)
 		self.wtd_id = waterdragon.generate_id()
 		self:memorize("wtd_id", self.wtd_id)
 	end
-	local global_data = waterdragon.waterdragons[self.wtd_id] or {}
-	if global_data.removal_queue
-		and #global_data.removal_queue > 0 then
-		for i = #global_data.removal_queue, 1, -1 do
-			if global_data.removal_queue[i]
-				and vector.equals(vec_round(global_data.removal_queue[i]), vec_round(self.object:get_pos())) then
-				waterdragon.waterdragons[self.wtd_id].removal_queue[i] = nil
-				self.object:remove()
-				return
-			end
-		end
-	end
-	waterdragon.waterdragons[self.wtd_id] = {
-		last_pos = self.object:get_pos(),
-		owner = self.owner or nil,
-		staticdata = self:get_staticdata(),
-		removal_queue = global_data.removal_queue or {},
-		stored_in_item = global_data.stored_in_item or false
-	}
-	local owner = waterdragon.waterdragons[self.wtd_id].owner
-	if owner
-		and minetest.get_player_by_name(owner)
-		and (not waterdragon.bonded_wtd[owner]
-			or not is_value_in_table(waterdragon.bonded_wtd[owner], self.wtd_id)) then
-		waterdragon.bonded_wtd[owner] = waterdragon.bonded_wtd[owner] or {}
-		table.insert(waterdragon.bonded_wtd[owner], self.wtd_id)
-	end
+	if waterdragon.register_dragon_data(self) then return end
 end
 
 -------------
@@ -2254,10 +2283,13 @@ function waterdragon.scottish_dragon_activate(self)
 	end
 	self.scottish_eye_colour = self:recall("scottish_eye_colour")
 	self.attack_cooldown = {}
+	self.scottish_id = self:recall("scottish_id") or 1
 	if self.scottish_id == 1 then
 		self.scottish_id = waterdragon.generate_scottish_id()
 		self:memorize("scottish_id", self.scottish_id)
 	end
+	-- The Dragon Horn and the global Dragon data work off wtd_id
+	self.wtd_id = self.scottish_id
 	-- Tamed Data
 	self.rider = nil
 	self.owner = self:recall("owner") or false
@@ -2278,6 +2310,7 @@ function waterdragon.scottish_dragon_activate(self)
 	self.flap_sound_timer = 5.0
 	self.flap_sound_played = false
 	waterdragon.scottish_dragons[self.object] = { owner = self.owner }
+	if waterdragon.register_dragon_data(self) then return end
 end
 
 -- Water Dragon
@@ -2394,22 +2427,7 @@ function waterdragon.dragon_step(self, dtime)
 		end
 	end
 	-- Global Info
-	if self.hp <= 0 then
-		waterdragon.waterdragons[self.wtd_id] = nil
-		return
-	end
-	local global_data = waterdragon.waterdragons[self.wtd_id] or {}
-	waterdragon.waterdragons[self.wtd_id] = {
-		last_pos = self.object:get_pos(),
-		owner = self.owner or nil,
-		name = self.nametag or nil,
-		staticdata = self:get_staticdata(),
-		removal_queue = global_data.removal_queue or {},
-		stored_in_item = global_data.stored_in_item or false
-	}
-	if waterdragon.waterdragons[self.wtd_id].stored_in_item then
-		self.object:remove()
-	end
+	waterdragon.update_dragon_data(self)
 end
 
 -------------------
@@ -2519,6 +2537,8 @@ function waterdragon.scottish_dragon_step(self, dtime)
 	if not waterdragon.scottish_dragons[self.object] then
 		waterdragon.scottish_dragons[self.object] = { owner = self.owner }
 	end
+	-- Global Info
+	waterdragon.update_dragon_data(self)
 end
 
 -- Scottish Dragon

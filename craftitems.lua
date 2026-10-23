@@ -45,11 +45,12 @@ local function infotext(str, format)
 end
 
 local function get_horn_desc(self)
+	local nameless = "a Nameless " .. correct_name(self.name)
 	local info = S("Dragon Horn\n") .. minetest.colorize("#bdd9ff", correct_name(self.name))
 	if self.nametag == "" then
-		info = info .. "\n" .. infotext("a Nameless Water Dragon")
+		info = info .. "\n" .. infotext(nameless)
 	else
-		info = info .. "\n" .. infotext(self.nametag or "a Nameless Water Dragon")
+		info = info .. "\n" .. infotext(self.nametag or nameless)
 	end
 	if self.age then
 		info = info .. "\n" .. infotext(self.age) .. " Year(s) old"
@@ -763,13 +764,17 @@ local function capture(player, ent)
 		meta:set_string("mob", ent.name)
 		meta:set_string("wtd_id", ent.wtd_id)
 		meta:set_string("staticdata", ent:get_staticdata())
-		meta:set_string("nametag", ent.nametag or "a Nameless Water Dragon")
+		meta:set_string("nametag", ent.nametag or ("a Nameless " .. correct_name(ent.name)))
 		meta:set_string("description", get_horn_desc(ent))
 		if stored_aging > 0 then
 			meta:set_int("timestamp", os.time())
 		end
 		player:set_wielded_item(stack)
-		waterdragon.waterdragons[ent.wtd_id].stored_in_item = true
+		local global_data = waterdragon.waterdragons[ent.wtd_id] or {}
+		global_data.removal_queue = global_data.removal_queue or {}
+		global_data.staticdata = global_data.staticdata or ent:get_staticdata()
+		global_data.stored_in_item = true
+		waterdragon.waterdragons[ent.wtd_id] = global_data
 		ent.object:remove()
 		waterdragon.force_storage_save = true
 		return stack
@@ -863,7 +868,7 @@ local function dragon_horn_place(itemstack, player, pointed_thing)
 		pos.y = pos.y + 3
 		local mob = meta:get_string("mob")
 		local staticdata = meta:get_string("staticdata")
-		local nametag = meta:get_string("nametag") or "a Nameless Water Dragon"
+		local nametag = meta:get_string("nametag")
 		local id = meta:get_string("wtd_id")
 		if not waterdragon.waterdragons[id] then -- Clear data if linked Water Dragon is dead
 			meta:set_string("mob", nil)
@@ -892,7 +897,9 @@ local function dragon_horn_place(itemstack, player, pointed_thing)
 			end
 			meta:set_string("staticdata", nil)
 			meta:set_string("description", desc)
-			if meta:get_int("timestamp") > 0 then
+			if ent
+				and ent:get_luaentity()
+				and meta:get_int("timestamp") > 0 then
 				local time = meta:get_int("timestamp")
 				local diff = os.time() - time
 				ent:get_luaentity().time_in_horn = diff
